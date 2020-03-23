@@ -49,6 +49,11 @@ The entry point to the library is the `Backstack` composable.
 
 There is a sample app in the `sample` module that demonstrates various transition animations and
 the behavior with different backstacks.
+
+![Slide Transition](.images/sample-slide.gif)
+![Crossfade Transition](.images/sample-crossfade.gif)
+![Custom Transition](.images/sample-custom.gif)
+
 ## Gradle
 
 `compose-backstack` is available from Jitpack:
