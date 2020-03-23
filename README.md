@@ -6,7 +6,7 @@ backstacks of screens and animated transitions when the stack changes. It is _no
 library, although it is meant to be easy to plug into your navigation library of choice
 (e.g. [compose-router](https://github.com/zsoltk/compose-router)), or even just use on its own.
 
-This library is compatible with Compose dev06.
+This library is compatible with Compose dev07.
 
 ## Usage
 
@@ -62,6 +62,6 @@ allprojects {
 }
 
 dependencies {
-    implementation 'com.github.zach-klippenstein:compose-backstack:0.1.0'
+    implementation 'com.github.zach-klippenstein:compose-backstack:0.2.0'
 }
 ```
