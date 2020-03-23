@@ -73,7 +73,7 @@ fun App() {
                 }
 
                 Text("Backstack:")
-                RadioGroup() {
+                RadioGroup {
                     backstacks.forEach { backstack ->
                         RadioGroupTextItem(
                             text = backstack.first,
