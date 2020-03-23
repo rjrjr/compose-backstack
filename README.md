@@ -1,5 +1,6 @@
 # compose-backstack
 [![](https://jitpack.io/v/zach-klippenstein/compose-backstack.svg)](https://jitpack.io/#zach-klippenstein/compose-backstack)
+[![GitHub license](https://img.shields.io/badge/license-Apache%20License%202.0-blue.svg?style=flat)](https://www.apache.org/licenses/LICENSE-2.0)
 
 Simple library for [Jetpack Compose](https://developer.android.com/jetpack/compose) for rendering
 backstacks of screens and animated transitions when the stack changes. It is _not_ a navigation
