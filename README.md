@@ -10,7 +10,22 @@ This library is compatible with Compose dev07.
 
 ## Usage
 
-The entry point to the library is the `Backstack` composable.
+The entry point to the library is the `Backstack` composable. It essentially looks like this:
+
+```kotlin
+@Composable fun <T : Any> Backstack(
+    backstack: List<T>,
+    drawScreen: @Composable() (T) -> Unit
+)
+```
+
+The API is very similar to a lot of composables that draw lists: it takes a list of keys and a
+composable function that knows how to draw a key. In this case, a key represents a distinct screen
+in the backstack. When the top key in the stack changes between compose passes, the screens will
+be animated with a transition.
+
+The actual API takes a few more parameters, e.g. to allow custom animations. See the
+[source kdoc](backstack/src/main/java/com/zachklipp/compose/backstack/Backstack.kt) for details!
 
 ## Example
 
