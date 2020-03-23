@@ -3,14 +3,14 @@
 package com.zachklipp.compose.backstack
 
 import androidx.compose.Composable
-import androidx.ui.core.DrawModifier
 import androidx.ui.core.LayoutDirection
 import androidx.ui.core.LayoutModifier
 import androidx.ui.core.Modifier
-import androidx.ui.graphics.Canvas
-import androidx.ui.graphics.Paint
-import androidx.ui.graphics.withSaveLayer
-import androidx.ui.unit.*
+import androidx.ui.core.drawOpacity
+import androidx.ui.unit.Density
+import androidx.ui.unit.IntPxPosition
+import androidx.ui.unit.IntPxSize
+import androidx.ui.unit.ipx
 import com.zachklipp.compose.backstack.BackstackTransition.Crossfade
 import com.zachklipp.compose.backstack.BackstackTransition.Slide
 
@@ -74,20 +74,6 @@ interface BackstackTransition {
         override fun modifierForScreen(
             visibility: Float,
             isTop: Boolean
-        ): Modifier = OpacityModifier(visibility)
-
-        // Note: In dev07 this modifier is built-in as drawOpacity.
-        private class OpacityModifier(opacity: Float) : DrawModifier {
-            private val paint = Paint().also { it.alpha = opacity }
-
-            override fun draw(
-                density: Density,
-                drawContent: () -> Unit,
-                canvas: Canvas,
-                size: PxSize
-            ) {
-                canvas.withSaveLayer(size.toRect(), paint, drawContent)
-            }
-        }
+        ): Modifier = drawOpacity(visibility)
     }
 }
