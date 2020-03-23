@@ -60,6 +60,7 @@ buildscript {
       ],
       kotlin: [
           binaryCompatibilityValidatorPlugin: "org.jetbrains.kotlinx:binary-compatibility-validator:0.2.1",
+          dokka: "org.jetbrains.dokka:dokka-gradle-plugin:0.10.0",
           gradlePlugin: "org.jetbrains.kotlin:kotlin-gradle-plugin:${versions.kotlin}",
           stdlib: "org.jetbrains.kotlin:kotlin-stdlib-jdk8",
           reflect: "org.jetbrains.kotlin:kotlin-reflect:${versions.kotlin}",
@@ -70,7 +71,6 @@ buildscript {
               mockito: "com.nhaarman:mockito-kotlin-kt1.1:1.6.0"
           ]
       ],
-      mavenPublish: "com.vanniktech:gradle-maven-publish-plugin:0.9.0",
       ktlint: "org.jlleitschuh.gradle:ktlint-gradle:9.2.0",
   ]
 
@@ -82,6 +82,7 @@ buildscript {
 
   dependencies {
     classpath deps.android_gradle_plugin
+    classpath deps.kotlin.dokka
     classpath deps.kotlin.gradlePlugin
     classpath deps.ktlint
   }
