@@ -11,9 +11,9 @@ import androidx.compose.key
 import androidx.compose.remember
 import androidx.compose.state
 import androidx.ui.animation.animatedFloat
-import androidx.ui.core.Clip
 import androidx.ui.core.ContextAmbient
 import androidx.ui.core.Modifier
+import androidx.ui.core.drawClip
 import androidx.ui.foundation.Box
 import androidx.ui.foundation.shape.RectangleShape
 import androidx.ui.layout.Stack
@@ -219,24 +219,21 @@ fun <T : Any> Backstack(
     }
 
     // Actually draw the screens.
-    Stack(modifier = modifier) {
-        // Note: in dev07, this Clip should be replaceable with DrawClipToBounds.
-        Clip(RectangleShape) {
-            activeStackDrawers.forEach { (item, transition) ->
-                // Key is a convenience helper that treats its arguments as @Pivotal. This is how state
-                // preservation is implemented. Even if screens are moved around within the list, as long
-                // as they're invoked through the exact same sequence of source locations from within this
-                // key lambda, they will keep their state.
-                key(item) {
-                    // Cache the composable that actually draws this item so it's not recomposed if the
-                    // backstack doesn't change. This helps performance with long backstacks.
-                    // We don't need to pass item to remember because key guarantees that it won't change
-                    // within this part of the composition.
-                    val drawItem: @Composable() () -> Unit = remember {
-                        @Composable { drawScreen(item) }
-                    }
-                    transition(transitionProgress.value, drawItem)
+    Stack(modifier = modifier + drawClip(RectangleShape)) {
+        activeStackDrawers.forEach { (item, transition) ->
+            // Key is a convenience helper that treats its arguments as @Pivotal. This is how state
+            // preservation is implemented. Even if screens are moved around within the list, as long
+            // as they're invoked through the exact same sequence of source locations from within this
+            // key lambda, they will keep their state.
+            key(item) {
+                // Cache the composable that actually draws this item so it's not recomposed if the
+                // backstack doesn't change. This helps performance with long backstacks.
+                // We don't need to pass item to remember because key guarantees that it won't change
+                // within this part of the composition.
+                val drawItem: @Composable() () -> Unit = remember {
+                    @Composable { drawScreen(item) }
                 }
+                transition(transitionProgress.value, drawItem)
             }
         }
     }

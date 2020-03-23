@@ -7,12 +7,12 @@ import androidx.compose.state
 import androidx.ui.foundation.Box
 import androidx.ui.foundation.Clickable
 import androidx.ui.foundation.Dialog
-import androidx.ui.graphics.vector.DrawVector
+import androidx.ui.graphics.vector.drawVector
 import androidx.ui.layout.*
+import androidx.ui.material.Surface
 import androidx.ui.material.icons.Icons
 import androidx.ui.material.icons.filled.ArrowDropDown
 import androidx.ui.material.ripple.Ripple
-import androidx.ui.material.surface.Surface
 import androidx.ui.unit.dp
 
 /**
@@ -34,11 +34,15 @@ fun <T : Any> Spinner(
         Ripple(bounded = true) {
             Clickable(onClick = { isOpen = !isOpen }) {
                 Row {
-                    Box(modifier = LayoutFlexible(1f)) {
+                    Box(modifier = LayoutWeight(1f)) {
                         drawItem(selectedItem)
                     }
-                    Box(modifier = LayoutWidth(48.dp) + LayoutAspectRatio(1f) + LayoutGravity.Center) {
-                        DrawVector(vectorImage = Icons.Default.ArrowDropDown)
+                    Box(
+                        modifier = LayoutWidth(48.dp) +
+                                LayoutAspectRatio(1f) +
+                                LayoutGravity.Center +
+                                drawVector(vectorImage = Icons.Default.ArrowDropDown)
+                    ) {
                     }
                 }
             }

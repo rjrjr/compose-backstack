@@ -4,9 +4,9 @@ package com.zachklipp.compose.backstack
 
 import androidx.compose.Composable
 import androidx.ui.core.DrawModifier
+import androidx.ui.core.LayoutDirection
 import androidx.ui.core.LayoutModifier
 import androidx.ui.core.Modifier
-import androidx.ui.core.ModifierScope
 import androidx.ui.graphics.Canvas
 import androidx.ui.graphics.Paint
 import androidx.ui.graphics.withSaveLayer
@@ -51,11 +51,11 @@ interface BackstackTransition {
             offset = if (isTop) 1f - visibility else -1 + visibility
         )
 
-        // Note: In dev07, use LayoutOffset modifier instead.
         private class PercentageLayoutOffset(private val offset: Float) : LayoutModifier {
-            override fun ModifierScope.modifyPosition(
+            override fun Density.modifyPosition(
                 childSize: IntPxSize,
-                containerSize: IntPxSize
+                containerSize: IntPxSize,
+                layoutDirection: LayoutDirection
             ): IntPxPosition {
                 val realOffset = offset.coerceIn(-1f..1f)
                 return IntPxPosition(
