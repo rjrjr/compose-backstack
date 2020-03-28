@@ -1,3 +1,5 @@
-include ':backstack'
-include ':sample'
+include(
+    ":backstack",
+    ":sample"
+)
 rootProject.name = "compose-backstack"

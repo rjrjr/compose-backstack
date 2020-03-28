@@ -1,12 +1,13 @@
-apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
-apply plugin: 'org.jetbrains.dokka'
-
-android rootProject.ext.defaultAndroidConfig
+plugins {
+    id("com.android.library")
+    id("default-android-config")
+    kotlin("android")
+    id("org.jetbrains.dokka")
+}
 
 dependencies {
-  compileOnly deps.compose.tooling
+    compileOnly(Dependencies.Compose.tooling)
 
-  implementation deps.kotlin.stdlib
-  implementation deps.compose.foundation
+    implementation(Dependencies.Kotlin.stdlib)
+    implementation(Dependencies.Compose.foundation)
 }
