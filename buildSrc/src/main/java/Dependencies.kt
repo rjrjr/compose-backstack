@@ -30,6 +30,8 @@ object Dependencies {
         const val savedstate = "androidx.savedstate:savedstate:1.0.0"
         const val transition = "androidx.transition:transition:1.3.1"
         const val viewbinding = "androidx.databinding:viewbinding:3.6.1"
+
+        const val junitExt = "androidx.test.ext:junit:1.1.1"
     }
 
     object Compose {
@@ -55,6 +57,11 @@ object Dependencies {
             const val jdk = "org.jetbrains.kotlin:kotlin-test-junit"
             const val mockito = "com.nhaarman:mockito-kotlin-kt1.1:1.6.0"
         }
+    }
+
+    object Test {
+        const val junit = "junit:junit:4.13"
+        const val truth = "com.google.truth:truth:1.0.1"
     }
 
     const val ktlint = "org.jlleitschuh.gradle:ktlint-gradle:9.2.0"

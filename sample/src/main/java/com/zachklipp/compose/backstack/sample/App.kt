@@ -38,13 +38,6 @@ private val backstackTransitions = listOf(
     "Fancy" to FancyTransition
 )
 
-//@Composable
-//fun App() {
-//    Center {
-//        Text("Hi")
-//    }
-//}
-
 @Composable
 fun App() {
     MaterialTheme(colors = darkColorPalette()) {
@@ -130,7 +123,6 @@ fun AppPreview() {
 }
 
 private object FancyTransition : BackstackTransition {
-    @Composable
     override fun modifierForScreen(
         visibility: Float,
         isTop: Boolean

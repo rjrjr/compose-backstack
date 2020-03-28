@@ -10,4 +10,11 @@ dependencies {
 
     implementation(Dependencies.Kotlin.stdlib)
     implementation(Dependencies.Compose.foundation)
+
+    testImplementation(Dependencies.Test.junit)
+    testImplementation(Dependencies.Test.truth)
+
+    androidTestImplementation(Dependencies.AndroidX.junitExt)
+    androidTestImplementation(Dependencies.Compose.test)
+    androidTestImplementation(Dependencies.Test.truth)
 }

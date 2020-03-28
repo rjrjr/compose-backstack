@@ -6,7 +6,7 @@ plugins {
 
 android {
     defaultConfig {
-        applicationId = "com.zachklipp.compose.backstack"
+        applicationId = "com.zachklipp.compose.backstack.sample"
     }
 }
 
@@ -18,4 +18,7 @@ dependencies {
     implementation(Dependencies.Compose.material)
     implementation(Dependencies.Compose.tooling)
     implementation(Dependencies.Kotlin.stdlib)
+
+    androidTestImplementation(Dependencies.AndroidX.junitExt)
+    androidTestImplementation(Dependencies.Compose.test)
 }

@@ -2,7 +2,6 @@
 
 package com.zachklipp.compose.backstack
 
-import androidx.compose.Composable
 import androidx.ui.core.LayoutDirection
 import androidx.ui.core.LayoutModifier
 import androidx.ui.core.Modifier
@@ -33,7 +32,6 @@ interface BackstackTransition {
      * visible, then the top screen is always transitioning _out_, and non-top screens are either
      * transitioning out or invisible.
      */
-    @Composable
     fun modifierForScreen(
         visibility: Float,
         isTop: Boolean
@@ -43,7 +41,6 @@ interface BackstackTransition {
      * A simple transition that slides screens horizontally.
      */
     object Slide : BackstackTransition {
-        @Composable
         override fun modifierForScreen(
             visibility: Float,
             isTop: Boolean
@@ -57,7 +54,7 @@ interface BackstackTransition {
                 containerSize: IntPxSize,
                 layoutDirection: LayoutDirection
             ): IntPxPosition {
-                val realOffset = offset.coerceIn(-1f..1f)
+                var realOffset = offset.coerceIn(-1f..1f)
                 return IntPxPosition(
                     x = containerSize.width * realOffset,
                     y = 0.ipx
@@ -70,7 +67,6 @@ interface BackstackTransition {
      * A simple transition that crossfades between screens.
      */
     object Crossfade : BackstackTransition {
-        @Composable
         override fun modifierForScreen(
             visibility: Float,
             isTop: Boolean
