@@ -1,45 +1,33 @@
 package com.zachklipp.compose.backstack.sample
 
-import androidx.ui.core.DrawModifier
 import androidx.ui.core.Modifier
-import androidx.ui.graphics.Canvas
-import androidx.ui.graphics.withSave
-import androidx.ui.unit.Density
-import androidx.ui.unit.PxSize
+import androidx.ui.core.drawLayer
+import androidx.ui.unit.lerp
+import androidx.ui.unit.px
 import com.zachklipp.compose.backstack.BackstackTransition
+import com.zachklipp.compose.backstack.BackstackTransition.Crossfade
+import com.zachklipp.compose.backstack.BackstackTransition.Slide
 import kotlin.math.pow
 
-internal object FancyTransition : BackstackTransition {
+/**
+ * Example of a custom transition that combines the existing [Crossfade] and [Slide] transitions
+ * with some additional math and other transformations.
+ */
+object FancyTransition : BackstackTransition {
     override fun modifierForScreen(
         visibility: Float,
         isTop: Boolean
     ): Modifier {
         return if (isTop) {
-            BackstackTransition.Slide.modifierForScreen(visibility.pow(1.1f), isTop) +
-                    BackstackTransition.Crossfade.modifierForScreen(visibility.pow(.1f), isTop)
+            // Start sliding in from the middle to reduce the motion a bit.
+            val slideVisibility = lerp(.5.px, 1.px, visibility).value
+            Slide.modifierForScreen(slideVisibility, isTop) +
+                    Crossfade.modifierForScreen(visibility, isTop)
         } else {
-            ScaleModifier(visibility.pow(.1f)) +
-                    BackstackTransition.Crossfade.modifierForScreen(visibility.pow(.5f), isTop)
-        }
-    }
-
-    private class ScaleModifier(private val factor: Float) :
-        DrawModifier {
-        override fun draw(
-            density: Density,
-            drawContent: () -> Unit,
-            canvas: Canvas,
-            size: PxSize
-        ) {
-            val halfWidth = size.width.value / 2
-            val halfHeight = size.height.value / 2
-
-            canvas.withSave {
-                canvas.translate(halfWidth, halfHeight)
-                canvas.scale(factor)
-                canvas.translate(-halfWidth, -halfHeight)
-                drawContent()
-            }
+            // Move the non-top screen back, but only a little.
+            val scaleVisibility = lerp(.9.px, 1.px, visibility).value
+            drawLayer(scaleX = scaleVisibility, scaleY = scaleVisibility) +
+                    Crossfade.modifierForScreen(visibility.pow(.5f), isTop)
         }
     }
 }
