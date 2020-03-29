@@ -55,6 +55,7 @@ interface BackstackTransition {
                 layoutDirection: LayoutDirection
             ): IntPxPosition {
                 var realOffset = offset.coerceIn(-1f..1f)
+                if (layoutDirection == LayoutDirection.Rtl) realOffset *= -1f
                 return IntPxPosition(
                     x = containerSize.width * realOffset,
                     y = 0.ipx

@@ -44,6 +44,38 @@ class SlideTransitionTest {
             .isEqualTo(0, 0)
     }
 
+    @Test
+    fun `modifies position when rtl going backwards`() {
+        val isTop = false
+        val layoutDirection = LayoutDirection.Rtl
+        assertThat(Slide.applyModifiedPosition(0f, containerSize, isTop, layoutDirection))
+            .isEqualTo(100, 0)
+        assertThat(Slide.applyModifiedPosition(.25f, containerSize, isTop, layoutDirection))
+            .isEqualTo(75, 0)
+        assertThat(Slide.applyModifiedPosition(.5f, containerSize, isTop, layoutDirection))
+            .isEqualTo(50, 0)
+        assertThat(Slide.applyModifiedPosition(.75f, containerSize, isTop, layoutDirection))
+            .isEqualTo(25, 0)
+        assertThat(Slide.applyModifiedPosition(1f, containerSize, isTop, layoutDirection))
+            .isEqualTo(0, 0)
+    }
+
+    @Test
+    fun `modifies position when rtl and top going forwards`() {
+        val isTop = true
+        val layoutDirection = LayoutDirection.Rtl
+        assertThat(Slide.applyModifiedPosition(0f, containerSize, isTop, layoutDirection))
+            .isEqualTo(-100, 0)
+        assertThat(Slide.applyModifiedPosition(.25f, containerSize, isTop, layoutDirection))
+            .isEqualTo(-75, 0)
+        assertThat(Slide.applyModifiedPosition(.5f, containerSize, isTop, layoutDirection))
+            .isEqualTo(-50, 0)
+        assertThat(Slide.applyModifiedPosition(.75f, containerSize, isTop, layoutDirection))
+            .isEqualTo(-25, 0)
+        assertThat(Slide.applyModifiedPosition(1f, containerSize, isTop, layoutDirection))
+            .isEqualTo(0, 0)
+    }
+
     private fun BackstackTransition.applyModifiedPosition(
         visibility: Float,
         containerSize: IntPxSize,
