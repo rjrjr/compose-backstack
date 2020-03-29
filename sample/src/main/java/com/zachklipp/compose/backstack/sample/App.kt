@@ -6,24 +6,16 @@ import androidx.animation.TweenBuilder
 import androidx.compose.Composable
 import androidx.compose.remember
 import androidx.compose.state
-import androidx.ui.core.DrawModifier
-import androidx.ui.core.Modifier
 import androidx.ui.core.Text
 import androidx.ui.foundation.DrawBorder
-import androidx.ui.graphics.Canvas
 import androidx.ui.graphics.Color
-import androidx.ui.graphics.withSave
 import androidx.ui.layout.*
 import androidx.ui.material.*
 import androidx.ui.tooling.preview.Preview
-import androidx.ui.unit.Density
-import androidx.ui.unit.PxSize
 import androidx.ui.unit.dp
 import com.zachklipp.compose.backstack.Backstack
-import com.zachklipp.compose.backstack.BackstackTransition
 import com.zachklipp.compose.backstack.BackstackTransition.Crossfade
 import com.zachklipp.compose.backstack.BackstackTransition.Slide
-import kotlin.math.pow
 
 private val backstacks = listOf(
     listOf("one"),
@@ -120,38 +112,4 @@ fun App() {
 @Composable
 fun AppPreview() {
     App()
-}
-
-private object FancyTransition : BackstackTransition {
-    override fun modifierForScreen(
-        visibility: Float,
-        isTop: Boolean
-    ): Modifier {
-        return if (isTop) {
-            Slide.modifierForScreen(visibility.pow(1.1f), isTop) +
-                    Crossfade.modifierForScreen(visibility.pow(.1f), isTop)
-        } else {
-            ScaleModifier(visibility.pow(.1f)) +
-                    Crossfade.modifierForScreen(visibility.pow(.5f), isTop)
-        }
-    }
-
-    private class ScaleModifier(private val factor: Float) : DrawModifier {
-        override fun draw(
-            density: Density,
-            drawContent: () -> Unit,
-            canvas: Canvas,
-            size: PxSize
-        ) {
-            val halfWidth = size.width.value / 2
-            val halfHeight = size.height.value / 2
-
-            canvas.withSave {
-                canvas.translate(halfWidth, halfHeight)
-                canvas.scale(factor)
-                canvas.translate(-halfWidth, -halfHeight)
-                drawContent()
-            }
-        }
-    }
 }
