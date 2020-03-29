@@ -19,3 +19,5 @@ jobs:
         java-version: 1.8
     - name: Build with Gradle
       run: ./gradlew build
+    - name: Android UI Tests
+      uses: vgaidarji/android-github-actions-emulator@v1.0.1
