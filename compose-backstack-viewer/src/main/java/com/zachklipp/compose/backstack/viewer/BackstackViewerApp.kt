@@ -158,12 +158,13 @@ private fun AppScreens(model: AppModel) {
     } else null
 
     MaterialTheme(colors = lightColorPalette()) {
-        InspectionGestureDetector(enabled = model.inspectionEnabled) {
+        InspectionGestureDetector(enabled = model.inspectionEnabled) { inspectionParams ->
             Backstack(
                 backstack = model.selectedBackstack.second,
                 transition = model.selectedTransition.second,
                 animationBuilder = animation,
                 modifier = LayoutSize.Fill + DrawBorder(size = 3.dp, color = Color.Red),
+                inspectionParams = inspectionParams,
                 onTransitionStarting = { from, to, direction ->
                     println(
                         """
