@@ -1,5 +1,5 @@
 # compose-backstack
-[![](https://jitpack.io/v/zach-klippenstein/compose-backstack.svg)](https://jitpack.io/#zach-klippenstein/compose-backstack)
+[![Maven Central](https://img.shields.io/maven-central/v/com.zachklipp/compose-backstack.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:com.zachklipp%20a:compose-backstack)
 [![GitHub license](https://img.shields.io/badge/license-Apache%20License%202.0-blue.svg?style=flat)](https://www.apache.org/licenses/LICENSE-2.0)
 
 Simple library for [Jetpack Compose](https://developer.android.com/jetpack/compose) for rendering
@@ -122,17 +122,19 @@ the behavior with different backstacks.
 
 ## Gradle
 
-`compose-backstack` is available from Jitpack:
+`compose-backstack` is on Maven Central:
 
 ```
 allprojects {
     repositories {
-        …
-        maven { url 'https://jitpack.io' }
+        mavenCentral()
     }
 }
 
 dependencies {
-    implementation 'com.github.zach-klippenstein:compose-backstack:0.2.0'
+    implementation 'com.zachklipp:compose-backstack:0.3.0'
+
+    // For BackstackViewerApp.
+    debugImplementation 'com.zachklipp:compose-backstack-viewer:0.3.0'
 }
 ```
