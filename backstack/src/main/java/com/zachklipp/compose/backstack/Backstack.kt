@@ -11,6 +11,7 @@ import androidx.compose.key
 import androidx.compose.remember
 import androidx.compose.state
 import androidx.ui.animation.animatedFloat
+import androidx.ui.core.AnimationClockAmbient
 import androidx.ui.core.ContextAmbient
 import androidx.ui.core.Modifier
 import androidx.ui.core.drawClip
@@ -103,6 +104,10 @@ private val DefaultBackstackAnimation: AnimationBuilder<Float>
  * @param animationBuilder Defines the curve and speed of transition animations.
  * @param onTransitionStarting Callback that will be invoked before starting each transition.
  * @param onTransitionFinished Callback that will be invoked after each transition finishes.
+ * @param inspectionParams Optional [InspectionParams] that, when not null, enables inspection mode,
+ * which will draw all the screens in the backstack as a translucent 3D stack. You can wrap your
+ * backstack with [InspectionGestureDetector] to automatically generate [InspectionParams]
+ * controlled by touch gestures.
  * @param drawScreen Called with each element of [backstack] to render it.
  */
 @Composable
@@ -113,6 +118,7 @@ fun <T : Any> Backstack(
     animationBuilder: AnimationBuilder<Float>? = null,
     onTransitionStarting: ((from: List<T>, to: List<T>, TransitionDirection) -> Unit)? = null,
     onTransitionFinished: (() -> Unit)? = null,
+    inspectionParams: InspectionParams? = null,
     drawScreen: @Composable() (T) -> Unit
 ) {
     require(backstack.isNotEmpty()) { "Backstack must contain at least 1 screen." }
@@ -143,6 +149,9 @@ fun <T : Any> Backstack(
         }
     }
     val animation = animationBuilder ?: DefaultBackstackAnimation
+    val clock = AnimationClockAmbient.current
+    val inspector = remember { BackstackInspector(clock) }
+    inspector.params = inspectionParams
 
     if (direction == null && activeKeys != backstack) {
         // Not in the middle of a transition and we got a new backstack.
@@ -201,19 +210,14 @@ fun <T : Any> Backstack(
     // state as soon as a different branch is taken. See @Pivotal for more information.
     activeStackDrawers = remember(activeKeys, transition) {
         activeKeys.mapIndexed { index, key ->
-            val isTop = index == activeKeys.size - 1
             ScreenWrapper(key) { progress, children ->
-                val visibility = when {
-                    // transitionProgress always corresponds directly to visibility of the top screen.
-                    isTop -> progress
-                    // The second-to-top screen has the inverse visibility of the top screen.
-                    index == activeKeys.size - 2 -> 1f - progress
-                    // All other screens should not be drawn at all. They're only kept around to maintain
-                    // their composable state.
-                    else -> 0f
+                // Inspector and transition are mutually exclusive.
+                val screenModifier = if (inspector.isInspectionActive) {
+                    calculateInspectionModifier(inspector, index, activeKeys.size, progress)
+                } else {
+                    calculateRegularModifier(transition, index, activeKeys.size, progress)
                 }
-                val transitionModifier = transition.modifierForScreen(visibility, isTop)
-                Box(transitionModifier, children = children)
+                Box(screenModifier, children = children)
             }
         }
     }
@@ -237,4 +241,37 @@ fun <T : Any> Backstack(
             }
         }
     }
+}
+
+private fun calculateRegularModifier(
+    transition: BackstackTransition,
+    index: Int,
+    count: Int,
+    progress: Float
+): Modifier {
+    val visibility = when (index) {
+        // transitionProgress always corresponds directly to visibility of the top screen.
+        count - 1 -> progress
+        // The second-to-top screen has the inverse visibility of the top screen.
+        count - 2 -> 1f - progress
+        // All other screens should not be drawn at all. They're only kept around to maintain
+        // their composable state.
+        else -> 0f
+    }
+    return transition.modifierForScreen(visibility, index == count - 1)
+}
+
+@Composable
+private fun calculateInspectionModifier(
+    inspector: BackstackInspector,
+    index: Int,
+    count: Int,
+    progress: Float
+): Modifier {
+    val visibility = when (index) {
+        count - 1 -> progress
+        // All previous screens are always visible in inspection mode.
+        else -> 1f
+    }
+    return inspector.inspectScreen(index, count, visibility)
 }
