@@ -42,11 +42,20 @@ afterEvaluate {
                 artifact(dokkaJar)
 
                 pom {
+                    name.set("Compose Backstack")
+                    description.set("Composable for rendering transitions between backstacks.")
                     url.set(projectUrl)
                     licenses {
                         license {
                             name.set("The Apache License, Version 2.0")
                             url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+                        }
+                    }
+                    developers {
+                        developer {
+                            id.set("zach-klippenstein")
+                            name.set("Zach Klippenstein")
+                            email.set("zach.klippenstein@gmail.com")
                         }
                     }
                     scm {
