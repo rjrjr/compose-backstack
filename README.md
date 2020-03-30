@@ -26,7 +26,8 @@ in the backstack. When the top key in the stack changes between compose passes, 
 be animated with a transition.
 
 The actual API takes a few more parameters, e.g. to allow custom animations. See the
-[source kdoc](backstack/src/main/java/com/zachklipp/compose/backstack/Backstack.kt) for details!
+[source kdoc](compose-backstack/src/main/java/com/zachklipp/compose/backstack/Backstack.kt) for
+details!
 
 ## Example
 
