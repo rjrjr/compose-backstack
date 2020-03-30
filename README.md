@@ -61,6 +61,42 @@ The actual API takes a few more parameters, e.g. to allow custom animations. See
  }
 ```
 
+## Custom transitions
+
+Transitions between screens are defined by implementing the `BackstackTransition` interface and
+passing the implementation to the `Backstack` composable. This interface has a single method:
+
+```kotlin
+fun modifierForScreen(
+    visibility: Float,
+    isTop: Boolean
+): Modifier
+```
+
+The `modifierForScreen` method is called for every screen in the backstack (even ones that are
+completely hidden), and must return a [`Modifier`](https://developer.android.com/reference/kotlin/androidx/ui/core/Modifier)
+that will be applied to the entire screen. Compose has many `Modifier`s built-in, which can be used
+to do a wide variety of visual transformations such as adjust position, size, transparency, etc.
+
+When not currently transitioning, `visibility` will be 0 for all screens except the top one, for
+which `visibility` will be 1. When animating between two screens, `visibility` will be somewhere
+between 0 and 1 for both the top screen and the screen immediately under the top one. The visibility
+of all other screens in the stack will continue to be 0.
+
+The `isTop` flag indicates if the returned modifier will be applied to the top screen or not, and
+can be used to display a different animation for the top vs under-top screens. For example, the
+`Slide` transition uses `isTop` to determine whether to translate the screen to the end/right, or
+the start/left.
+
+Visibility will always transition between 0 and 1. If you need to map that range to a different
+range of floats, or any other type, you can use one of the `lerp` functions provided by Compose.
+
+### Testing custom transitions
+
+You can use the `BackstackViewerApp` composable in the `backstack-viewer` artifact to test your
+custom transitions interactively. This composable is used by the sample app, and in the screenshots
+below.
+
 ## Samples
 
 There is a sample app in the `sample` module that demonstrates various transition animations and
