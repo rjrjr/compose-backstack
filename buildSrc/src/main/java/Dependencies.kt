@@ -8,6 +8,7 @@ object Versions {
     val agp = loadPropertyFromResources(versionsFile, "androidGradlePluginVersion")
     const val compose = "0.1.0-dev07"
     val kotlin = loadPropertyFromResources(versionsFile, "kotlinVersion")
+    val dokka = loadPropertyFromResources(versionsFile, "dokkaVersion")
 }
 
 object Dependencies {
@@ -46,7 +47,7 @@ object Dependencies {
     object Kotlin {
         const val binaryCompatibilityValidatorPlugin =
             "org.jetbrains.kotlinx:binary-compatibility-validator:0.2.1"
-        const val dokka = "org.jetbrains.dokka:dokka-gradle-plugin:0.10.0"
+        val dokka = "org.jetbrains.dokka:dokka-gradle-plugin:${Versions.dokka}"
         val gradlePlugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:${Versions.kotlin}"
         const val stdlib = "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
         val reflect = "org.jetbrains.kotlin:kotlin-reflect:${Versions.kotlin}"

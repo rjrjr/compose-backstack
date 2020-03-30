@@ -11,7 +11,7 @@ android {
 }
 
 dependencies {
-    implementation(project(":backstack-viewer"))
+    implementation(project(":compose-backstack-viewer"))
     implementation(Dependencies.AndroidX.appcompat)
     implementation(Dependencies.Compose.foundation)
     implementation(Dependencies.Kotlin.stdlib)

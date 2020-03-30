@@ -3,6 +3,7 @@ plugins {
     id("default-android-config")
     kotlin("android")
     id("org.jetbrains.dokka")
+    id("publish-to-maven")
 }
 
 dependencies {

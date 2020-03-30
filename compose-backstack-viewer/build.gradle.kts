@@ -3,12 +3,13 @@ plugins {
     id("default-android-config")
     kotlin("android")
     id("org.jetbrains.dokka")
+    id("publish-to-maven")
 }
 
 dependencies {
     compileOnly(Dependencies.Compose.tooling)
 
-    api(project(":backstack"))
+    api(project(":compose-backstack"))
 
     implementation(Dependencies.AndroidX.appcompat)
     implementation(Dependencies.Compose.icons)
