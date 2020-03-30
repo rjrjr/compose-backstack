@@ -18,6 +18,7 @@ import com.zachklipp.compose.backstack.Backstack
 import com.zachklipp.compose.backstack.BackstackTransition
 import com.zachklipp.compose.backstack.BackstackTransition.Crossfade
 import com.zachklipp.compose.backstack.BackstackTransition.Slide
+import com.zachklipp.compose.backstack.InspectionGestureDetector
 
 private val DEFAULT_BACKSTACKS = listOf(
     listOf("one"),
@@ -30,11 +31,11 @@ private val BUILTIN_BACKSTACK_TRANSITIONS = listOf(
     "Crossfade" to Crossfade
 )
 
-@Preview
-@Composable
-private fun BackstackViewerAppPreview() {
-    BackstackViewerApp()
-}
+//@Preview
+//@Composable
+//private fun BackstackViewerAppPreview() {
+//    BackstackViewerApp()
+//}
 
 @Model
 private class AppModel(
@@ -42,7 +43,8 @@ private class AppModel(
     var backstacks: List<Pair<String, List<String>>>,
     var selectedTransition: Pair<String, BackstackTransition> = namedTransitions.first(),
     var selectedBackstack: Pair<String, List<String>> = backstacks.first(),
-    var slowAnimations: Boolean = false
+    var slowAnimations: Boolean = false,
+    var inspectionEnabled: Boolean = false
 ) {
     val bottomScreen get() = selectedBackstack.second.first()
 
@@ -120,6 +122,11 @@ private fun AppControls(model: AppModel) {
         Switch(model.slowAnimations, onCheckedChange = { model.slowAnimations = it })
     }
 
+    Row {
+        Text("Inspect (pinch + drag): ", modifier = LayoutGravity.Center)
+        Switch(model.inspectionEnabled, onCheckedChange = { model.inspectionEnabled = it })
+    }
+
     RadioGroup {
         model.backstacks.forEach { backstack ->
             RadioGroupTextItem(
@@ -143,28 +150,30 @@ private fun AppScreens(model: AppModel) {
     } else null
 
     MaterialTheme(colors = lightColorPalette()) {
-        Backstack(
-            backstack = model.selectedBackstack.second,
-            transition = model.selectedTransition.second,
-            animationBuilder = animation,
-            modifier = LayoutSize.Fill + DrawBorder(size = 3.dp, color = Color.Red),
-            onTransitionStarting = { from, to, direction ->
-                println(
-                    """
-                      Transitioning $direction:
-                        from: $from
-                          to: $to
-                    """.trimIndent()
+        InspectionGestureDetector(enabled = model.inspectionEnabled) {
+            Backstack(
+                backstack = model.selectedBackstack.second,
+                transition = model.selectedTransition.second,
+                animationBuilder = animation,
+                modifier = LayoutSize.Fill + DrawBorder(size = 3.dp, color = Color.Red),
+                onTransitionStarting = { from, to, direction ->
+                    println(
+                        """
+                          Transitioning $direction:
+                            from: $from
+                              to: $to
+                        """.trimIndent()
+                    )
+                },
+                onTransitionFinished = { println("Transition finished.") }
+            ) { screen ->
+                AppScreen(
+                    name = screen,
+                    showBack = screen != model.bottomScreen,
+                    onAdd = { model.pushScreen("$screen+") },
+                    onBack = model::popScreen
                 )
-            },
-            onTransitionFinished = { println("Transition finished.") }
-        ) { screen ->
-            AppScreen(
-                name = screen,
-                showBack = screen != model.bottomScreen,
-                onAdd = { model.pushScreen("$screen+") },
-                onBack = model::popScreen
-            )
+            }
         }
     }
 }

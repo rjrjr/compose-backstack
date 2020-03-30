@@ -97,6 +97,19 @@ You can use the `BackstackViewerApp` composable in the `backstack-viewer` artifa
 custom transitions interactively. This composable is used by the sample app, and in the screenshots
 below.
 
+## Inspecting the backstack
+
+The `Backstack` composable takes an optional `InspectionParams` parameter. When not null, the entire
+backstack will be rendered as a translucent 3D stack. The top-most screen in the stack will still
+be rendered in its regular position, but with a very low opacity, and will still be interactive. The
+`BackstackInspectorParams` controls how the stack is rendered, including rotation, scaling,
+opacity, etc.
+
+You can wrap your `Backstack` with the `InspectionGestureDetector` composable to automatically
+control the inspector mode using touch gestures.
+
+![Backstack inspector](.images/inspector.gif)
+
 ## Samples
 
 There is a sample app in the `sample` module that demonstrates various transition animations and
