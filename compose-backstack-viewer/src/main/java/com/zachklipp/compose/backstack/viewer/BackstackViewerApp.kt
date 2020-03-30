@@ -2,12 +2,17 @@
 
 package com.zachklipp.compose.backstack.viewer
 
+import android.content.Context
+import android.content.ContextWrapper
+import androidx.activity.ComponentActivity
+import androidx.activity.OnBackPressedCallback
 import androidx.animation.TweenBuilder
 import androidx.compose.Composable
 import androidx.compose.Model
+import androidx.compose.onCommit
 import androidx.compose.remember
+import androidx.ui.core.ContextAmbient
 import androidx.ui.core.Text
-import androidx.ui.foundation.Box
 import androidx.ui.foundation.DrawBorder
 import androidx.ui.graphics.Color
 import androidx.ui.layout.*
@@ -31,11 +36,11 @@ private val BUILTIN_BACKSTACK_TRANSITIONS = listOf(
     "Crossfade" to Crossfade
 )
 
-//@Preview
-//@Composable
-//private fun BackstackViewerAppPreview() {
-//    BackstackViewerApp()
-//}
+@Preview
+@Composable
+private fun BackstackViewerAppPreview() {
+    BackstackViewerApp()
+}
 
 @Model
 private class AppModel(
@@ -85,23 +90,26 @@ fun BackstackViewerApp(
     namedCustomTransitions: List<Pair<String, BackstackTransition>> = emptyList(),
     prefabBackstacks: List<List<String>>? = null
 ) {
+    val model = remember(namedCustomTransitions, prefabBackstacks) {
+        AppModel(
+            namedTransitions = namedCustomTransitions + BUILTIN_BACKSTACK_TRANSITIONS,
+            backstacks = (prefabBackstacks?.takeUnless { it.isEmpty() }
+                ?: DEFAULT_BACKSTACKS)
+                .map { it.joinToString() to it }
+        )
+    }
+
+    // When we're on the first screen, let the activity handle the back press.
+    if (model.selectedBackstack.second.size > 1) {
+        OnBackPressed { model.popScreen() }
+    }
+
     MaterialTheme(colors = darkColorPalette()) {
         Surface {
-            Box(padding = 16.dp) {
-                val model = remember(namedCustomTransitions, prefabBackstacks) {
-                    AppModel(
-                        namedTransitions = namedCustomTransitions + BUILTIN_BACKSTACK_TRANSITIONS,
-                        backstacks = (prefabBackstacks?.takeUnless { it.isEmpty() }
-                            ?: DEFAULT_BACKSTACKS)
-                            .map { it.joinToString() to it }
-                    )
-                }
-
-                Column(modifier = LayoutSize.Fill) {
-                    AppControls(model)
-                    Spacer(LayoutHeight(24.dp))
-                    AppScreens(model)
-                }
+            Column(modifier = LayoutPadding(16.dp) + LayoutSize.Fill) {
+                AppControls(model)
+                Spacer(LayoutHeight(24.dp))
+                AppScreens(model)
             }
         }
     }
@@ -175,5 +183,28 @@ private fun AppScreens(model: AppModel) {
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun OnBackPressed(onPressed: () -> Unit) {
+    val context = ContextAmbient.current
+    onCommit(context, onPressed) {
+        val activity = context.findComponentActivity() ?: return@onCommit
+        val callback = object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                onPressed()
+            }
+        }
+        activity.onBackPressedDispatcher.addCallback(callback)
+        onDispose { callback.remove() }
+    }
+}
+
+private tailrec fun Context.findComponentActivity(): ComponentActivity? {
+    return when (this) {
+        is ComponentActivity -> this
+        is ContextWrapper -> baseContext.findComponentActivity()
+        else -> null
     }
 }
