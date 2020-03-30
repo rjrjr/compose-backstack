@@ -4,8 +4,8 @@ package com.zachklipp.compose.backstack.viewer
 
 import androidx.animation.TweenBuilder
 import androidx.compose.Composable
+import androidx.compose.Model
 import androidx.compose.remember
-import androidx.compose.state
 import androidx.ui.core.Text
 import androidx.ui.foundation.Box
 import androidx.ui.foundation.DrawBorder
@@ -36,6 +36,29 @@ private fun BackstackViewerAppPreview() {
     BackstackViewerApp()
 }
 
+@Model
+private class AppModel(
+    var namedTransitions: List<Pair<String, BackstackTransition>>,
+    var backstacks: List<Pair<String, List<String>>>,
+    var selectedTransition: Pair<String, BackstackTransition> = namedTransitions.first(),
+    var selectedBackstack: Pair<String, List<String>> = backstacks.first(),
+    var slowAnimations: Boolean = false
+) {
+    val bottomScreen get() = selectedBackstack.second.first()
+
+    fun pushScreen(screen: String) {
+        val newBackstack = selectedBackstack.second + screen
+        selectedBackstack = newBackstack.joinToString() to newBackstack
+    }
+
+    fun popScreen() {
+        if (selectedBackstack.second.size > 1) {
+            val newBackstack = selectedBackstack.second.dropLast(1)
+            selectedBackstack = newBackstack.joinToString() to newBackstack
+        }
+    }
+}
+
 /**
  * Pre-fab Composable application that can be used to view various [BackstackTransition]s. Intended
  * to be the root content view of an activity.
@@ -63,82 +86,85 @@ fun BackstackViewerApp(
     MaterialTheme(colors = darkColorPalette()) {
         Surface {
             Box(padding = 16.dp) {
-                val allTransitions = remember(namedCustomTransitions) {
-                    namedCustomTransitions + BUILTIN_BACKSTACK_TRANSITIONS
-                }
-                val backstacks =
-                    (prefabBackstacks?.takeUnless { it.isEmpty() } ?: DEFAULT_BACKSTACKS)
-                        .map { it.joinToString() to it }
-                var selectedTransition by state { allTransitions.first() }
-                var selectedBackstack by state { backstacks.first() }
-                var slowAnimations by state { false }
-                val animation = remember(slowAnimations) {
-                    if (slowAnimations) TweenBuilder<Float>().apply { duration = 2000 } else null
+                val model = remember(namedCustomTransitions, prefabBackstacks) {
+                    AppModel(
+                        namedTransitions = namedCustomTransitions + BUILTIN_BACKSTACK_TRANSITIONS,
+                        backstacks = (prefabBackstacks?.takeUnless { it.isEmpty() }
+                            ?: DEFAULT_BACKSTACKS)
+                            .map { it.joinToString() to it }
+                    )
                 }
 
                 Column(modifier = LayoutSize.Fill) {
-                    Spinner(
-                        items = allTransitions,
-                        selectedItem = selectedTransition,
-                        onSelected = { selectedTransition = it }
-                    ) {
-                        ListItem(text = "${it.first} Transition")
-                    }
-
-                    Row {
-                        Text("Slow animations:", modifier = LayoutGravity.Center)
-                        Switch(slowAnimations, onCheckedChange = { slowAnimations = it })
-                    }
-
-                    RadioGroup {
-                        backstacks.forEach { backstack ->
-                            RadioGroupTextItem(
-                                text = backstack.first,
-                                textStyle = MaterialTheme.typography().body1,
-                                selected = backstack == selectedBackstack,
-                                onSelect = { selectedBackstack = backstack }
-                            )
-                        }
-                    }
-
+                    AppControls(model)
                     Spacer(LayoutHeight(24.dp))
-                    MaterialTheme(colors = lightColorPalette()) {
-                        Backstack(
-                            backstack = selectedBackstack.second,
-                            transition = selectedTransition.second,
-                            animationBuilder = animation,
-                            modifier = LayoutSize.Fill +
-                                    DrawBorder(size = 3.dp, color = Color.Red),
-                            onTransitionStarting = { from, to, direction ->
-                                println(
-                                    """
-                              Transitioning $direction:
-                                from: $from
-                                  to: $to
-                            """.trimIndent()
-                                )
-                            },
-                            onTransitionFinished = { println("Transition finished.") }
-                        ) { screen ->
-                            AppScreen(
-                                name = screen,
-                                isLastScreen = screen == selectedBackstack.second.first(),
-                                onAdd = {
-                                    val newBackstack = selectedBackstack.second + "$screen+"
-                                    selectedBackstack = newBackstack.joinToString() to newBackstack
-                                },
-                                onBack = {
-                                    if (selectedBackstack.second.size > 1) {
-                                        val newBackstack = selectedBackstack.second.dropLast(1)
-                                        selectedBackstack =
-                                            newBackstack.joinToString() to newBackstack
-                                    }
-                                }
-                            )
-                        }
-                    }
+                    AppScreens(model)
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun AppControls(model: AppModel) {
+    Spinner(
+        items = model.namedTransitions,
+        selectedItem = model.selectedTransition,
+        onSelected = { model.selectedTransition = it }
+    ) {
+        ListItem(text = "${it.first} Transition")
+    }
+
+    Row {
+        Text("Slow animations: ", modifier = LayoutGravity.Center)
+        Switch(model.slowAnimations, onCheckedChange = { model.slowAnimations = it })
+    }
+
+    RadioGroup {
+        model.backstacks.forEach { backstack ->
+            RadioGroupTextItem(
+                text = backstack.first,
+                textStyle = MaterialTheme.typography().body1,
+                selected = backstack == model.selectedBackstack,
+                onSelect = { model.selectedBackstack = backstack }
+            )
+        }
+    }
+}
+
+@Composable
+private fun AppScreens(model: AppModel) {
+    val animation = if (model.slowAnimations) {
+        remember {
+            TweenBuilder<Float>().apply {
+                duration = 2000
+            }
+        }
+    } else null
+
+    MaterialTheme(colors = lightColorPalette()) {
+        Backstack(
+            backstack = model.selectedBackstack.second,
+            transition = model.selectedTransition.second,
+            animationBuilder = animation,
+            modifier = LayoutSize.Fill + DrawBorder(size = 3.dp, color = Color.Red),
+            onTransitionStarting = { from, to, direction ->
+                println(
+                    """
+                      Transitioning $direction:
+                        from: $from
+                          to: $to
+                    """.trimIndent()
+                )
+            },
+            onTransitionFinished = { println("Transition finished.") }
+        ) { screen ->
+            AppScreen(
+                name = screen,
+                showBack = screen != model.bottomScreen,
+                onAdd = { model.pushScreen("$screen+") },
+                onBack = model::popScreen
+            )
         }
     }
 }

@@ -23,19 +23,19 @@ import androidx.ui.tooling.preview.Preview
 @Preview
 @Composable
 private fun AppScreenPreview() {
-    AppScreen(name = "preview", isLastScreen = false, onBack = {}, onAdd = {})
+    AppScreen(name = "preview", showBack = false, onBack = {}, onAdd = {})
 }
 
 @Composable
 internal fun AppScreen(
     name: String,
-    isLastScreen: Boolean,
+    showBack: Boolean,
     onBack: () -> Unit,
     onAdd: () -> Unit
 ) {
     Scaffold(
         topAppBar = {
-            val navigationIcon = if (isLastScreen) Icons.Default.Menu else Icons.Default.ArrowBack
+            val navigationIcon = if (showBack) Icons.Default.ArrowBack else Icons.Default.Menu
             TopAppBar(
                 navigationIcon = { IconButton(onBack) { Icon(navigationIcon) } },
                 title = { Text(name) })
