@@ -19,7 +19,7 @@ class SampleAppTest {
     @Test
     fun launches() {
         // This fails, semantics bug?
-        //findByText("Slow animations:")
+        //findBySubstring("Slow animations")
     }
 
     @Ignore("None of the find methods seem to work.")

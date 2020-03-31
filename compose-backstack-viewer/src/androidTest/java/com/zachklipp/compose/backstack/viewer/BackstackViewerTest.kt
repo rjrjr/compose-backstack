@@ -19,7 +19,7 @@ class BackstackViewerTest {
         }
 
         // This fails, semantics bug?
-        //findByText("Slow animations:")
+        //findBySubstring("Slow animations")
         //findBySubstring("Counter:").assertIsDisplayed()
     }
 }
