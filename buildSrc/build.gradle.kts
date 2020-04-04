@@ -11,6 +11,10 @@ repositories {
     google()
 }
 
+kotlinDslPluginOptions {
+    experimentalWarning.set(false)
+}
+
 val versions = loadProperties("$projectDir/src/main/resources/versions.properties")
 val agpVersion = versions["androidGradlePluginVersion"]
 val kotlinVersion = versions["kotlinVersion"]
