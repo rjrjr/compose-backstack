@@ -26,7 +26,7 @@ object FancyTransition : BackstackTransition {
         } else {
             // Move the non-top screen back, but only a little.
             val scaleVisibility = lerp(.9.px, 1.px, visibility).value
-            drawLayer(scaleX = scaleVisibility, scaleY = scaleVisibility) +
+            Modifier.drawLayer(scaleX = scaleVisibility, scaleY = scaleVisibility) +
                     Crossfade.modifierForScreen(visibility.pow(.5f), isTop)
         }
     }

@@ -12,8 +12,10 @@ import androidx.compose.Model
 import androidx.compose.onCommit
 import androidx.compose.remember
 import androidx.ui.core.ContextAmbient
-import androidx.ui.core.Text
+import androidx.ui.core.Modifier
 import androidx.ui.foundation.DrawBorder
+import androidx.ui.foundation.Text
+import androidx.ui.foundation.currentTextStyle
 import androidx.ui.graphics.Color
 import androidx.ui.layout.*
 import androidx.ui.material.*
@@ -106,9 +108,9 @@ fun BackstackViewerApp(
 
     MaterialTheme(colors = darkColorPalette()) {
         Surface {
-            Column(modifier = LayoutPadding(16.dp) + LayoutSize.Fill) {
+            Column(modifier = Modifier.padding(16.dp).fillMaxSize()) {
                 AppControls(model)
-                Spacer(LayoutHeight(24.dp))
+                Spacer(Modifier.preferredHeight(24.dp))
                 AppScreens(model)
             }
         }
@@ -126,12 +128,12 @@ private fun AppControls(model: AppModel) {
     }
 
     Row {
-        Text("Slow animations: ", modifier = LayoutGravity.Center)
+        Text("Slow animations: ", modifier = Modifier.gravity(RowAlign.Center))
         Switch(model.slowAnimations, onCheckedChange = { model.slowAnimations = it })
     }
 
     Row {
-        Text("Inspect (pinch + drag): ", modifier = LayoutGravity.Center)
+        Text("Inspect (pinch + drag): ", modifier = Modifier.gravity(RowAlign.Center))
         Switch(model.inspectionEnabled, onCheckedChange = { model.inspectionEnabled = it })
     }
 
@@ -139,7 +141,7 @@ private fun AppControls(model: AppModel) {
         model.backstacks.forEach { backstack ->
             RadioGroupTextItem(
                 text = backstack.first,
-                textStyle = MaterialTheme.typography().body1,
+                textStyle = currentTextStyle(),
                 selected = backstack == model.selectedBackstack,
                 onSelect = { model.selectedBackstack = backstack }
             )
@@ -163,7 +165,7 @@ private fun AppScreens(model: AppModel) {
                 backstack = model.selectedBackstack.second,
                 transition = model.selectedTransition.second,
                 animationBuilder = animation,
-                modifier = LayoutSize.Fill + DrawBorder(size = 3.dp, color = Color.Red),
+                modifier = Modifier.fillMaxSize() + DrawBorder(size = 3.dp, color = Color.Red),
                 inspectionParams = inspectionParams,
                 onTransitionStarting = { from, to, direction ->
                     println(
