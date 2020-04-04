@@ -6,7 +6,7 @@ import androidx.compose.Model
 import androidx.compose.Providers
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.ui.core.AnimationClockAmbient
-import androidx.ui.core.Text
+import androidx.ui.foundation.Text
 import androidx.ui.test.assertIsDisplayed
 import androidx.ui.test.createComposeRule
 import androidx.ui.test.findByText

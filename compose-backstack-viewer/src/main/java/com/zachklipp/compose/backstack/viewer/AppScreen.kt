@@ -7,9 +7,12 @@ import androidx.compose.Composable
 import androidx.compose.Pivotal
 import androidx.compose.onActive
 import androidx.compose.state
-import androidx.ui.core.Text
+import androidx.ui.core.Alignment
+import androidx.ui.core.Modifier
 import androidx.ui.foundation.Icon
-import androidx.ui.layout.Center
+import androidx.ui.foundation.Text
+import androidx.ui.layout.fillMaxSize
+import androidx.ui.layout.wrapContentSize
 import androidx.ui.material.FloatingActionButton
 import androidx.ui.material.IconButton
 import androidx.ui.material.Scaffold
@@ -42,9 +45,10 @@ internal fun AppScreen(
         },
         floatingActionButton = { FloatingActionButton(onClick = onAdd) { Icon(Icons.Default.Add) } }
     ) {
-        Center {
-            Text(text = "Counter: ${Counter(200)}")
-        }
+        Text(
+            text = "Counter: ${Counter(200)}",
+            modifier = Modifier.fillMaxSize().wrapContentSize(Alignment.Center)
+        )
     }
 }
 
