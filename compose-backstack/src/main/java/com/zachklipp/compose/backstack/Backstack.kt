@@ -18,6 +18,8 @@ import androidx.ui.core.drawClip
 import androidx.ui.foundation.Box
 import androidx.ui.foundation.shape.RectangleShape
 import androidx.ui.layout.Stack
+import androidx.ui.semantics.Semantics
+import androidx.ui.semantics.hidden
 import com.zachklipp.compose.backstack.TransitionDirection.Backward
 import com.zachklipp.compose.backstack.TransitionDirection.Forward
 
@@ -212,12 +214,19 @@ fun <T : Any> Backstack(
         activeKeys.mapIndexed { index, key ->
             ScreenWrapper(key) { progress, children ->
                 // Inspector and transition are mutually exclusive.
-                val screenModifier = if (inspector.isInspectionActive) {
+                val screenProperties = if (inspector.isInspectionActive) {
                     calculateInspectionModifier(inspector, index, activeKeys.size, progress)
                 } else {
                     calculateRegularModifier(transition, index, activeKeys.size, progress)
                 }
-                Box(screenModifier, children = children)
+
+                // Without an explicit semantics container, all screens will be merged into a single
+                // semantics group.
+                Semantics(container = true, properties = {
+                    hidden = !screenProperties.isVisible
+                }) {
+                    Box(screenProperties.modifier, children = children)
+                }
             }
         }
     }
@@ -243,12 +252,17 @@ fun <T : Any> Backstack(
     }
 }
 
+private data class ScreenProperties(
+    val modifier: Modifier,
+    val isVisible: Boolean
+)
+
 private fun calculateRegularModifier(
     transition: BackstackTransition,
     index: Int,
     count: Int,
     progress: Float
-): Modifier {
+): ScreenProperties {
     val visibility = when (index) {
         // transitionProgress always corresponds directly to visibility of the top screen.
         count - 1 -> progress
@@ -258,7 +272,10 @@ private fun calculateRegularModifier(
         // their composable state.
         else -> 0f
     }
-    return transition.modifierForScreen(visibility, index == count - 1)
+    return ScreenProperties(
+        modifier = transition.modifierForScreen(visibility, index == count - 1),
+        isVisible = visibility != 0f
+    )
 }
 
 @Composable
@@ -267,11 +284,14 @@ private fun calculateInspectionModifier(
     index: Int,
     count: Int,
     progress: Float
-): Modifier {
+): ScreenProperties {
     val visibility = when (index) {
         count - 1 -> progress
         // All previous screens are always visible in inspection mode.
         else -> 1f
     }
-    return inspector.inspectScreen(index, count, visibility)
+    return ScreenProperties(
+        modifier = inspector.inspectScreen(index, count, visibility),
+        isVisible = true
+    )
 }

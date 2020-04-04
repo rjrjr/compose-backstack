@@ -7,11 +7,9 @@ import androidx.compose.Providers
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.ui.core.AnimationClockAmbient
 import androidx.ui.foundation.Text
-import androidx.ui.test.assertIsDisplayed
-import androidx.ui.test.createComposeRule
-import androidx.ui.test.findByText
-import com.google.common.truth.ExpectFailure.expectFailure
-import org.junit.Ignore
+import androidx.ui.test.*
+import com.zachklipp.compose.backstack.BackstackTransition.Crossfade
+import com.zachklipp.compose.backstack.BackstackTransition.Slide
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -31,63 +29,99 @@ class BackstackTest {
     private val animation = TweenBuilder<Float>().apply { duration = 100 }
 
     @Test
-    fun initialStateWithSingleScreen() {
+    fun initialStateWithSingleScreen_slide() {
+        assertInitialStateWithSingleScreen(Slide)
+    }
+
+    @Test
+    fun initialStateWithSingleScreen_crossfade() {
+        assertInitialStateWithSingleScreen(Crossfade)
+    }
+
+    @Test
+    fun initialStateWithMultipleScreens_slide() {
+        assertInitialStateWithMultipleScreens(Slide)
+    }
+
+    @Test
+    fun initialStateWithMultipleScreens_crossfade() {
+        assertInitialStateWithMultipleScreens(Crossfade)
+    }
+
+    @Test
+    fun transition_slide() {
+        assertTransition(Slide)
+    }
+
+    @Test
+    fun transition_crossfade() {
+        assertTransition(Crossfade)
+    }
+
+    private fun assertInitialStateWithSingleScreen(transition: BackstackTransition) {
         val originalBackstack = listOf("one")
         compose.setContent {
-            Backstack(originalBackstack) { Text(it) }
+            Backstack(originalBackstack, transition = transition) { Text(it) }
         }
 
         findByText("one").assertIsDisplayed()
     }
 
-    @Ignore("isDisplayed check doesn't work if backstack has more than 1 item")
-    @Test
-    fun initialStateWithMultipleScreens() {
+    private fun assertInitialStateWithMultipleScreens(transition: BackstackTransition) {
         val originalBackstack = listOf("one", "two")
         compose.setContent {
-            Backstack(originalBackstack) { Text(it) }
+            Backstack(originalBackstack, transition = transition) { Text(it) }
         }
 
         findByText("two").assertIsDisplayed()
 
-        expectFailure {
-            findByText("one")
-        }
+        findByText("one")
+            .assertExists()
+            // Check explicit semantics flag. We can't use assertIsNotDisplayed because it checks
+            // layout bounds and the transition might hide the screen by just making it fully
+            // transparent, but leaving it positioned on the screen.
+            .assertIsHidden()
     }
 
-    @Ignore("isDisplayed check doesn't work if backstack has more than 1 item")
-    @Test
-    fun transition() {
+    private fun assertTransition(transition: BackstackTransition) {
         val originalBackstack = listOf("one")
         val destinationBackstack = listOf("one", "two")
         val state = State(originalBackstack)
         compose.setContent {
             Providers(AnimationClockAmbient provides clock) {
-                Backstack(state.backstack, animationBuilder = animation) { Text(it) }
+                Backstack(
+                    state.backstack,
+                    animationBuilder = animation,
+                    transition = transition
+                ) { Text(it) }
             }
         }
 
-        findByText("one").assertIsDisplayed()
+        findByText("one").assertIsNotHidden()
         findByText("two").assertDoesNotExist()
 
         compose.runOnUiThread {
             state.backstack = destinationBackstack
         }
 
-        findByText("one").assertIsDisplayed()
-        findByText("two").assertDoesNotExist()
+        findByText("one").assertIsNotHidden()
+        findByText("two").assertExists()
+            .assertIsHidden()
 
         advanceTransition(.25f)
 
-        findByText("one").assertIsDisplayed()
-        findByText("two").assertIsDisplayed()
+        findByText("one").assertIsNotHidden()
+        findByText("two").assertIsNotHidden()
 
         advanceTransition(.75f)
 
-        findByText("one").assertIsDisplayed()
-        findByText("two").assertIsDisplayed()
+        findByText("one").assertIsNotHidden()
+        findByText("two").assertIsNotHidden()
 
         advanceTransition(1f)
+
+        findByText("one").assertIsHidden()
+        findByText("two").assertIsNotHidden()
     }
 
     private fun advanceTransition(percentage: Float) {
