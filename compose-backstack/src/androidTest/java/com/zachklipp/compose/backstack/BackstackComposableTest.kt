@@ -20,7 +20,7 @@ private class State(
 )
 
 @RunWith(AndroidJUnit4::class)
-class BackstackTest {
+class BackstackComposableTest {
 
     @get:Rule
     val compose = createComposeRule()

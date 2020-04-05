@@ -71,6 +71,6 @@ interface BackstackTransition {
         override fun modifierForScreen(
             visibility: Float,
             isTop: Boolean
-        ): Modifier = drawOpacity(visibility)
+        ): Modifier = Modifier.drawOpacity(visibility)
     }
 }
