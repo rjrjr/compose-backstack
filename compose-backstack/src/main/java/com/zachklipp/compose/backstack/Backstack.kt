@@ -12,8 +12,8 @@ import androidx.ui.core.*
 import androidx.ui.foundation.Box
 import androidx.ui.foundation.shape.RectangleShape
 import androidx.ui.layout.Stack
+import androidx.ui.savedinstancestate.UiSavedStateRegistryAmbient
 import androidx.ui.semantics.Semantics
-import androidx.ui.semantics.hidden
 import com.zachklipp.compose.backstack.TransitionDirection.Backward
 import com.zachklipp.compose.backstack.TransitionDirection.Forward
 
@@ -68,7 +68,15 @@ private val DefaultBackstackAnimation: AnimationBuilder<Float>
  *
  * This composable does not actually provide any navigation functionality – it just renders
  * transitions between stacks of screens. It can be plugged into your navigation library of choice,
- * or just used on its own with a simple list of screens, like this:
+ * or just used on its own with a simple list of screens.
+ *
+ * ## Instance state caching
+ *
+ * Screens that contain persistable state using the (i.e. via
+ * [savedInstanceState][androidx.ui.savedinstancestate.savedInstanceState]) will automatically have
+ * that state saved when they are hidden, and restored the next time they're shown.
+ *
+ * ## Example
  *
  * ```
  * sealed class Screen {
@@ -220,6 +228,9 @@ fun <T : Any> Backstack(
     // state as soon as a different branch is taken. See @Pivotal for more information.
     activeStackDrawers = remember(activeKeys, transition) {
         activeKeys.mapIndexed { index, key ->
+            // This wrapper composable will remain in the composition as long as its key is
+            // in the backstack. So we can use remember here to hold state that should persist
+            // even when the screen is hidden.
             ScreenWrapper(key) { progress, children ->
                 // Inspector and transition are mutually exclusive.
                 val screenProperties = if (inspector.isInspectionActive) {
@@ -228,12 +239,23 @@ fun <T : Any> Backstack(
                     calculateRegularModifier(transition, index, activeKeys.size, progress)
                 }
 
+                // This must be called even if the screen is not visible, so the screen's state gets
+                // cached before it's removed from the composition.
+                val savedStateRegistry = ChildSavedStateRegistry(screenProperties.isVisible)
+
+                if (!screenProperties.isVisible) {
+                    // Remove the screen from the composition.
+                    // This must be done after updating the savedState visibility so it has a chance
+                    // to query providers before they're unregistered.
+                    return@ScreenWrapper
+                }
+
                 // Without an explicit semantics container, all screens will be merged into a single
                 // semantics group.
-                Semantics(container = true, properties = {
-                    hidden = !screenProperties.isVisible
-                }) {
-                    Box(screenProperties.modifier, children = children)
+                Semantics(container = true) {
+                    Providers(UiSavedStateRegistryAmbient provides savedStateRegistry) {
+                        Box(screenProperties.modifier, children = children)
+                    }
                 }
             }
         }
@@ -247,14 +269,7 @@ fun <T : Any> Backstack(
             // as they're invoked through the exact same sequence of source locations from within this
             // key lambda, they will keep their state.
             key(item) {
-                // Cache the composable that actually draws this item so it's not recomposed if the
-                // backstack doesn't change. This helps performance with long backstacks.
-                // We don't need to pass item to remember because key guarantees that it won't change
-                // within this part of the composition.
-                val drawItem: @Composable() () -> Unit = remember {
-                    @Composable { drawScreen(item) }
-                }
-                transition(transitionProgress.value, drawItem)
+                transition(transitionProgress.value) { drawScreen(item) }
             }
         }
     }

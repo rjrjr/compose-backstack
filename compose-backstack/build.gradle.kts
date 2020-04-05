@@ -11,6 +11,7 @@ dependencies {
 
     implementation(Dependencies.Kotlin.stdlib)
     implementation(Dependencies.Compose.foundation)
+    implementation(Dependencies.Compose.savedstate)
 
     testImplementation(Dependencies.Test.junit)
     testImplementation(Dependencies.Test.truth)

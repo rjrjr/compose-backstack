@@ -7,7 +7,10 @@ import androidx.compose.Providers
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.ui.core.AnimationClockAmbient
 import androidx.ui.foundation.Text
-import androidx.ui.test.*
+import androidx.ui.test.assertIsDisplayed
+import androidx.ui.test.createComposeRule
+import androidx.ui.test.findByText
+import androidx.ui.test.runOnUiThread
 import com.zachklipp.compose.backstack.BackstackTransition.Crossfade
 import com.zachklipp.compose.backstack.BackstackTransition.Slide
 import org.junit.Rule
@@ -74,13 +77,7 @@ class BackstackComposableTest {
         }
 
         findByText("two").assertIsDisplayed()
-
-        findByText("one")
-            .assertExists()
-            // Check explicit semantics flag. We can't use assertIsNotDisplayed because it checks
-            // layout bounds and the transition might hide the screen by just making it fully
-            // transparent, but leaving it positioned on the screen.
-            .assertIsHidden()
+        findByText("one").assertDoesNotExist()
     }
 
     private fun assertTransition(transition: BackstackTransition) {
@@ -97,36 +94,35 @@ class BackstackComposableTest {
             }
         }
 
-        findByText("one").assertIsNotHidden()
+        findByText("one").assertIsDisplayed()
         findByText("two").assertDoesNotExist()
 
         runOnUiThread {
             state.backstack = destinationBackstack
         }
 
-        findByText("one").assertIsNotHidden()
-        findByText("two").assertExists()
-            .assertIsHidden()
+        findByText("one").assertIsDisplayed()
+        findByText("two").assertDoesNotExist()
 
-        advanceTransition(.25f)
+        setTransitionTime(25)
 
-        findByText("one").assertIsNotHidden()
-        findByText("two").assertIsNotHidden()
+        findByText("one").assertIsDisplayed()
+        findByText("two").assertIsDisplayed()
 
-        advanceTransition(.75f)
+        setTransitionTime(75)
 
-        findByText("one").assertIsNotHidden()
-        findByText("two").assertIsNotHidden()
+        findByText("one").assertIsDisplayed()
+        findByText("two").assertIsDisplayed()
 
-        advanceTransition(1f)
+        setTransitionTime(100)
 
-        findByText("one").assertIsHidden()
-        findByText("two").assertIsNotHidden()
+        findByText("one").assertDoesNotExist()
+        findByText("two").assertIsDisplayed()
     }
 
-    private fun advanceTransition(percentage: Float) {
+    private fun setTransitionTime(time: Long) {
         runOnUiThread {
-            clock.clockTimeMillis = (100 * percentage).toLong()
+            clock.clockTimeMillis = time
         }
     }
 }
