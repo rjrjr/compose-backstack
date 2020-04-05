@@ -6,15 +6,12 @@ import androidx.animation.AnimationBuilder
 import androidx.animation.AnimationEndReason
 import androidx.animation.AnimationEndReason.TargetReached
 import androidx.animation.TweenBuilder
-import androidx.compose.Composable
-import androidx.compose.key
-import androidx.compose.remember
-import androidx.compose.state
+import androidx.compose.*
 import androidx.ui.animation.animatedFloat
 import androidx.ui.core.AnimationClockAmbient
 import androidx.ui.core.ContextAmbient
 import androidx.ui.core.Modifier
-import androidx.ui.core.drawClip
+import androidx.ui.core.clip
 import androidx.ui.foundation.Box
 import androidx.ui.foundation.shape.RectangleShape
 import androidx.ui.layout.Stack
@@ -61,7 +58,8 @@ private val DefaultBackstackAnimation: AnimationBuilder<Float>
  *    be lost.
  *  - If items in the stack are reordered between compositions, the stack should not contain
  *    duplicates. If it does, due to how `@Pivotal` works, the states of those screens will be
- *    lost if they are moved around. Duplicates should retain state if they are not reordered.
+ *    lost if they are moved around. If the list contains duplicates, an [IllegalArgumentException]
+ *    will be thrown.
  *
  * This composable does not actually provide any navigation functionality – it just renders
  * transitions between stacks of screens. It can be plugged into your navigation library of choice,
@@ -124,6 +122,11 @@ fun <T : Any> Backstack(
     drawScreen: @Composable() (T) -> Unit
 ) {
     require(backstack.isNotEmpty()) { "Backstack must contain at least 1 screen." }
+    onCommit(backstack) {
+        require(backstack.distinct().size == backstack.size) {
+            "Backstack must not contain duplicates: $backstack"
+        }
+    }
 
     // When transitioning, contains a stable cache of the screens actually being displayed. Will not
     // change even if backstack changes during the transition.
@@ -232,7 +235,7 @@ fun <T : Any> Backstack(
     }
 
     // Actually draw the screens.
-    Stack(modifier = modifier + drawClip(RectangleShape)) {
+    Stack(modifier = modifier.clip(RectangleShape)) {
         activeStackDrawers.forEach { (item, transition) ->
             // Key is a convenience helper that treats its arguments as @Pivotal. This is how state
             // preservation is implemented. Even if screens are moved around within the list, as long

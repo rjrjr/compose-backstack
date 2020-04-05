@@ -1,5 +1,3 @@
-@file:Suppress("RemoveEmptyParenthesesFromAnnotationEntry", "FunctionName")
-
 package com.zachklipp.compose.backstack.viewer
 
 import android.content.Context
@@ -8,7 +6,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
 import androidx.animation.TweenBuilder
 import androidx.compose.Composable
-import androidx.compose.Model
+import androidx.compose.Pivotal
 import androidx.compose.onCommit
 import androidx.compose.remember
 import androidx.ui.core.ContextAmbient
@@ -33,39 +31,13 @@ private val DEFAULT_BACKSTACKS = listOf(
     listOf("one", "two", "three")
 )
 
-private val BUILTIN_BACKSTACK_TRANSITIONS = listOf(
-    "Slide" to Slide,
-    "Crossfade" to Crossfade
-)
+private val BUILTIN_BACKSTACK_TRANSITIONS = listOf(Slide, Crossfade)
+    .map { Pair(it::class.simpleName!!, it) }
 
 @Preview
 @Composable
 private fun BackstackViewerAppPreview() {
     BackstackViewerApp()
-}
-
-@Model
-private class AppModel(
-    var namedTransitions: List<Pair<String, BackstackTransition>>,
-    var backstacks: List<Pair<String, List<String>>>,
-    var selectedTransition: Pair<String, BackstackTransition> = namedTransitions.first(),
-    var selectedBackstack: Pair<String, List<String>> = backstacks.first(),
-    var slowAnimations: Boolean = false,
-    var inspectionEnabled: Boolean = false
-) {
-    val bottomScreen get() = selectedBackstack.second.first()
-
-    fun pushScreen(screen: String) {
-        val newBackstack = selectedBackstack.second + screen
-        selectedBackstack = newBackstack.joinToString() to newBackstack
-    }
-
-    fun popScreen() {
-        if (selectedBackstack.second.size > 1) {
-            val newBackstack = selectedBackstack.second.dropLast(1)
-            selectedBackstack = newBackstack.joinToString() to newBackstack
-        }
-    }
 }
 
 /**
@@ -74,7 +46,7 @@ private class AppModel(
  *
  * This composable can be used to interact with your own custom transitions. It lets the user select
  * from the available transitions, and then toggle between various pre-defined backstacks. The
- * backstacks are simply strings, and each string will be rendered as a Materialy [Scaffold] with
+ * backstacks are simply strings, and each string will be rendered as a Material [Scaffold] with
  * that string, and a counter value that will automatically increase over time, to demonstrate
  * state retention. The demo screens also allow the user to push additional copies of the current
  * screen to the backstack, or pop the current screen.
@@ -89,20 +61,16 @@ private class AppModel(
  */
 @Composable
 fun BackstackViewerApp(
-    namedCustomTransitions: List<Pair<String, BackstackTransition>> = emptyList(),
-    prefabBackstacks: List<List<String>>? = null
+    @Pivotal namedCustomTransitions: List<Pair<String, BackstackTransition>> = emptyList(),
+    @Pivotal prefabBackstacks: List<List<String>>? = null
 ) {
-    val model = remember(namedCustomTransitions, prefabBackstacks) {
-        AppModel(
-            namedTransitions = namedCustomTransitions + BUILTIN_BACKSTACK_TRANSITIONS,
-            backstacks = (prefabBackstacks?.takeUnless { it.isEmpty() }
-                ?: DEFAULT_BACKSTACKS)
-                .map { it.joinToString() to it }
-        )
-    }
+    val model = AppModel.create(
+        namedTransitions = namedCustomTransitions + BUILTIN_BACKSTACK_TRANSITIONS,
+        prefabBackstacks = (prefabBackstacks?.takeUnless { it.isEmpty() } ?: DEFAULT_BACKSTACKS)
+    )
 
     // When we're on the first screen, let the activity handle the back press.
-    if (model.selectedBackstack.second.size > 1) {
+    if (model.currentBackstack.size > 1) {
         OnBackPressed { model.popScreen() }
     }
 
@@ -120,11 +88,11 @@ fun BackstackViewerApp(
 @Composable
 private fun AppControls(model: AppModel) {
     Spinner(
-        items = model.namedTransitions,
-        selectedItem = model.selectedTransition,
-        onSelected = { model.selectedTransition = it }
+        items = model.namedTransitions.map { it.first },
+        selectedItem = model.selectedTransition.first,
+        onSelected = { model.selectTransition(it) }
     ) {
-        ListItem(text = "${it.first} Transition")
+        ListItem(text = "$it Transition")
     }
 
     Row {
@@ -138,12 +106,12 @@ private fun AppControls(model: AppModel) {
     }
 
     RadioGroup {
-        model.backstacks.forEach { backstack ->
+        model.prefabBackstacks.forEach { backstack ->
             RadioGroupTextItem(
-                text = backstack.first,
+                text = backstack.joinToString(", "),
                 textStyle = currentTextStyle(),
-                selected = backstack == model.selectedBackstack,
-                onSelect = { model.selectedBackstack = backstack }
+                selected = backstack == model.currentBackstack,
+                onSelect = { model.currentBackstack = backstack }
             )
         }
     }
@@ -162,7 +130,7 @@ private fun AppScreens(model: AppModel) {
     MaterialTheme(colors = lightColorPalette()) {
         InspectionGestureDetector(enabled = model.inspectionEnabled) { inspectionParams ->
             Backstack(
-                backstack = model.selectedBackstack.second,
+                backstack = model.currentBackstack,
                 transition = model.selectedTransition.second,
                 animationBuilder = animation,
                 modifier = Modifier.fillMaxSize() + DrawBorder(size = 3.dp, color = Color.Red),
