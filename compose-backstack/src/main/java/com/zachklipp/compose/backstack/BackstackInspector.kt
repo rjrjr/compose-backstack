@@ -219,7 +219,7 @@ internal class BackstackInspector(clock: AnimationClockObservable) {
                 }
             }
         }
-        val drawModifier = drawLayer(
+        val drawModifier = Modifier.drawLayer(
             scaleX = scale,
             scaleY = scale,
             rotationX = rotationX,

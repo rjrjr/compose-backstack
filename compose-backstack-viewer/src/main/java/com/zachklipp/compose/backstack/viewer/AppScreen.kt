@@ -9,6 +9,7 @@ import androidx.compose.onActive
 import androidx.compose.state
 import androidx.ui.core.Alignment
 import androidx.ui.core.Modifier
+import androidx.ui.core.TestTag
 import androidx.ui.foundation.Icon
 import androidx.ui.foundation.Text
 import androidx.ui.layout.fillMaxSize
@@ -22,6 +23,9 @@ import androidx.ui.material.icons.filled.Add
 import androidx.ui.material.icons.filled.ArrowBack
 import androidx.ui.material.icons.filled.Menu
 import androidx.ui.tooling.preview.Preview
+
+internal fun addTestTag(screen: String) = "add screen to $screen"
+internal fun backTestTag(screen: String) = "go back from $screen"
 
 @Preview
 @Composable
@@ -40,10 +44,22 @@ internal fun AppScreen(
         topAppBar = {
             val navigationIcon = if (showBack) Icons.Default.ArrowBack else Icons.Default.Menu
             TopAppBar(
-                navigationIcon = { IconButton(onBack) { Icon(navigationIcon) } },
-                title = { Text(name) })
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        TestTag(backTestTag(name)) {
+                            Icon(navigationIcon)
+                        }
+                    }
+                },
+                title = { Text("Screen $name") })
         },
-        floatingActionButton = { FloatingActionButton(onClick = onAdd) { Icon(Icons.Default.Add) } }
+        floatingActionButton = {
+            FloatingActionButton(onClick = onAdd) {
+                TestTag(addTestTag(name)) {
+                    Icon(Icons.Default.Add)
+                }
+            }
+        }
     ) {
         Text(
             text = "Counter: ${Counter(200)}",

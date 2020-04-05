@@ -8,10 +8,7 @@ import androidx.animation.AnimationEndReason.TargetReached
 import androidx.animation.TweenBuilder
 import androidx.compose.*
 import androidx.ui.animation.animatedFloat
-import androidx.ui.core.AnimationClockAmbient
-import androidx.ui.core.ContextAmbient
-import androidx.ui.core.Modifier
-import androidx.ui.core.clip
+import androidx.ui.core.*
 import androidx.ui.foundation.Box
 import androidx.ui.foundation.shape.RectangleShape
 import androidx.ui.layout.Stack
@@ -19,6 +16,9 @@ import androidx.ui.semantics.Semantics
 import androidx.ui.semantics.hidden
 import com.zachklipp.compose.backstack.TransitionDirection.Backward
 import com.zachklipp.compose.backstack.TransitionDirection.Forward
+
+/** Used to hide screens when not transitioning. */
+internal val HIDDEN_MODIFIER = Modifier.drawOpacity(0f)
 
 /**
  * Identifies which direction a transition is being performed in.
@@ -35,6 +35,11 @@ enum class TransitionDirection {
 private data class ScreenWrapper<T : Any>(
     val key: T,
     val transition: @Composable() (progress: Float, @Composable() () -> Unit) -> Unit
+)
+
+internal data class ScreenProperties(
+    val modifier: Modifier,
+    val isVisible: Boolean
 )
 
 @Composable
@@ -255,12 +260,7 @@ fun <T : Any> Backstack(
     }
 }
 
-private data class ScreenProperties(
-    val modifier: Modifier,
-    val isVisible: Boolean
-)
-
-private fun calculateRegularModifier(
+internal fun calculateRegularModifier(
     transition: BackstackTransition,
     index: Int,
     count: Int,
@@ -275,8 +275,14 @@ private fun calculateRegularModifier(
         // their composable state.
         else -> 0f
     }
+
+    val screenModifier = when (visibility) {
+        0f -> HIDDEN_MODIFIER
+        1f -> Modifier.None
+        else -> transition.modifierForScreen(visibility, index == count - 1)
+    }
     return ScreenProperties(
-        modifier = transition.modifierForScreen(visibility, index == count - 1),
+        modifier = screenModifier,
         isVisible = visibility != 0f
     )
 }

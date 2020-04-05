@@ -12,9 +12,6 @@ class IntPxPositionSubject(
     private val actual: IntPxPosition
 ) : Subject(metadata, actual) {
 
-    val x get() = check("x").that(actual.x.value)
-    val y get() = check("y").that(actual.y.value)
-
     fun isEqualTo(x: Int, y: Int) =
         check("IntPxPosition(x, y)").that(actual).isEqualTo(IntPxPosition(x.ipx, y.ipx))
 
