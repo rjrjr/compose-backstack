@@ -42,14 +42,6 @@ internal data class ScreenProperties(
     val isVisible: Boolean
 )
 
-@Composable
-private val DefaultBackstackAnimation: AnimationBuilder<Float>
-    get() {
-        val context = ContextAmbient.current
-        return TweenBuilder<Float>().apply {
-            duration = context.resources.getInteger(android.R.integer.config_shortAnimTime)
-        }
-    }
 
 /**
  * Renders the top of a stack of screens (as [T]s) and animates between screens when the top

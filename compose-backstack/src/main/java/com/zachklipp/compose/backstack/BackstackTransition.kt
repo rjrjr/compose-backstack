@@ -1,7 +1,6 @@
-@file:Suppress("RemoveEmptyParenthesesFromAnnotationEntry")
-
 package com.zachklipp.compose.backstack
 
+import androidx.compose.Composable
 import androidx.ui.core.LayoutDirection
 import androidx.ui.core.LayoutModifier
 import androidx.ui.core.Modifier
@@ -12,35 +11,72 @@ import androidx.ui.unit.IntPxSize
 import androidx.ui.unit.ipx
 import com.zachklipp.compose.backstack.BackstackTransition.Crossfade
 import com.zachklipp.compose.backstack.BackstackTransition.Slide
+import com.zachklipp.compose.backstack.ScreenTransformer.ScreenTransformResult
+import com.zachklipp.compose.backstack.ScreenTransformer.ScreenTransformResult.HideScreen
+import com.zachklipp.compose.backstack.ScreenTransformer.ScreenTransformResult.ModifyScreen
 
 /**
  * Defines transitions for a [Backstack]. Transitions control how screens are rendered by returning
  * [Modifier]s that will be used to wrap screen composables.
  *
+ * Transitions that perform animation should subclass [AnimatedBackstackTransition] instead of
+ * subclassing this directly.
+ *
  * @see Slide
  * @see Crossfade
  */
-interface BackstackTransition {
+abstract class BackstackTransition : ScreenTransformer {
+    @Composable
+    final override fun transformScreen(
+        screenIndex: Int,
+        screenCount: Int,
+        direction: TransitionDirection?
+    ): ScreenTransformResult {
+        // When not transitioning, always just draw the top screen, and remove transitions from
+        // the composition.
+        if (direction == null) {
+            return if (screenIndex == screenCount - 1) ModifyScreen(Modifier.None) else HideScreen
+        }
+
+        return when (screenIndex) {
+            screenCount - 1,
+            screenCount - 2 -> {
+                // Important to keep this call in the same position in the composition so it can
+                // retain state.
+                transformScreen(
+                    isTop = screenCount == screenIndex - 1,
+                    direction = direction
+                )
+            }
+            // All other screens should not be drawn at all. They're only kept around to maintain
+            // their composable state.
+            else -> HideScreen
+        }
+    }
 
     /**
-     * Returns a [Modifier] to use to draw screen in a [Backstack].
+     * Called only with the top and just-below-top screens when a transition is in progress.
      *
-     * @param visibility A float in the range `[0, 1]` that indicates at what visibility this screen
-     * should be drawn. For example, this value will increase when [isTop] is true and the transition
-     * is in the forward direction.
-     * @param isTop True only when being called for the top screen. E.g. if the screen is partially
-     * visible, then the top screen is always transitioning _out_, and non-top screens are either
-     * transitioning out or invisible.
+     * Screens involved in the transition will be "locked" to remain in the active stack until this
+     * function returns [HideScreen] for them.
      */
-    fun modifierForScreen(
-        visibility: Float,
-        isTop: Boolean
-    ): Modifier
+    @Composable
+    abstract fun transformScreen(
+        isTop: Boolean,
+        direction: TransitionDirection
+    ): ScreenTransformResult
 
-    /**
-     * A simple transition that slides screens horizontally.
-     */
-    object Slide : BackstackTransition {
+    /** A transition that completes immediately without animation. */
+    object None : BackstackTransition() {
+        @Composable
+        override fun transformScreen(
+            isTop: Boolean,
+            direction: TransitionDirection
+        ): ScreenTransformResult = if (isTop) ModifyScreen(Modifier.None) else HideScreen
+    }
+
+    /** A simple transition that slides screens horizontally. */
+    object Slide : AnimatedBackstackTransition() {
         override fun modifierForScreen(
             visibility: Float,
             isTop: Boolean
@@ -48,7 +84,8 @@ interface BackstackTransition {
             offset = if (isTop) 1f - visibility else -1 + visibility
         )
 
-        private class PercentageLayoutOffset(private val offset: Float) : LayoutModifier {
+        private class PercentageLayoutOffset(private val offset: Float) :
+            LayoutModifier {
             override fun Density.modifyPosition(
                 childSize: IntPxSize,
                 containerSize: IntPxSize,
@@ -64,10 +101,8 @@ interface BackstackTransition {
         }
     }
 
-    /**
-     * A simple transition that crossfades between screens.
-     */
-    object Crossfade : BackstackTransition {
+    /** A simple transition that crossfades between screens. */
+    object Crossfade : AnimatedBackstackTransition() {
         override fun modifierForScreen(
             visibility: Float,
             isTop: Boolean
