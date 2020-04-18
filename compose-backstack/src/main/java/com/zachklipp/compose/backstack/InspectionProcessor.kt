@@ -5,7 +5,9 @@ package com.zachklipp.compose.backstack
 import androidx.animation.AnimationClockObservable
 import androidx.animation.PhysicsBuilder
 import androidx.animation.Spring
-import androidx.compose.*
+import androidx.compose.Composable
+import androidx.compose.Immutable
+import androidx.compose.Model
 import androidx.ui.animation.AnimatedFloatModel
 import androidx.ui.animation.animate
 import androidx.ui.core.DensityAmbient
@@ -34,6 +36,7 @@ import kotlin.math.sin
  * @param overlayOpacity The alpha used to draw the top screen, without any other transformations.
  * Constrained to `[0, 1]`.
  */
+// TODO(zachklipp) Rename to XrayProperties, implement BackstackProcessor here.
 @Immutable
 data class InspectionParams(
     val offsetX: Dp = 500.dp,
@@ -56,17 +59,25 @@ fun InspectionParams.constrained() = InspectionParams(
     overlayOpacity = overlayOpacity.coerceIn(0f, 1f)
 )
 
-internal class BackstackInspector(clock: AnimationClockObservable) {
+// TODO(zachklipp) Refactor this to a similar shape as TransitionProperties.
+@Model
+internal class InspectionProcessor(clock: AnimationClockObservable) : BackstackProcessor {
 
     private val animation = PhysicsBuilder<Float>(stiffness = Spring.StiffnessLow)
+
+    var delegate: BackstackProcessor? = null
+        set(value) {
+            if (field != value) field = value
+        }
 
     /**
      * True when the inspector is in control of rendering.
      * Will continue to return true after setting [params] to null until it's finished animating.
      */
-    @Composable
-    var isInspectionActive: Boolean by mutableStateOf(false)
-        private set
+    var isInspectionActive: Boolean = false
+        private set(value) {
+            if (field != value) field = value
+        }
 
     /**
      * Update the parameters used to display the rendering.
@@ -80,6 +91,8 @@ internal class BackstackInspector(clock: AnimationClockObservable) {
     var params: InspectionParams? = null
         set(value) {
             val constrainedParams = value?.constrained()
+            if (constrainedParams == field) return
+
             if ((field == null) != (constrainedParams == null)) {
                 if (constrainedParams != null) {
                     startInspecting()
@@ -107,6 +120,18 @@ internal class BackstackInspector(clock: AnimationClockObservable) {
     private val alpha = AnimatedFloatModel(INITIAL_ALPHA, clock)
     private val overlayAlpha = AnimatedFloatModel(INITIAL_OVERLAY_ALPHA, clock)
 
+    @Composable
+    override fun processStack(keys: List<Any>): List<ModifiedScreen<Any>> {
+        if (!isInspectionActive) {
+            return delegate!!.processStack(keys)
+        }
+
+        return keys.mapIndexed { index, item ->
+            val modifier = inspectScreen(index, keys.size)
+            ModifiedScreen(item, modifier)
+        }
+    }
+
     /**
      * Calculates a [Modifier] to apply to a screen when in inspection mode.
      *
@@ -117,8 +142,7 @@ internal class BackstackInspector(clock: AnimationClockObservable) {
     @Composable
     internal fun inspectScreen(
         screenIndex: Int,
-        screenCount: Int,
-        visibility: Float
+        screenCount: Int
     ): Modifier {
         // Draw the top screen as an overlay so it's clear where touch targets are. Once
         // compose supports transforming inputs as well as outputs, the top screen can
@@ -131,8 +155,7 @@ internal class BackstackInspector(clock: AnimationClockObservable) {
         val centerOffset = animate(
             // Don't need to adjust the pivot point if there's only one screen.
             if (screenCount == 1) 0f
-            // Add -1 + visibility so new screens animate "out of" the previous one.
-            else (screenIndex - 1f + visibility) - screenCount / 3f
+            else (screenIndex - 1f) - screenCount / 3f
         )
 
         val scale = animate(if (isTop) 1f else scaleFactor.value)
@@ -159,7 +182,7 @@ internal class BackstackInspector(clock: AnimationClockObservable) {
                 else -> alpha.value
                 // Adjust alpha by visibility to make transition less jarring when adding/removing
                 // screens.
-            } * visibility
+            }
         )
 
         return Modifier.drawLayer(

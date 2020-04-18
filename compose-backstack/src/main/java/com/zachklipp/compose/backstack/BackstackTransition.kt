@@ -20,6 +20,7 @@ import com.zachklipp.compose.backstack.BackstackTransition.Slide
  * @see Slide
  * @see Crossfade
  */
+// TODO(zachklipp) Rename to ScreenTransition.
 interface BackstackTransition {
 
     /**
