@@ -12,7 +12,7 @@ class BackstackTest {
             1, 1f,
             ScreenProperties(
                 isVisible = true,
-                modifier = Modifier.None
+                modifier = Modifier
             )
         )
     }
@@ -28,7 +28,7 @@ class BackstackTest {
             ),
             ScreenProperties(
                 isVisible = true,
-                modifier = Modifier.None
+                modifier = Modifier
             )
         )
 
@@ -60,7 +60,7 @@ class BackstackTest {
             count, 0f,
             ScreenProperties(
                 isVisible = true,
-                modifier = Modifier.None
+                modifier = Modifier
             ),
             ScreenProperties(
                 isVisible = false,
@@ -84,7 +84,7 @@ class BackstackTest {
             ),
             ScreenProperties(
                 isVisible = true,
-                modifier = Modifier.None
+                modifier = Modifier
             )
         )
 
@@ -128,7 +128,7 @@ class BackstackTest {
             ),
             ScreenProperties(
                 isVisible = true,
-                modifier = Modifier.None
+                modifier = Modifier
             ),
             ScreenProperties(
                 isVisible = false,

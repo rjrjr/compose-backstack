@@ -100,7 +100,7 @@ class BackstackComposableTest {
         findByText("one").assertIsNotHidden()
         findByText("two").assertDoesNotExist()
 
-        compose.runOnUiThread {
+        runOnUiThread {
             state.backstack = destinationBackstack
         }
 
@@ -125,7 +125,7 @@ class BackstackComposableTest {
     }
 
     private fun advanceTransition(percentage: Float) {
-        compose.runOnUiThread {
+        runOnUiThread {
             clock.clockTimeMillis = (100 * percentage).toLong()
         }
     }

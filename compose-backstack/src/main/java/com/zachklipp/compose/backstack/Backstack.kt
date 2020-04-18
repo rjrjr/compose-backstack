@@ -118,7 +118,7 @@ private val DefaultBackstackAnimation: AnimationBuilder<Float>
 @Composable
 fun <T : Any> Backstack(
     backstack: List<T>,
-    modifier: Modifier = Modifier.None,
+    modifier: Modifier = Modifier,
     transition: BackstackTransition = BackstackTransition.Slide,
     animationBuilder: AnimationBuilder<Float>? = null,
     onTransitionStarting: ((from: List<T>, to: List<T>, TransitionDirection) -> Unit)? = null,
@@ -278,7 +278,7 @@ internal fun calculateRegularModifier(
 
     val screenModifier = when (visibility) {
         0f -> HIDDEN_MODIFIER
-        1f -> Modifier.None
+        1f -> Modifier
         else -> transition.modifierForScreen(visibility, index == count - 1)
     }
     return ScreenProperties(

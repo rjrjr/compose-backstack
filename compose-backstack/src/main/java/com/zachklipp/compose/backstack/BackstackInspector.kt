@@ -5,20 +5,14 @@ package com.zachklipp.compose.backstack
 import androidx.animation.AnimationClockObservable
 import androidx.animation.PhysicsBuilder
 import androidx.animation.Spring
-import androidx.compose.Composable
-import androidx.compose.Immutable
-import androidx.compose.mutableStateOf
+import androidx.compose.*
 import androidx.ui.animation.AnimatedFloatModel
 import androidx.ui.animation.animate
-import androidx.ui.core.DrawModifier
+import androidx.ui.core.DensityAmbient
 import androidx.ui.core.Modifier
 import androidx.ui.core.drawLayer
-import androidx.ui.graphics.Canvas
 import androidx.ui.graphics.vectormath.radians
-import androidx.ui.graphics.withSave
-import androidx.ui.unit.Density
 import androidx.ui.unit.Dp
-import androidx.ui.unit.PxSize
 import androidx.ui.unit.dp
 import kotlin.math.sin
 
@@ -130,6 +124,7 @@ internal class BackstackInspector(clock: AnimationClockObservable) {
         // compose supports transforming inputs as well as outputs, the top screen can
         // participate in scaling/rotation too.
         val isTop = screenIndex == screenCount - 1
+        val density = DensityAmbient.current
 
         // drawLayer will scale around the center of the bounds, so we need to offset relative
         // to that so the entire stack stays centered.
@@ -142,7 +137,7 @@ internal class BackstackInspector(clock: AnimationClockObservable) {
 
         val scale = animate(if (isTop) 1f else scaleFactor.value)
 
-        val offsetX = animate(
+        val offsetDpX = animate(
             if (isTop) 0f else {
                 (centerOffset * offsetDpX.value * scale *
                         // Adjust by screenCount to squeeze more in as the count increases.
@@ -150,7 +145,7 @@ internal class BackstackInspector(clock: AnimationClockObservable) {
                         (10f / screenCount) * sin(radians(rotationY.value)))
             }
         )
-        val offsetY = animate(if (isTop) 0f else (centerOffset * offsetDpY.value * scale))
+        val offsetDpY = animate(if (isTop) 0f else (centerOffset * offsetDpY.value * scale))
 
         val rotationX = animate(if (isTop) 0f else (rotationX.value))
         val rotationY = animate(if (isTop) 0f else (rotationY.value))
@@ -167,11 +162,14 @@ internal class BackstackInspector(clock: AnimationClockObservable) {
             } * visibility
         )
 
-        return createModifier(
-            offsetX.dp, offsetY.dp,
-            rotationX, rotationY,
-            scale,
-            alpha
+        return Modifier.drawLayer(
+            scaleX = scale,
+            scaleY = scale,
+            rotationX = rotationX,
+            rotationY = rotationY,
+            translationX = with(density) { offsetDpX.dp.toPx().value },
+            translationY = with(density) { offsetDpY.dp.toPx().value },
+            alpha = alpha
         )
     }
 
@@ -193,40 +191,6 @@ internal class BackstackInspector(clock: AnimationClockObservable) {
             // so we can tell the Backstack that we're done being in control.
             isInspectionActive = false
         })
-    }
-
-    private fun createModifier(
-        offsetX: Dp,
-        offsetY: Dp,
-        rotationX: Float,
-        rotationY: Float,
-        scale: Float,
-        alpha: Float
-    ): Modifier {
-        // If drawLayer ever gets translation support, this custom modifier can be deleted.
-        val translateModifier = object : DrawModifier {
-            override fun draw(
-                density: Density,
-                drawContent: () -> Unit,
-                canvas: Canvas,
-                size: PxSize
-            ) {
-                val offsetPxX = with(density) { offsetX.toPx().value }
-                val offsetPxY = with(density) { offsetY.toPx().value }
-                canvas.withSave {
-                    canvas.translate(offsetPxX, offsetPxY)
-                    drawContent()
-                }
-            }
-        }
-        val drawModifier = Modifier.drawLayer(
-            scaleX = scale,
-            scaleY = scale,
-            rotationX = rotationX,
-            rotationY = rotationY,
-            alpha = alpha
-        )
-        return translateModifier + drawModifier
     }
 
     private companion object {
