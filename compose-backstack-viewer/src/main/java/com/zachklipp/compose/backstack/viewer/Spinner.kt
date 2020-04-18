@@ -3,10 +3,16 @@
 package com.zachklipp.compose.backstack.viewer
 
 import androidx.compose.Composable
+import androidx.compose.getValue
+import androidx.compose.setValue
 import androidx.compose.state
+import androidx.ui.core.Alignment
 import androidx.ui.core.Modifier
 import androidx.ui.foundation.*
-import androidx.ui.layout.*
+import androidx.ui.layout.Column
+import androidx.ui.layout.Row
+import androidx.ui.layout.aspectRatio
+import androidx.ui.layout.preferredWidth
 import androidx.ui.material.MaterialTheme
 import androidx.ui.material.Surface
 import androidx.ui.material.darkColorPalette
@@ -57,7 +63,7 @@ internal fun <T : Any> Spinner(
         modifier = Modifier.ripple(bounded = true)
     ) {
         Row {
-            Box(modifier = Modifier.weight(1f).gravity(RowAlign.Center)) {
+            Box(modifier = Modifier.weight(1f).gravity(Alignment.CenterVertically)) {
                 drawItem(selectedItem)
             }
             Icon(

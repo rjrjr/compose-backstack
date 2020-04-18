@@ -2,13 +2,12 @@
 
 package com.zachklipp.compose.backstack
 
-import androidx.compose.Composable
-import androidx.compose.remember
-import androidx.compose.state
-import androidx.ui.core.gesture.DragGestureDetector
+import androidx.compose.*
+import androidx.ui.core.Modifier
 import androidx.ui.core.gesture.DragObserver
-import androidx.ui.core.gesture.ScaleGestureDetector
 import androidx.ui.core.gesture.ScaleObserver
+import androidx.ui.core.gesture.dragGestureFilter
+import androidx.ui.core.gesture.scaleGestureFilter
 import androidx.ui.foundation.Box
 import androidx.ui.unit.PxPosition
 
@@ -62,9 +61,11 @@ fun InspectionGestureDetector(
         }
     }
 
-    val scaleDetector = ScaleGestureDetector(scaleObserver = scaleObserver)
-    val drawDetector = DragGestureDetector(dragObserver = dragObserver)
-    Box(modifier = scaleDetector + drawDetector) {
+    Box(
+        modifier = Modifier
+            .scaleGestureFilter(scaleObserver = scaleObserver)
+            .dragGestureFilter(dragObserver = dragObserver)
+    ) {
         children(inspectionParams.takeIf { enabled })
     }
 }

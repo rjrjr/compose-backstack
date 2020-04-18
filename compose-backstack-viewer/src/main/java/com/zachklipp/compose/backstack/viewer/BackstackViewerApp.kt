@@ -9,11 +9,12 @@ import androidx.compose.Composable
 import androidx.compose.Pivotal
 import androidx.compose.onCommit
 import androidx.compose.remember
+import androidx.ui.core.Alignment
 import androidx.ui.core.ContextAmbient
 import androidx.ui.core.Modifier
-import androidx.ui.foundation.DrawBorder
 import androidx.ui.foundation.Text
 import androidx.ui.foundation.currentTextStyle
+import androidx.ui.foundation.drawBorder
 import androidx.ui.graphics.Color
 import androidx.ui.layout.*
 import androidx.ui.material.*
@@ -96,12 +97,12 @@ private fun AppControls(model: AppModel) {
     }
 
     Row {
-        Text("Slow animations: ", modifier = Modifier.gravity(RowAlign.Center))
+        Text("Slow animations: ", modifier = Modifier.gravity(Alignment.CenterVertically))
         Switch(model.slowAnimations, onCheckedChange = { model.slowAnimations = it })
     }
 
     Row {
-        Text("Inspect (pinch + drag): ", modifier = Modifier.gravity(RowAlign.Center))
+        Text("Inspect (pinch + drag): ", modifier = Modifier.gravity(Alignment.CenterVertically))
         Switch(model.inspectionEnabled, onCheckedChange = { model.inspectionEnabled = it })
     }
 
@@ -133,7 +134,7 @@ private fun AppScreens(model: AppModel) {
                 backstack = model.currentBackstack,
                 transition = model.selectedTransition.second,
                 animationBuilder = animation,
-                modifier = Modifier.fillMaxSize() + DrawBorder(size = 3.dp, color = Color.Red),
+                modifier = Modifier.fillMaxSize().drawBorder(size = 3.dp, color = Color.Red),
                 inspectionParams = inspectionParams,
                 onTransitionStarting = { from, to, direction ->
                     println(
