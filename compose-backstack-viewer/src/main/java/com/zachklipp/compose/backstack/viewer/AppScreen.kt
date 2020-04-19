@@ -19,6 +19,7 @@ import androidx.ui.material.icons.Icons
 import androidx.ui.material.icons.filled.Add
 import androidx.ui.material.icons.filled.ArrowBack
 import androidx.ui.material.icons.filled.Menu
+import androidx.ui.savedinstancestate.savedInstanceState
 import androidx.ui.tooling.preview.Preview
 
 internal fun addTestTag(screen: String) = "add screen to $screen"
@@ -68,7 +69,10 @@ internal fun AppScreen(
 @Suppress("SameParameterValue")
 @Composable
 private fun Counter(@Pivotal periodMs: Long): Int {
-    var value by state { 0 }
+    // If the screen is temporarily removed from the composition, the counter will effectively
+    // be "paused": it will stop incrementing, but will resume from its last value when restored to
+    // the composition.
+    var value by savedInstanceState { 0 }
     onActive {
         val mainHandler = Handler()
         var disposed = false

@@ -53,7 +53,7 @@ class BackstackViewerTest {
             .doClick()
             .assertIsSelected()
 
-        findByText("Screen one").assertIsDisplayed()
+        findByText("Screen one").assertDoesNotExist()
         findByText("Screen two").assertIsDisplayed()
     }
 
@@ -72,8 +72,8 @@ class BackstackViewerTest {
             .doClick()
             .assertIsSelected()
 
-        findByText("Screen one").assertIsDisplayed()
-        findByText("Screen two").assertIsDisplayed()
+        findByText("Screen one").assertDoesNotExist()
+        findByText("Screen two").assertDoesNotExist()
         findByText("Screen three").assertIsDisplayed()
     }
 
