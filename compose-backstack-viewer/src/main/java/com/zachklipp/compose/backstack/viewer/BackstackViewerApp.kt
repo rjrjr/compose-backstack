@@ -33,7 +33,7 @@ private val DEFAULT_BACKSTACKS = listOf(
 )
 
 private val BUILTIN_BACKSTACK_TRANSITIONS = listOf(Slide, Crossfade)
-    .map { Pair(it::class.simpleName!!, it) }
+    .map { Pair(it::class.java.simpleName, it) }
 
 @Preview
 @Composable

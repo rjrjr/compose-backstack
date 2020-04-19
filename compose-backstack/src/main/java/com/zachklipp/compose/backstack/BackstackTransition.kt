@@ -1,4 +1,4 @@
-@file:Suppress("RemoveEmptyParenthesesFromAnnotationEntry")
+@file:Suppress("RemoveEmptyParenthesesFromAnnotationEntry", "DEPRECATION")
 
 package com.zachklipp.compose.backstack
 

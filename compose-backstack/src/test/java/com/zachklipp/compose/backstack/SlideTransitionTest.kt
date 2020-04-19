@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.zachklipp.compose.backstack
 
 import androidx.ui.core.LayoutDirection
