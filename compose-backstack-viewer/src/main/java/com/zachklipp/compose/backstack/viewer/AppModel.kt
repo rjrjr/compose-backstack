@@ -1,23 +1,22 @@
 package com.zachklipp.compose.backstack.viewer
 
-import androidx.compose.Composable
-import androidx.compose.Model
+import androidx.compose.*
 import androidx.ui.savedinstancestate.listSaver
 import androidx.ui.savedinstancestate.rememberSavedInstanceState
 import com.zachklipp.compose.backstack.BackstackTransition
 
-@Model
+@Stable
 internal class AppModel private constructor(
     namedTransitions: List<Pair<String, BackstackTransition>>,
     prefabBackstacks: List<List<String>>
 ) {
-    private var selectedTransitionIndex = 0
+    private var selectedTransitionIndex by mutableStateOf(0)
 
     // Can't define this var in the constructor because the backing field isn't set by the time the
     // currentBackstack initializer tries to read it when the @Model annotation is applied.
     @Suppress("CanBePrimaryConstructorProperty")
-    var prefabBackstacks = prefabBackstacks
-    var currentBackstack = prefabBackstacks.first()
+    var prefabBackstacks by mutableStateOf(prefabBackstacks)
+    var currentBackstack by mutableStateOf(prefabBackstacks.first())
 
     var namedTransitions = namedTransitions
         set(value) {
@@ -26,8 +25,8 @@ internal class AppModel private constructor(
         }
     val selectedTransition get() = namedTransitions[selectedTransitionIndex]
 
-    var slowAnimations: Boolean = false
-    var inspectionEnabled: Boolean = false
+    var slowAnimations: Boolean by mutableStateOf( false)
+    var inspectionEnabled: Boolean by mutableStateOf(false)
 
     val bottomScreen get() = currentBackstack.first()
 

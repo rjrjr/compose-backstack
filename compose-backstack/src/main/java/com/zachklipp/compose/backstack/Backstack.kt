@@ -9,11 +9,11 @@ import androidx.animation.TweenBuilder
 import androidx.compose.*
 import androidx.ui.animation.animatedFloat
 import androidx.ui.core.*
+import androidx.ui.core.semantics.semantics
 import androidx.ui.foundation.Box
-import androidx.ui.foundation.shape.RectangleShape
+import androidx.ui.graphics.RectangleShape
 import androidx.ui.layout.Stack
 import androidx.ui.savedinstancestate.UiSavedStateRegistryAmbient
-import androidx.ui.semantics.Semantics
 import com.zachklipp.compose.backstack.TransitionDirection.Backward
 import com.zachklipp.compose.backstack.TransitionDirection.Forward
 
@@ -250,12 +250,10 @@ fun <T : Any> Backstack(
                     return@ScreenWrapper
                 }
 
-                // Without an explicit semantics container, all screens will be merged into a single
-                // semantics group.
-                Semantics(container = true) {
-                    Providers(UiSavedStateRegistryAmbient provides savedStateRegistry) {
-                        Box(screenProperties.modifier, children = children)
-                    }
+                Providers(UiSavedStateRegistryAmbient provides savedStateRegistry) {
+                    // Without an explicit semantics container, all screens will be merged into a
+                    // single semantics group.
+                    Box(screenProperties.modifier.semantics(), children = children)
                 }
             }
         }

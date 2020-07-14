@@ -167,8 +167,8 @@ internal class BackstackInspector(clock: AnimationClockObservable) {
             scaleY = scale,
             rotationX = rotationX,
             rotationY = rotationY,
-            translationX = with(density) { offsetDpX.dp.toPx().value },
-            translationY = with(density) { offsetDpY.dp.toPx().value },
+            translationX = with(density) { offsetDpX.dp.toPx() },
+            translationY = with(density) { offsetDpY.dp.toPx() },
             alpha = alpha
         )
     }

@@ -5,7 +5,7 @@ object Versions {
 
     const val targetSdk = 29
     val agp = loadPropertyFromResources(versionsFile, "androidGradlePluginVersion")
-    const val compose = "0.1.0-dev09"
+    const val compose = "0.1.0-dev14"
     val kotlin = loadPropertyFromResources(versionsFile, "kotlinVersion")
     val dokka = loadPropertyFromResources(versionsFile, "dokkaVersion")
 }
@@ -37,11 +37,11 @@ object Dependencies {
     object Compose {
         const val foundation = "androidx.ui:ui-foundation:${Versions.compose}"
         const val icons = "androidx.ui:ui-material-icons-extended:${Versions.compose}"
-        const val layout = "androidx.ui:ui-layout:${Versions.compose}"
         const val material = "androidx.ui:ui-material:${Versions.compose}"
         const val savedstate = "androidx.ui:ui-saved-instance-state:${Versions.compose}"
         const val test = "androidx.ui:ui-test:${Versions.compose}"
         const val tooling = "androidx.ui:ui-tooling:${Versions.compose}"
+        const val util = "androidx.ui:ui-util:${Versions.compose}"
     }
 
     object Kotlin {

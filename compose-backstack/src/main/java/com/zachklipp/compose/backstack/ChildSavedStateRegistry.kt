@@ -1,9 +1,6 @@
 package com.zachklipp.compose.backstack
 
-import androidx.compose.Composable
-import androidx.compose.CompositionLifecycleObserver
-import androidx.compose.currentComposer
-import androidx.compose.remember
+import androidx.compose.*
 import androidx.ui.savedinstancestate.UiSavedStateRegistry
 import androidx.ui.savedinstancestate.UiSavedStateRegistryAmbient
 
@@ -12,6 +9,7 @@ import androidx.ui.savedinstancestate.UiSavedStateRegistryAmbient
  * providers whenever [childWillBeComposed] transitions from true to false, and make those values available
  * to be restored when [childWillBeComposed] transitions from false to true.
  */
+@OptIn(ExperimentalComposeApi::class)
 @Composable
 fun ChildSavedStateRegistry(childWillBeComposed: Boolean): UiSavedStateRegistry {
     val parent = UiSavedStateRegistryAmbient.current

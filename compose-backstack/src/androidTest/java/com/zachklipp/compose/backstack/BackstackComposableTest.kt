@@ -2,8 +2,10 @@ package com.zachklipp.compose.backstack
 
 import androidx.animation.ManualAnimationClock
 import androidx.animation.TweenBuilder
-import androidx.compose.Model
 import androidx.compose.Providers
+import androidx.compose.getValue
+import androidx.compose.mutableStateOf
+import androidx.compose.setValue
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.ui.core.AnimationClockAmbient
 import androidx.ui.foundation.Text
@@ -16,11 +18,6 @@ import com.zachklipp.compose.backstack.BackstackTransition.Slide
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-
-@Model
-private class State(
-    var backstack: List<String>
-)
 
 @RunWith(AndroidJUnit4::class)
 class BackstackComposableTest {
@@ -83,11 +80,11 @@ class BackstackComposableTest {
     private fun assertTransition(transition: BackstackTransition) {
         val originalBackstack = listOf("one")
         val destinationBackstack = listOf("one", "two")
-        val state = State(originalBackstack)
+        var backstack by mutableStateOf(originalBackstack)
         compose.setContent {
             Providers(AnimationClockAmbient provides clock) {
                 Backstack(
-                    state.backstack,
+                    backstack,
                     animationBuilder = animation,
                     transition = transition
                 ) { Text(it) }
@@ -98,7 +95,7 @@ class BackstackComposableTest {
         findByText("two").assertDoesNotExist()
 
         runOnUiThread {
-            state.backstack = destinationBackstack
+            backstack = destinationBackstack
         }
 
         findByText("one").assertIsDisplayed()

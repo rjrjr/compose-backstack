@@ -29,7 +29,9 @@ jobs:
       fail-fast: false
       matrix:
         api-level:
-          - 21
+          # Broken, fixed in AGP 4.1 RC: https://issuetracker.google.com/issues/158747359
+          #- 21
+          - 23
           - 29
     steps:
       - uses: actions/checkout@v2

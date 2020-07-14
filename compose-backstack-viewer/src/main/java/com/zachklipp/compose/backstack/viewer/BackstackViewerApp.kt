@@ -6,7 +6,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
 import androidx.animation.TweenBuilder
 import androidx.compose.Composable
-import androidx.compose.Pivotal
+import androidx.compose.key
 import androidx.compose.onCommit
 import androidx.compose.remember
 import androidx.ui.core.Alignment
@@ -62,9 +62,9 @@ private fun BackstackViewerAppPreview() {
  */
 @Composable
 fun BackstackViewerApp(
-    @Pivotal namedCustomTransitions: List<Pair<String, BackstackTransition>> = emptyList(),
-    @Pivotal prefabBackstacks: List<List<String>>? = null
-) {
+    namedCustomTransitions: List<Pair<String, BackstackTransition>> = emptyList(),
+    prefabBackstacks: List<List<String>>? = null
+) = key(namedCustomTransitions, prefabBackstacks) {
     val model = AppModel.create(
         namedTransitions = namedCustomTransitions + BUILTIN_BACKSTACK_TRANSITIONS,
         prefabBackstacks = (prefabBackstacks?.takeUnless { it.isEmpty() } ?: DEFAULT_BACKSTACKS)
