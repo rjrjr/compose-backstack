@@ -6,7 +6,7 @@ import android.os.Handler
 import androidx.compose.*
 import androidx.ui.core.Alignment
 import androidx.ui.core.Modifier
-import androidx.ui.core.TestTag
+import androidx.ui.core.testTag
 import androidx.ui.foundation.Icon
 import androidx.ui.foundation.Text
 import androidx.ui.layout.fillMaxSize
@@ -39,23 +39,19 @@ internal fun AppScreen(
     onAdd: () -> Unit
 ) {
     Scaffold(
-        topAppBar = {
+        topBar = {
             val navigationIcon = if (showBack) Icons.Default.ArrowBack else Icons.Default.Menu
             TopAppBar(
                 navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        TestTag(backTestTag(name)) {
-                            Icon(navigationIcon)
-                        }
+                    IconButton(onClick = onBack, modifier = Modifier.testTag(backTestTag(name))) {
+                        Icon(navigationIcon)
                     }
                 },
                 title = { Text("Screen $name") })
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = onAdd) {
-                TestTag(addTestTag(name)) {
-                    Icon(Icons.Default.Add)
-                }
+            FloatingActionButton(onClick = onAdd, modifier = Modifier.testTag(addTestTag(name))) {
+                Icon(Icons.Default.Add)
             }
         }
     ) {

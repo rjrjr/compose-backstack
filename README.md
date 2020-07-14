@@ -7,7 +7,7 @@ backstacks of screens and animated transitions when the stack changes. It is _no
 library, although it is meant to be easy to plug into your navigation library of choice
 (e.g. [compose-router](https://github.com/zsoltk/compose-router)), or even just use on its own.
 
-This library is compatible with Compose dev07.
+This library is compatible with Compose dev14.
 
 ## Usage
 

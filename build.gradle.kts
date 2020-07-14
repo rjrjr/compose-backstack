@@ -40,6 +40,8 @@ subprojects {
             // 1.3 and 1.4. Otherwise you'll see errors like "Runtime JAR file has version 1.3 which
             // is older than required for API version 1.4"
             apiVersion = "1.3"
+
+            freeCompilerArgs = listOf("-Xopt-in=kotlin.RequiresOptIn")
         }
     }
 }

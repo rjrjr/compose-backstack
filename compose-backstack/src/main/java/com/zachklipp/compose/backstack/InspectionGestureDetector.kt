@@ -9,7 +9,7 @@ import androidx.ui.core.gesture.ScaleObserver
 import androidx.ui.core.gesture.dragGestureFilter
 import androidx.ui.core.gesture.scaleGestureFilter
 import androidx.ui.foundation.Box
-import androidx.ui.unit.PxPosition
+import androidx.ui.geometry.Offset
 
 /**
  * Wrap your [Backstack] with this composable to get convenient gesture-based control of the
@@ -50,11 +50,11 @@ fun InspectionGestureDetector(
     }
     val dragObserver = remember(enabled) {
         object : DragObserver {
-            override fun onDrag(dragDistance: PxPosition): PxPosition {
-                if (!enabled) return PxPosition.Origin
+            override fun onDrag(dragDistance: Offset): Offset {
+                if (!enabled) return Offset.Zero
                 inspectionParams = inspectionParams.copy(
                     // Dragging left-and-right rotates around the vertical Y axis.
-                    rotationYDegrees = inspectionParams.rotationYDegrees + (dragDistance.x.value / 5f)
+                    rotationYDegrees = inspectionParams.rotationYDegrees + (dragDistance.x / 5f)
                 ).constrained()
                 return dragDistance
             }

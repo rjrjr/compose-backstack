@@ -3,18 +3,17 @@
 package com.zachklipp.compose.backstack
 
 import androidx.ui.core.LayoutDirection
-import androidx.ui.unit.IntPxPosition
-import androidx.ui.unit.IntPxSize
-import androidx.ui.unit.ipx
+import androidx.ui.unit.IntOffset
+import androidx.ui.unit.IntSize
 import com.zachklipp.compose.backstack.BackstackTransition.Slide
-import com.zachklipp.compose.backstack.IntPxPositionSubject.Companion.assertThat
+import com.zachklipp.compose.backstack.IntOffsetSubject.Companion.assertThat
 import com.zachklipp.compose.backstack.TransitionDirection.Backward
 import com.zachklipp.compose.backstack.TransitionDirection.Forward
 import org.junit.Test
 
 class PercentageLayoutOffsetTest {
 
-    private val containerSize = IntPxSize(100.ipx, 100.ipx)
+    private val containerSize = IntSize(100, 100)
 
     private var isTop = false
     private var transitionDirection = Forward
@@ -46,7 +45,7 @@ class PercentageLayoutOffsetTest {
 
     private fun BackstackTransition.applyModifiedPosition(
         visibility: Float
-    ): IntPxPosition {
+    ): IntOffset {
         val modifier = modifierForScreen(visibility, isTop) as PercentageLayoutOffset
         return modifier.offsetPosition(containerSize)
     }

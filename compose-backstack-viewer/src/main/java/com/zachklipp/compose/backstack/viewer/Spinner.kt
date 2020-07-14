@@ -19,7 +19,6 @@ import androidx.ui.material.darkColorPalette
 import androidx.ui.material.icons.Icons
 import androidx.ui.material.icons.filled.ArrowDropDown
 import androidx.ui.material.lightColorPalette
-import androidx.ui.material.ripple.ripple
 import androidx.ui.tooling.preview.Preview
 import androidx.ui.unit.dp
 
@@ -58,10 +57,7 @@ internal fun <T : Any> Spinner(
     var isOpen by state { false }
 
     // Always draw the selected item.
-    Row(
-        Modifier.ripple(bounded = true)
-            .clickable(onClick = { isOpen = !isOpen })
-    ) {
+    Row(Modifier.clickable(onClick = { isOpen = !isOpen })) {
         Box(modifier = Modifier.weight(1f).gravity(Alignment.CenterVertically)) {
             drawItem(selectedItem)
         }
@@ -77,13 +73,10 @@ internal fun <T : Any> Spinner(
             Surface(elevation = 1.dp) {
                 Column {
                     for (item in items) {
-                        Box(
-                            Modifier.ripple(bounded = true)
-                                .clickable(onClick = {
-                                    isOpen = false
-                                    if (item != selectedItem) onSelected(item)
-                                })
-                        ) {
+                        Box(Modifier.clickable(onClick = {
+                            isOpen = false
+                            if (item != selectedItem) onSelected(item)
+                        })) {
                             drawItem(item)
                         }
                     }
