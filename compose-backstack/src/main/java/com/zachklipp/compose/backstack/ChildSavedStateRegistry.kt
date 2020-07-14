@@ -1,10 +1,11 @@
 package com.zachklipp.compose.backstack
 
 import androidx.compose.Composable
+import androidx.compose.CompositionLifecycleObserver
+import androidx.compose.currentComposer
 import androidx.compose.remember
 import androidx.ui.savedinstancestate.UiSavedStateRegistry
 import androidx.ui.savedinstancestate.UiSavedStateRegistryAmbient
-import androidx.ui.savedinstancestate.rememberSavedInstanceState
 
 /**
  * Returns a [UiSavedStateRegistry] that will automatically save values from all its registered
@@ -12,50 +13,58 @@ import androidx.ui.savedinstancestate.rememberSavedInstanceState
  * to be restored when [childWillBeComposed] transitions from false to true.
  */
 @Composable
-@Suppress("RemoveExplicitTypeArguments")
 fun ChildSavedStateRegistry(childWillBeComposed: Boolean): UiSavedStateRegistry {
-    val parentRegistry = UiSavedStateRegistryAmbient.current
-
-    // This map holds all the savedInstanceState for this screen as long as it exists
-    // in the backstack. When the screen is hidden, we will cache its state providers
-    // into this map before removing it from the composition. This cache will in turn
-    // be persisted into and restored from the parent UiSavedStateRegistry.
-    val values = rememberSavedInstanceState<MutableMap<String, Any>> { mutableMapOf() }
-    val holder = remember {
-        // If there's no registry available, then we won't be restored anyway so there are no
-        // serializability restrictions on saved values.
-        val canBeSaved: (Any) -> Boolean = parentRegistry?.let { it::canBeSaved } ?: { true }
-        SavedStateHolder(canBeSaved, values)
-    }
-    holder.setScreenVisibility(childWillBeComposed)
-    return holder.registry
+    val parent = UiSavedStateRegistryAmbient.current
+    val key = currentComposer.currentCompoundKeyHash.toString()
+    val holder = remember { SavedStateHolder(key) }
+    return holder.updateAndReturnRegistry(parent, childWillBeComposed)
 }
 
-internal class SavedStateHolder(
-    private val canBeSaved: (Any) -> Boolean,
-    private var values: Map<String, Any>
-) {
-    var registry: UiSavedStateRegistry = createRegistry()
-        private set
+internal class SavedStateHolder(private val key: String) : CompositionLifecycleObserver {
+    private var parent: UiSavedStateRegistry? = null
     private var isScreenVisible = false
+    private var values: Map<String, Any>? = null
+    private var registry: UiSavedStateRegistry = createRegistry()
 
     /**
-     * Tracks the visibility of the screen this class holds the state for and returns either the
-     * [UiSavedStateRegistry] if visible, or null if not visible.
+     * Manages the visibility of the screen and saves its state whenever [isVisible] transitions
+     * from true to false, or whenever the Android OS triggers an onSaveInstanceState dispatch.
      *
-     * When [isVisible] transitions from false to true, a new registry will be created that can will
-     * restore from previously-saved values.
-     *
-     * When [isVisible] transitions from true to false, the existing registry will be used to save
-     * all values.
+     * Returns a [UiSavedStateRegistry] containing the most recently saved values.
      */
-    fun setScreenVisibility(isVisible: Boolean) {
-        if (isVisible == this.isScreenVisible) return
+    @Suppress("UNCHECKED_CAST")
+    fun updateAndReturnRegistry(
+        parent: UiSavedStateRegistry?,
+        isVisible: Boolean
+    ): UiSavedStateRegistry {
+        // When values is null, try restore any previously saved values (or fallback to an empty
+        // map). Once values is non-null, it'll hold the all the latest saved values for the screen.
+        values = values ?: parent?.consumeRestored(key) as Map<String, Any>? ?: emptyMap()
+
+        val oldParent = this.parent
+        this.parent = parent
+
+        // Use an identity comparison here for safety because UiSavedStateRegistry is an interface
+        // and custom implementations might have their own custom equals implementation. And if we
+        // call unregisterProvider on an UiSavedStateRegistry where `key` isn't already registered,
+        // then it'll crash.
+        if (parent !== oldParent) {
+            oldParent?.unregisterProvider(key)
+            parent?.registerProvider(key) {
+                if (isScreenVisible) {
+                    // Save the screen if it is visible right now. If it is invisible, then it's
+                    // values were already saved upon leaving the screen.
+                    values = registry.performSave()
+                }
+                values
+            }
+        }
+
+        if (isVisible == this.isScreenVisible) return registry
         this.isScreenVisible = isVisible
 
         if (!isVisible) {
-            // This will automatically preserve any values that were passed into the factory
-            // function but not consumed.
+            // Perform save on this screen just before it leaves the composition.
             values = registry.performSave()
         } else {
             // Recreate the registry so the most recently-saved values will be used to restore.
@@ -63,7 +72,22 @@ internal class SavedStateHolder(
             // it needs to be recreated on every restoration.
             registry = createRegistry()
         }
+
+        return registry
     }
 
-    private fun createRegistry() = UiSavedStateRegistry(values, canBeSaved)
+    override fun onEnter() {
+        // No-op
+    }
+
+    override fun onLeave() {
+        parent?.unregisterProvider(key)
+    }
+
+    private fun createRegistry(): UiSavedStateRegistry {
+        // If there's no registry available, then we won't be restored anyway so there are no
+        // serializability restrictions on saved values.
+        val canBeSaved: (Any) -> Boolean = parent?.let { it::canBeSaved } ?: { true }
+        return UiSavedStateRegistry(values, canBeSaved)
+    }
 }
