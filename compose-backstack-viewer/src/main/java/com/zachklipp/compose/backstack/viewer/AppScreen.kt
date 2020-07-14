@@ -68,7 +68,7 @@ internal fun AppScreen(
 
 @Suppress("SameParameterValue")
 @Composable
-private fun Counter(@Pivotal periodMs: Long): Int {
+private fun Counter(periodMs: Long): Int = key(periodMs) {
     // If the screen is temporarily removed from the composition, the counter will effectively
     // be "paused": it will stop incrementing, but will resume from its last value when restored to
     // the composition.
@@ -85,5 +85,5 @@ private fun Counter(@Pivotal periodMs: Long): Int {
         }
         schedule()
     }
-    return value
+    return@key value
 }

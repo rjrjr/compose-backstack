@@ -5,7 +5,7 @@ object Versions {
 
     const val targetSdk = 29
     val agp = loadPropertyFromResources(versionsFile, "androidGradlePluginVersion")
-    const val compose = "0.1.0-dev09"
+    const val compose = "0.1.0-dev13"
     val kotlin = loadPropertyFromResources(versionsFile, "kotlinVersion")
     val dokka = loadPropertyFromResources(versionsFile, "dokkaVersion")
 }

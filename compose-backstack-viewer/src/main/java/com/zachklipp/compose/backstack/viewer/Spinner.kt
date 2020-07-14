@@ -58,19 +58,17 @@ internal fun <T : Any> Spinner(
     var isOpen by state { false }
 
     // Always draw the selected item.
-    Clickable(
-        onClick = { isOpen = !isOpen },
-        modifier = Modifier.ripple(bounded = true)
+    Row(
+        Modifier.ripple(bounded = true)
+            .clickable(onClick = { isOpen = !isOpen })
     ) {
-        Row {
-            Box(modifier = Modifier.weight(1f).gravity(Alignment.CenterVertically)) {
-                drawItem(selectedItem)
-            }
-            Icon(
-                Icons.Default.ArrowDropDown,
-                modifier = Modifier.preferredWidth(48.dp).aspectRatio(1f)
-            )
+        Box(modifier = Modifier.weight(1f).gravity(Alignment.CenterVertically)) {
+            drawItem(selectedItem)
         }
+        Icon(
+            Icons.Default.ArrowDropDown,
+            modifier = Modifier.preferredWidth(48.dp).aspectRatio(1f)
+        )
     }
 
     if (isOpen) {
@@ -79,12 +77,13 @@ internal fun <T : Any> Spinner(
             Surface(elevation = 1.dp) {
                 Column {
                     for (item in items) {
-                        Clickable(
-                            modifier = Modifier.ripple(bounded = true),
-                            onClick = {
-                                isOpen = false
-                                if (item != selectedItem) onSelected(item)
-                            }) {
+                        Box(
+                            Modifier.ripple(bounded = true)
+                                .clickable(onClick = {
+                                    isOpen = false
+                                    if (item != selectedItem) onSelected(item)
+                                })
+                        ) {
                             drawItem(item)
                         }
                     }

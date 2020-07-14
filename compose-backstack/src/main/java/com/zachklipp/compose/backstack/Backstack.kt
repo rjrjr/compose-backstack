@@ -10,7 +10,7 @@ import androidx.compose.*
 import androidx.ui.animation.animatedFloat
 import androidx.ui.core.*
 import androidx.ui.foundation.Box
-import androidx.ui.foundation.shape.RectangleShape
+import androidx.ui.graphics.RectangleShape
 import androidx.ui.layout.Stack
 import androidx.ui.savedinstancestate.UiSavedStateRegistryAmbient
 import androidx.ui.semantics.Semantics

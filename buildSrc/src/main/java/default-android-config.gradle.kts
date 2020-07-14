@@ -27,6 +27,7 @@ configure<BaseExtension> {
     buildFeatures.compose = true
 
     composeOptions {
+        kotlinCompilerVersion = "1.3.70-dev-withExperimentalGoogleExtensions-20200424"
         kotlinCompilerExtensionVersion = Versions.compose
     }
 }

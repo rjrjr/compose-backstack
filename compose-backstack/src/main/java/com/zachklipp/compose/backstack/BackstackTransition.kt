@@ -2,14 +2,8 @@
 
 package com.zachklipp.compose.backstack
 
-import androidx.ui.core.LayoutDirection
-import androidx.ui.core.LayoutModifier
 import androidx.ui.core.Modifier
 import androidx.ui.core.drawOpacity
-import androidx.ui.unit.Density
-import androidx.ui.unit.IntPxPosition
-import androidx.ui.unit.IntPxSize
-import androidx.ui.unit.ipx
 import com.zachklipp.compose.backstack.BackstackTransition.Crossfade
 import com.zachklipp.compose.backstack.BackstackTransition.Slide
 
@@ -47,21 +41,6 @@ interface BackstackTransition {
         ): Modifier = PercentageLayoutOffset(
             offset = if (isTop) 1f - visibility else -1 + visibility
         )
-
-        private class PercentageLayoutOffset(private val offset: Float) : LayoutModifier {
-            override fun Density.modifyPosition(
-                childSize: IntPxSize,
-                containerSize: IntPxSize,
-                layoutDirection: LayoutDirection
-            ): IntPxPosition {
-                var realOffset = offset.coerceIn(-1f..1f)
-                if (layoutDirection == LayoutDirection.Rtl) realOffset *= -1f
-                return IntPxPosition(
-                    x = containerSize.width * realOffset,
-                    y = 0.ipx
-                )
-            }
-        }
     }
 
     /**
