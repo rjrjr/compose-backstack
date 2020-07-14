@@ -1,9 +1,20 @@
 Changelog
 =========
 
+## v0.4.0
+
+_2020-07-13_
+
+ * New: Start using `UiSavedStateRegistry` to preserve screen "view" state. (#25)
+ * New: Automatically save/restore the state of a `BackstackViewerApp` using the new saved state tools. (#21)
+   * Buggy implementation subsequently fixed by @grandstaish in #29, thanks!
+ * Fix: Rename `master` branch to `main`.
+ * Upgrade: Kotlin to 1.3.71. (#15)
+ * Upgrade: Compose to dev14. (#31)
+
 ## v0.3.0
 
-_2020-30-22_
+_2020-03-22_
 
  * Introduce inspection mode for peering into the past. (#12)
  * Add RTL support to the `Slide` transition.
