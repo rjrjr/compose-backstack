@@ -9,10 +9,12 @@ plugins {
 }
 
 val releaseVersion = loadPropertyFromResources("versions.properties", "releaseVersion")
+val composeDevVersion = loadPropertyFromResources("versions.properties", "composeDevVersion")
 val isRelease = properties["isRelease"] == "true"
 
 group = "com.zachklipp"
-version = if (isRelease) releaseVersion else "$releaseVersion-SNAPSHOT"
+version = "$releaseVersion+$composeDevVersion"
+    .let { if (isRelease) it else "$it-SNAPSHOT" }
 
 val projectUrl = "https://github.com/zach-klippenstein/compose-backstack"
 val sonatypeUrl = if (isRelease) {

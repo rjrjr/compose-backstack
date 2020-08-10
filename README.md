@@ -7,7 +7,8 @@ backstacks of screens and animated transitions when the stack changes. It is _no
 library, although it is meant to be easy to plug into your navigation library of choice
 (e.g. [compose-router](https://github.com/zsoltk/compose-router)), or even just use on its own.
 
-This library is compatible with Compose dev16.
+The Compose version that this library is compatible with is indicated in this library's version
+number.
 
 ## Usage
 
@@ -132,9 +133,9 @@ allprojects {
 }
 
 dependencies {
-    implementation 'com.zachklipp:compose-backstack:0.3.0'
+    implementation "com.zachklipp:compose-backstack:${Versions.backstack}"
 
     // For BackstackViewerApp.
-    debugImplementation 'com.zachklipp:compose-backstack-viewer:0.3.0'
+    debugImplementation "com.zachklipp:compose-backstack-viewer:${Versions.backstack}"
 }
 ```
