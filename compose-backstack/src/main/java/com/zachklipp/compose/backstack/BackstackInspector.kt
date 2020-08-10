@@ -2,18 +2,18 @@
 
 package com.zachklipp.compose.backstack
 
-import androidx.animation.AnimationClockObservable
-import androidx.animation.PhysicsBuilder
-import androidx.animation.Spring
-import androidx.compose.*
-import androidx.ui.animation.AnimatedFloatModel
-import androidx.ui.animation.animate
-import androidx.ui.core.DensityAmbient
-import androidx.ui.core.Modifier
-import androidx.ui.core.drawLayer
-import androidx.ui.graphics.vectormath.radians
-import androidx.ui.unit.Dp
-import androidx.ui.unit.dp
+import androidx.compose.animation.AnimatedFloatModel
+import androidx.compose.animation.animate
+import androidx.compose.animation.core.AnimationClockObservable
+import androidx.compose.animation.core.FloatSpringSpec
+import androidx.compose.animation.core.Spring
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.drawLayer
+import androidx.compose.ui.graphics.vectormath.radians
+import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import kotlin.math.sin
 
 /**
@@ -58,13 +58,12 @@ fun InspectionParams.constrained() = InspectionParams(
 
 internal class BackstackInspector(clock: AnimationClockObservable) {
 
-    private val animation = PhysicsBuilder<Float>(stiffness = Spring.StiffnessLow)
+    private val animation = FloatSpringSpec(stiffness = Spring.StiffnessLow)
 
     /**
      * True when the inspector is in control of rendering.
      * Will continue to return true after setting [params] to null until it's finished animating.
      */
-    @Composable
     var isInspectionActive: Boolean by mutableStateOf(false)
         private set
 

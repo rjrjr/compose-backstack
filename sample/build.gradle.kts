@@ -15,7 +15,6 @@ dependencies {
     implementation(Dependencies.AndroidX.appcompat)
     implementation(Dependencies.Compose.foundation)
     implementation(Dependencies.Compose.util)
-    implementation(Dependencies.Kotlin.stdlib)
 
     androidTestImplementation(Dependencies.AndroidX.junitExt)
     androidTestImplementation(Dependencies.Compose.test)

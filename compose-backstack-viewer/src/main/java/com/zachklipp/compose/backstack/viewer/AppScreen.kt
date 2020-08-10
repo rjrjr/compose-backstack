@@ -3,23 +3,23 @@
 package com.zachklipp.compose.backstack.viewer
 
 import android.os.Handler
-import androidx.compose.*
-import androidx.ui.core.Alignment
-import androidx.ui.core.Modifier
-import androidx.ui.core.testTag
-import androidx.ui.foundation.Icon
-import androidx.ui.foundation.Text
-import androidx.ui.layout.fillMaxSize
-import androidx.ui.layout.wrapContentSize
-import androidx.ui.material.FloatingActionButton
-import androidx.ui.material.IconButton
-import androidx.ui.material.Scaffold
-import androidx.ui.material.TopAppBar
-import androidx.ui.material.icons.Icons
-import androidx.ui.material.icons.filled.Add
-import androidx.ui.material.icons.filled.ArrowBack
-import androidx.ui.material.icons.filled.Menu
-import androidx.ui.savedinstancestate.savedInstanceState
+import androidx.compose.foundation.Icon
+import androidx.compose.foundation.Text
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.material.FloatingActionButton
+import androidx.compose.material.IconButton
+import androidx.compose.material.Scaffold
+import androidx.compose.material.TopAppBar
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.runtime.*
+import androidx.compose.runtime.savedinstancestate.savedInstanceState
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.ui.tooling.preview.Preview
 
 internal fun addTestTag(screen: String) = "add screen to $screen"

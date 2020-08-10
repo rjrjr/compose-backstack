@@ -2,9 +2,9 @@
 
 package com.zachklipp.compose.backstack
 
-import androidx.ui.core.LayoutDirection
-import androidx.ui.unit.IntOffset
-import androidx.ui.unit.IntSize
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.LayoutDirection
 import com.zachklipp.compose.backstack.BackstackTransition.Slide
 import com.zachklipp.compose.backstack.IntOffsetSubject.Companion.assertThat
 import com.zachklipp.compose.backstack.TransitionDirection.Backward

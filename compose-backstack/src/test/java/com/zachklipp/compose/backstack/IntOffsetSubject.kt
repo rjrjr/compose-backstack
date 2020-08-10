@@ -1,6 +1,6 @@
 package com.zachklipp.compose.backstack
 
-import androidx.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntOffset
 import com.google.common.truth.FailureMetadata
 import com.google.common.truth.Subject
 import com.google.common.truth.Subject.Factory

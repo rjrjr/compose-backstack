@@ -4,22 +4,24 @@ import android.content.Context
 import android.content.ContextWrapper
 import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
-import androidx.animation.TweenBuilder
-import androidx.compose.Composable
-import androidx.compose.key
-import androidx.compose.onCommit
-import androidx.compose.remember
-import androidx.ui.core.Alignment
-import androidx.ui.core.ContextAmbient
-import androidx.ui.core.Modifier
-import androidx.ui.foundation.Text
-import androidx.ui.foundation.currentTextStyle
-import androidx.ui.foundation.drawBorder
-import androidx.ui.graphics.Color
-import androidx.ui.layout.*
-import androidx.ui.material.*
+import androidx.compose.animation.core.TweenSpec
+import androidx.compose.foundation.Box
+import androidx.compose.foundation.Text
+import androidx.compose.foundation.currentTextStyle
+import androidx.compose.foundation.drawBorder
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.material.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.key
+import androidx.compose.runtime.onCommit
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.ContextAmbient
+import androidx.compose.ui.unit.dp
 import androidx.ui.tooling.preview.Preview
-import androidx.ui.unit.dp
 import com.zachklipp.compose.backstack.Backstack
 import com.zachklipp.compose.backstack.BackstackTransition
 import com.zachklipp.compose.backstack.BackstackTransition.Crossfade
@@ -75,7 +77,7 @@ fun BackstackViewerApp(
         OnBackPressed { model.popScreen() }
     }
 
-    MaterialTheme(colors = darkColorPalette()) {
+    MaterialTheme(colors = darkColors()) {
         Surface {
             Column(modifier = Modifier.padding(16.dp).fillMaxSize()) {
                 AppControls(model)
@@ -108,9 +110,8 @@ private fun AppControls(model: AppModel) {
 
     RadioGroup {
         model.prefabBackstacks.forEach { backstack ->
-            RadioGroupTextItem(
+            RadioButton(
                 text = backstack.joinToString(", "),
-                textStyle = currentTextStyle(),
                 selected = backstack == model.currentBackstack,
                 onSelect = { model.currentBackstack = backstack }
             )
@@ -122,13 +123,11 @@ private fun AppControls(model: AppModel) {
 private fun AppScreens(model: AppModel) {
     val animation = if (model.slowAnimations) {
         remember {
-            TweenBuilder<Float>().apply {
-                duration = 2000
-            }
+            TweenSpec<Float>(durationMillis = 2000)
         }
     } else null
 
-    MaterialTheme(colors = lightColorPalette()) {
+    MaterialTheme(colors = lightColors()) {
         InspectionGestureDetector(enabled = model.inspectionEnabled) { inspectionParams ->
             Backstack(
                 backstack = model.currentBackstack,
@@ -156,6 +155,32 @@ private fun AppScreens(model: AppModel) {
             }
         }
     }
+}
+
+@Composable
+private fun RadioButton(
+    text: String,
+    selected: Boolean,
+    onSelect: () -> Unit
+) {
+    Box(
+        modifier = Modifier.selectable(
+            selected = selected,
+            onClick = { if (!selected) onSelect() }
+        ),
+        children = {
+            Box {
+                Row(Modifier.fillMaxWidth().padding(16.dp)) {
+                    RadioButton(selected = selected, onClick = onSelect)
+                    Text(
+                        text = text,
+                        style = MaterialTheme.typography.body1.merge(other = currentTextStyle()),
+                        modifier = Modifier.padding(start = 16.dp)
+                    )
+                }
+            }
+        }
+    )
 }
 
 @Composable

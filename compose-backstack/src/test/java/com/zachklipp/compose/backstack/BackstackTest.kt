@@ -1,6 +1,6 @@
 package com.zachklipp.compose.backstack
 
-import androidx.ui.core.Modifier
+import androidx.compose.ui.Modifier
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 

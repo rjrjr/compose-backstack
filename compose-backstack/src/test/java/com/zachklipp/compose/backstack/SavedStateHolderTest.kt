@@ -1,6 +1,6 @@
 package com.zachklipp.compose.backstack
 
-import androidx.ui.savedinstancestate.UiSavedStateRegistry
+import androidx.compose.runtime.savedinstancestate.UiSavedStateRegistry
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 

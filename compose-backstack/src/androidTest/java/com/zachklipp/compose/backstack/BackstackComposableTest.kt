@@ -1,18 +1,15 @@
 package com.zachklipp.compose.backstack
 
-import androidx.animation.ManualAnimationClock
-import androidx.animation.TweenBuilder
-import androidx.compose.Providers
-import androidx.compose.getValue
-import androidx.compose.mutableStateOf
-import androidx.compose.setValue
+import androidx.compose.animation.core.ManualAnimationClock
+import androidx.compose.animation.core.TweenSpec
+import androidx.compose.foundation.Text
+import androidx.compose.runtime.Providers
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.AnimationClockAmbient
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.ui.core.AnimationClockAmbient
-import androidx.ui.foundation.Text
-import androidx.ui.test.assertIsDisplayed
-import androidx.ui.test.createComposeRule
-import androidx.ui.test.findByText
-import androidx.ui.test.runOnUiThread
+import androidx.ui.test.*
 import com.zachklipp.compose.backstack.BackstackTransition.Crossfade
 import com.zachklipp.compose.backstack.BackstackTransition.Slide
 import org.junit.Rule
@@ -26,7 +23,7 @@ class BackstackComposableTest {
     val compose = createComposeRule()
 
     private val clock = ManualAnimationClock(0)
-    private val animation = TweenBuilder<Float>().apply { duration = 100 }
+    private val animation = TweenSpec<Float>(durationMillis = 100)
 
     @Test
     fun initialStateWithSingleScreen_slide() {
@@ -64,7 +61,7 @@ class BackstackComposableTest {
             Backstack(originalBackstack, transition = transition) { Text(it) }
         }
 
-        findByText("one").assertIsDisplayed()
+        onNodeWithText("one").assertIsDisplayed()
     }
 
     private fun assertInitialStateWithMultipleScreens(transition: BackstackTransition) {
@@ -73,8 +70,8 @@ class BackstackComposableTest {
             Backstack(originalBackstack, transition = transition) { Text(it) }
         }
 
-        findByText("two").assertIsDisplayed()
-        findByText("one").assertDoesNotExist()
+        onNodeWithText("two").assertIsDisplayed()
+        onNodeWithText("one").assertDoesNotExist()
     }
 
     private fun assertTransition(transition: BackstackTransition) {
@@ -91,30 +88,30 @@ class BackstackComposableTest {
             }
         }
 
-        findByText("one").assertIsDisplayed()
-        findByText("two").assertDoesNotExist()
+        onNodeWithText("one").assertIsDisplayed()
+        onNodeWithText("two").assertDoesNotExist()
 
         runOnUiThread {
             backstack = destinationBackstack
         }
 
-        findByText("one").assertIsDisplayed()
-        findByText("two").assertDoesNotExist()
+        onNodeWithText("one").assertIsDisplayed()
+        onNodeWithText("two").assertDoesNotExist()
 
         setTransitionTime(25)
 
-        findByText("one").assertIsDisplayed()
-        findByText("two").assertIsDisplayed()
+        onNodeWithText("one").assertIsDisplayed()
+        onNodeWithText("two").assertIsDisplayed()
 
         setTransitionTime(75)
 
-        findByText("one").assertIsDisplayed()
-        findByText("two").assertIsDisplayed()
+        onNodeWithText("one").assertIsDisplayed()
+        onNodeWithText("two").assertIsDisplayed()
 
         setTransitionTime(100)
 
-        findByText("one").assertDoesNotExist()
-        findByText("two").assertIsDisplayed()
+        onNodeWithText("one").assertDoesNotExist()
+        onNodeWithText("two").assertIsDisplayed()
     }
 
     private fun setTransitionTime(time: Long) {
