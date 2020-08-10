@@ -2,14 +2,14 @@
 
 package com.zachklipp.compose.backstack
 
-import androidx.compose.*
-import androidx.ui.core.Modifier
-import androidx.ui.core.gesture.DragObserver
-import androidx.ui.core.gesture.ScaleObserver
-import androidx.ui.core.gesture.dragGestureFilter
-import androidx.ui.core.gesture.scaleGestureFilter
-import androidx.ui.foundation.Box
-import androidx.ui.geometry.Offset
+import androidx.compose.foundation.Box
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.gesture.DragObserver
+import androidx.compose.ui.gesture.ScaleObserver
+import androidx.compose.ui.gesture.dragGestureFilter
+import androidx.compose.ui.gesture.scaleGestureFilter
 
 /**
  * Wrap your [Backstack] with this composable to get convenient gesture-based control of the

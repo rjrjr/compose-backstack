@@ -41,7 +41,11 @@ subprojects {
             // is older than required for API version 1.4"
             apiVersion = "1.3"
 
-            freeCompilerArgs = listOf("-Xopt-in=kotlin.RequiresOptIn")
+            freeCompilerArgs = listOf(
+                "-Xopt-in=kotlin.RequiresOptIn",
+                "-Xallow-jvm-ir-dependencies",
+                "-Xskip-prerelease-check"
+            )
         }
     }
 }

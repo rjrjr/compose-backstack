@@ -9,7 +9,6 @@ plugins {
 dependencies {
     compileOnly(Dependencies.Compose.tooling)
 
-    implementation(Dependencies.Kotlin.stdlib)
     implementation(Dependencies.Compose.foundation)
     implementation(Dependencies.Compose.savedstate)
 

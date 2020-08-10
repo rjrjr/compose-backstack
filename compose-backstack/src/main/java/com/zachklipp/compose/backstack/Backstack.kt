@@ -2,18 +2,21 @@
 
 package com.zachklipp.compose.backstack
 
-import androidx.animation.AnimationBuilder
-import androidx.animation.AnimationEndReason
-import androidx.animation.AnimationEndReason.TargetReached
-import androidx.animation.TweenBuilder
-import androidx.compose.*
-import androidx.ui.animation.animatedFloat
-import androidx.ui.core.*
-import androidx.ui.core.semantics.semantics
-import androidx.ui.foundation.Box
-import androidx.ui.graphics.RectangleShape
-import androidx.ui.layout.Stack
-import androidx.ui.savedinstancestate.UiSavedStateRegistryAmbient
+import androidx.compose.animation.animatedFloat
+import androidx.compose.animation.core.AnimationEndReason
+import androidx.compose.animation.core.AnimationEndReason.TargetReached
+import androidx.compose.animation.core.AnimationSpec
+import androidx.compose.animation.core.TweenSpec
+import androidx.compose.foundation.Box
+import androidx.compose.foundation.layout.Stack
+import androidx.compose.runtime.*
+import androidx.compose.runtime.savedinstancestate.UiSavedStateRegistryAmbient
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawOpacity
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.platform.AnimationClockAmbient
+import androidx.compose.ui.platform.ContextAmbient
 import com.zachklipp.compose.backstack.TransitionDirection.Backward
 import com.zachklipp.compose.backstack.TransitionDirection.Forward
 
@@ -43,12 +46,12 @@ internal data class ScreenProperties(
 )
 
 @Composable
-private val DefaultBackstackAnimation: AnimationBuilder<Float>
+private val DefaultBackstackAnimation: AnimationSpec<Float>
     get() {
         val context = ContextAmbient.current
-        return TweenBuilder<Float>().apply {
-            duration = context.resources.getInteger(android.R.integer.config_shortAnimTime)
-        }
+        return TweenSpec(
+            durationMillis = context.resources.getInteger(android.R.integer.config_shortAnimTime)
+        )
     }
 
 /**
@@ -128,7 +131,7 @@ fun <T : Any> Backstack(
     backstack: List<T>,
     modifier: Modifier = Modifier,
     transition: BackstackTransition = BackstackTransition.Slide,
-    animationBuilder: AnimationBuilder<Float>? = null,
+    animationBuilder: AnimationSpec<Float>? = null,
     onTransitionStarting: ((from: List<T>, to: List<T>, TransitionDirection) -> Unit)? = null,
     onTransitionFinished: (() -> Unit)? = null,
     inspectionParams: InspectionParams? = null,
@@ -251,9 +254,7 @@ fun <T : Any> Backstack(
                 }
 
                 Providers(UiSavedStateRegistryAmbient provides savedStateRegistry) {
-                    // Without an explicit semantics container, all screens will be merged into a
-                    // single semantics group.
-                    Box(screenProperties.modifier.semantics(), children = children)
+                    Box(screenProperties.modifier, children = children)
                 }
             }
         }

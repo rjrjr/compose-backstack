@@ -2,30 +2,34 @@
 
 package com.zachklipp.compose.backstack.viewer
 
-import androidx.compose.Composable
-import androidx.compose.getValue
-import androidx.compose.setValue
-import androidx.compose.state
-import androidx.ui.core.Alignment
-import androidx.ui.core.Modifier
-import androidx.ui.foundation.*
-import androidx.ui.layout.Column
-import androidx.ui.layout.Row
-import androidx.ui.layout.aspectRatio
-import androidx.ui.layout.preferredWidth
-import androidx.ui.material.MaterialTheme
-import androidx.ui.material.Surface
-import androidx.ui.material.darkColorPalette
-import androidx.ui.material.icons.Icons
-import androidx.ui.material.icons.filled.ArrowDropDown
-import androidx.ui.material.lightColorPalette
+import androidx.compose.foundation.Box
+import androidx.compose.foundation.Icon
+import androidx.compose.foundation.Text
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.preferredWidth
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
+import androidx.compose.material.darkColors
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.lightColors
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.state
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.ui.tooling.preview.Preview
-import androidx.ui.unit.dp
 
 @Preview
 @Composable
 private fun SpinnerPreviewLight() {
-    MaterialTheme(colors = lightColorPalette()) {
+    MaterialTheme(colors = lightColors()) {
         Surface {
             Spinner(listOf("foo"), selectedItem = "foo", onSelected = {}) { Text(it) }
         }
@@ -35,7 +39,7 @@ private fun SpinnerPreviewLight() {
 @Preview
 @Composable
 private fun SpinnerPreviewDark() {
-    MaterialTheme(colors = darkColorPalette()) {
+    MaterialTheme(colors = darkColors()) {
         Surface {
             Spinner(listOf("foo"), selectedItem = "foo", onSelected = {}) { Text(it) }
         }

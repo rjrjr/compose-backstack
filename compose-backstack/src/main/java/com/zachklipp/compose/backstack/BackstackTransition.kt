@@ -2,8 +2,8 @@
 
 package com.zachklipp.compose.backstack
 
-import androidx.ui.core.Modifier
-import androidx.ui.core.drawOpacity
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawOpacity
 import com.zachklipp.compose.backstack.BackstackTransition.Crossfade
 import com.zachklipp.compose.backstack.BackstackTransition.Slide
 

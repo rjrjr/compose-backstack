@@ -18,15 +18,15 @@ class BackstackViewerTest {
             BackstackViewerApp()
         }
 
-        findByText("Slide Transition").assertIsDisplayed()
-        findBySubstring("Slow animations").assertIsDisplayed()
+        onNodeWithText("Slide Transition").assertIsDisplayed()
+        onNodeWithSubstring("Slow animations").assertIsDisplayed()
 
-        findByText("one").assertIsSelected()
-        findByText("one, two").assertIsUnselected()
-        findByText("one, two, three").assertIsUnselected()
+        onNodeWithText("one").assertIsSelected()
+        onNodeWithText("one, two").assertIsNotSelected()
+        onNodeWithText("one, two, three").assertIsNotSelected()
 
-        findByText("Screen one").assertIsDisplayed()
-        findBySubstring("Counter:").assertIsDisplayed()
+        onNodeWithText("Screen one").assertIsDisplayed()
+        onNodeWithSubstring("Counter:").assertIsDisplayed()
     }
 
     @Test
@@ -35,8 +35,8 @@ class BackstackViewerTest {
             BackstackViewerApp()
         }
 
-        findByTag(backTestTag("one")).assertHasClickAction().doClick()
-        findByText("Screen one").assertIsDisplayed()
+        onNodeWithTag(backTestTag("one")).assertHasClickAction().performClick()
+        onNodeWithText("Screen one").assertIsDisplayed()
     }
 
     @Test
@@ -45,16 +45,16 @@ class BackstackViewerTest {
             BackstackViewerApp()
         }
 
-        findByText("Screen one").assertIsDisplayed()
-        findByText("Screen two").assertDoesNotExist()
+        onNodeWithText("Screen one").assertIsDisplayed()
+        onNodeWithText("Screen two").assertDoesNotExist()
 
-        findByText("one, two")
-            .assertIsUnselected()
-            .doClick()
+        onNodeWithText("one, two")
+            .assertIsNotSelected()
+            .performClick()
             .assertIsSelected()
 
-        findByText("Screen one").assertDoesNotExist()
-        findByText("Screen two").assertIsDisplayed()
+        onNodeWithText("Screen one").assertDoesNotExist()
+        onNodeWithText("Screen two").assertIsDisplayed()
     }
 
     @Test
@@ -63,18 +63,18 @@ class BackstackViewerTest {
             BackstackViewerApp()
         }
 
-        findByText("Screen one").assertIsDisplayed()
-        findByText("Screen two").assertDoesNotExist()
-        findByText("Screen three").assertDoesNotExist()
+        onNodeWithText("Screen one").assertIsDisplayed()
+        onNodeWithText("Screen two").assertDoesNotExist()
+        onNodeWithText("Screen three").assertDoesNotExist()
 
-        findByText("one, two, three")
-            .assertIsUnselected()
-            .doClick()
+        onNodeWithText("one, two, three")
+            .assertIsNotSelected()
+            .performClick()
             .assertIsSelected()
 
-        findByText("Screen one").assertDoesNotExist()
-        findByText("Screen two").assertDoesNotExist()
-        findByText("Screen three").assertIsDisplayed()
+        onNodeWithText("Screen one").assertDoesNotExist()
+        onNodeWithText("Screen two").assertDoesNotExist()
+        onNodeWithText("Screen three").assertIsDisplayed()
     }
 
     @Test
@@ -83,16 +83,16 @@ class BackstackViewerTest {
             BackstackViewerApp()
         }
 
-        findByText("one, two, three").doClick().assertIsSelected()
-        findByText("Screen three").assertIsDisplayed()
+        onNodeWithText("one, two, three").performClick().assertIsSelected()
+        onNodeWithText("Screen three").assertIsDisplayed()
 
-        findByTag(backTestTag("three")).doClick()
-        findByText("one, two").assertIsSelected()
-        findByText("Screen three").assertDoesNotExist()
+        onNodeWithTag(backTestTag("three")).performClick()
+        onNodeWithText("one, two").assertIsSelected()
+        onNodeWithText("Screen three").assertDoesNotExist()
 
-        findByTag(backTestTag("two")).doClick()
-        findByText("one").assertIsSelected()
-        findByText("Screen two").assertDoesNotExist()
+        onNodeWithTag(backTestTag("two")).performClick()
+        onNodeWithText("one").assertIsSelected()
+        onNodeWithText("Screen two").assertDoesNotExist()
     }
 
     @Test
@@ -101,9 +101,9 @@ class BackstackViewerTest {
             BackstackViewerApp()
         }
 
-        findByTag(addTestTag("one")).assertHasClickAction().doClick()
-        findByText("Screen one+").assertIsDisplayed()
-        findByTag(backTestTag("one+")).assertHasClickAction().doClick()
-        findByText("Screen one+").assertDoesNotExist()
+        onNodeWithTag(addTestTag("one")).assertHasClickAction().performClick()
+        onNodeWithText("Screen one+").assertIsDisplayed()
+        onNodeWithTag(backTestTag("one+")).assertHasClickAction().performClick()
+        onNodeWithText("Screen one+").assertDoesNotExist()
     }
 }

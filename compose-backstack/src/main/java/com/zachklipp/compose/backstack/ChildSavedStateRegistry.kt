@@ -1,8 +1,8 @@
 package com.zachklipp.compose.backstack
 
-import androidx.compose.*
-import androidx.ui.savedinstancestate.UiSavedStateRegistry
-import androidx.ui.savedinstancestate.UiSavedStateRegistryAmbient
+import androidx.compose.runtime.*
+import androidx.compose.runtime.savedinstancestate.UiSavedStateRegistry
+import androidx.compose.runtime.savedinstancestate.UiSavedStateRegistryAmbient
 
 /**
  * Returns a [UiSavedStateRegistry] that will automatically save values from all its registered
