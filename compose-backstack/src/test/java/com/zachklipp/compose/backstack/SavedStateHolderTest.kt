@@ -10,11 +10,12 @@ class SavedStateHolderTest {
     fun `saves and restores`() {
         val parent = UiSavedStateRegistry(restoredValues = null, canBeSaved = { true })
         val holder = SavedStateHolder("pk")
+        val valueProvider = { "value" }
 
         var registry = holder.updateAndReturnRegistry(parent, isVisible = true)
-        registry.registerProvider("ck") { "value" }
+        registry.registerProvider("ck", valueProvider)
         registry = holder.updateAndReturnRegistry(parent, isVisible = false)
-        registry.unregisterProvider("ck")
+        registry.unregisterProvider("ck", valueProvider)
         registry = holder.updateAndReturnRegistry(parent = parent, isVisible = true)
 
         assertThat(registry.consumeRestored("ck")).isEqualTo("value")
@@ -22,7 +23,7 @@ class SavedStateHolderTest {
 
     @Test
     fun `restores from initial values`() {
-        val restoredValues = mutableMapOf("pk" to mapOf("ck" to "value"))
+        val restoredValues = mutableMapOf("pk" to listOf(mapOf("ck" to listOf("value"))))
         val parent = UiSavedStateRegistry(restoredValues = restoredValues, canBeSaved = { true })
         val holder = SavedStateHolder("pk")
 
@@ -35,10 +36,11 @@ class SavedStateHolderTest {
     fun `doesn't save unregistered providers`() {
         val parent = UiSavedStateRegistry(restoredValues = null, canBeSaved = { true })
         val holder = SavedStateHolder("pk")
+        val valueProvider = { "value" }
 
         var registry = holder.updateAndReturnRegistry(parent, isVisible = true)
-        registry.registerProvider("key") { "value" }
-        registry.unregisterProvider("key")
+        registry.registerProvider("key", valueProvider)
+        registry.unregisterProvider("key", valueProvider)
         holder.updateAndReturnRegistry(parent, isVisible = false)
         registry = holder.updateAndReturnRegistry(parent, isVisible = true)
 
@@ -47,7 +49,7 @@ class SavedStateHolderTest {
 
     @Test
     fun `preserves unrestored values from previous save`() {
-        val restoredValues = mutableMapOf("pk" to mapOf("old key" to "old value"))
+        val restoredValues = mutableMapOf("pk" to listOf(mapOf("old key" to listOf("old value"))))
         val parent = UiSavedStateRegistry(restoredValues = restoredValues, canBeSaved = { true })
         val holder = SavedStateHolder("pk")
 
@@ -61,7 +63,7 @@ class SavedStateHolderTest {
 
     @Test
     fun `cleans up restored values from previous save`() {
-        val restoredValues = mutableMapOf("pk" to mapOf("old key" to "old value"))
+        val restoredValues = mutableMapOf("pk" to listOf(mapOf("old key" to listOf("old value"))))
         val parent = UiSavedStateRegistry(restoredValues = restoredValues, canBeSaved = { true })
         val holder = SavedStateHolder("pk")
 
@@ -83,21 +85,22 @@ class SavedStateHolderTest {
         registry.registerProvider("ck") { "value" }
 
         val values = parent.performSave()
-        assertThat(values["pk"]).isEqualTo(mapOf("ck" to "value"))
+        assertThat(values["pk"]).isEqualTo(listOf(mapOf("ck" to listOf("value"))))
     }
 
     @Test
     fun `parent saves contain values from non-visible screens`() {
         val parent = UiSavedStateRegistry(restoredValues = null, canBeSaved = { true })
         val holder = SavedStateHolder("pk")
+        val valueProvider = { "value" }
 
         var registry = holder.updateAndReturnRegistry(parent, isVisible = true)
-        registry.registerProvider("ck") { "value" }
+        registry.registerProvider("ck", valueProvider)
         registry = holder.updateAndReturnRegistry(parent, isVisible = false)
-        registry.unregisterProvider("ck")
+        registry.unregisterProvider("ck", valueProvider)
 
         val values = parent.performSave()
-        assertThat(values["pk"]).isEqualTo(mapOf("ck" to "value"))
+        assertThat(values["pk"]).isEqualTo(listOf(mapOf("ck" to listOf("value"))))
     }
 
     @Test
@@ -107,15 +110,20 @@ class SavedStateHolderTest {
 
         val topRegistry = UiSavedStateRegistry(restoredValues = null, canBeSaved = { true })
         val middleRegistry = topStateHolder.updateAndReturnRegistry(topRegistry, isVisible = true)
-        val bottomRegistry = middleStateHolder.updateAndReturnRegistry(middleRegistry, isVisible = true)
+        val bottomRegistry =
+            middleStateHolder.updateAndReturnRegistry(middleRegistry, isVisible = true)
 
         middleRegistry.registerProvider("ck1") { "middle value" }
         bottomRegistry.registerProvider("ck2") { "bottom value" }
 
         val values = topRegistry.performSave()
-        assertThat(values["pk1"]).isEqualTo(mapOf(
-            "ck1" to "middle value",
-            "pk2" to mapOf("ck2" to "bottom value")
-        ))
+        assertThat(values["pk1"]).isEqualTo(
+            listOf(
+                mapOf(
+                    "ck1" to listOf("middle value"),
+                    "pk2" to listOf(mapOf("ck2" to listOf("bottom value")))
+                )
+            )
+        )
     }
 }

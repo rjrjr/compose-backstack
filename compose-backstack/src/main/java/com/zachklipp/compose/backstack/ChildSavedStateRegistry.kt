@@ -21,8 +21,16 @@ fun ChildSavedStateRegistry(childWillBeComposed: Boolean): UiSavedStateRegistry 
 internal class SavedStateHolder(private val key: String) : CompositionLifecycleObserver {
     private var parent: UiSavedStateRegistry? = null
     private var isScreenVisible = false
-    private var values: Map<String, Any>? = null
+    private var values: Map<String, List<Any?>>? = null
     private var registry: UiSavedStateRegistry = createRegistry()
+    private var valueProvider: () -> Any? = {
+        if (isScreenVisible) {
+            // Save the screen if it is visible right now. If it is invisible, then it's
+            // values were already saved upon leaving the screen.
+            values = registry.performSave()
+        }
+        values
+    }
 
     /**
      * Manages the visibility of the screen and saves its state whenever [isVisible] transitions
@@ -37,7 +45,7 @@ internal class SavedStateHolder(private val key: String) : CompositionLifecycleO
     ): UiSavedStateRegistry {
         // When values is null, try restore any previously saved values (or fallback to an empty
         // map). Once values is non-null, it'll hold the all the latest saved values for the screen.
-        values = values ?: parent?.consumeRestored(key) as Map<String, Any>? ?: emptyMap()
+        values = values ?: parent?.consumeRestored(key) as Map<String, List<Any?>>? ?: emptyMap()
 
         val oldParent = this.parent
         this.parent = parent
@@ -47,15 +55,8 @@ internal class SavedStateHolder(private val key: String) : CompositionLifecycleO
         // call unregisterProvider on an UiSavedStateRegistry where `key` isn't already registered,
         // then it'll crash.
         if (parent !== oldParent) {
-            oldParent?.unregisterProvider(key)
-            parent?.registerProvider(key) {
-                if (isScreenVisible) {
-                    // Save the screen if it is visible right now. If it is invisible, then it's
-                    // values were already saved upon leaving the screen.
-                    values = registry.performSave()
-                }
-                values
-            }
+            oldParent?.unregisterProvider(key, valueProvider)
+            parent?.registerProvider(key, valueProvider)
         }
 
         if (isVisible == this.isScreenVisible) return registry
@@ -79,7 +80,7 @@ internal class SavedStateHolder(private val key: String) : CompositionLifecycleO
     }
 
     override fun onLeave() {
-        parent?.unregisterProvider(key)
+        parent?.unregisterProvider(key, valueProvider)
     }
 
     private fun createRegistry(): UiSavedStateRegistry {

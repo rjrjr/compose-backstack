@@ -27,7 +27,7 @@ configure<BaseExtension> {
     buildFeatures.compose = true
 
     composeOptions {
-        kotlinCompilerVersion = "1.4.0-rc"
+        kotlinCompilerVersion = Versions.kotlin
         kotlinCompilerExtensionVersion = Versions.compose
     }
 }

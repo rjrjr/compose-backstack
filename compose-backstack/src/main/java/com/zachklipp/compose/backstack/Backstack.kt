@@ -57,7 +57,7 @@ private val DefaultBackstackAnimation: AnimationSpec<Float>
 /**
  * Renders the top of a stack of screens (as [T]s) and animates between screens when the top
  * value changes. Any state used by a screen will be preserved as long as it remains in the stack
- * (i.e. result of [remember] or [state] calls).
+ * (i.e. result of [remember] calls).
  *
  * The [backstack] must follow some rules:
  *  - Must always contain at least one item.
@@ -76,8 +76,9 @@ private val DefaultBackstackAnimation: AnimationSpec<Float>
  * ## Instance state caching
  *
  * Screens that contain persistable state using the (i.e. via
- * [savedInstanceState][androidx.ui.savedinstancestate.savedInstanceState]) will automatically have
- * that state saved when they are hidden, and restored the next time they're shown.
+ * [savedInstanceState][androidx.compose.runtime.savedinstancestate.savedInstanceState]) will
+ * automatically have that state saved when they are hidden, and restored the next time they're
+ * shown.
  *
  * ## Example
  *
@@ -146,19 +147,19 @@ fun <T : Any> Backstack(
 
     // When transitioning, contains a stable cache of the screens actually being displayed. Will not
     // change even if backstack changes during the transition.
-    var activeKeys by state { backstack }
+    var activeKeys by remember { mutableStateOf(backstack) }
     // The "top" screen being transitioned to. Used at the end of the transition to detect if the
     // backstack changed and needs another transition immediately.
-    var targetTop by state { backstack.last() }
+    var targetTop by remember { mutableStateOf(backstack.last()) }
     // Wrap all items to draw in a list, so that they will all share a constant "compositional
     // position", which allows us to use @Pivotal machinery to preserve state.
-    var activeStackDrawers by state { emptyList<ScreenWrapper<T>>() }
+    var activeStackDrawers by remember { mutableStateOf(emptyList<ScreenWrapper<T>>()) }
     // Defines the progress of the current transition animation in terms of visibility of the top
     // screen. 1 means top screen is visible, 0 means top screen is entirely hidden. Must be 1 when
     // no transition in progress.
     val transitionProgress = animatedFloat(1f)
     // Null means not transitioning.
-    var direction by state<TransitionDirection?> { null }
+    var direction by remember { mutableStateOf<TransitionDirection?>(null) }
     // Callback passed to animations to cleanup after the transition is done.
     val onTransitionEnd = remember {
         { reason: AnimationEndReason, _: Float ->

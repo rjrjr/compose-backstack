@@ -16,10 +16,7 @@ import androidx.compose.material.darkColors
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.lightColors
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.state
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -58,7 +55,7 @@ internal fun <T : Any> Spinner(
 ) {
     if (items.isEmpty()) return
 
-    var isOpen by state { false }
+    var isOpen by remember { mutableStateOf(false) }
 
     // Always draw the selected item.
     Row(Modifier.clickable(onClick = { isOpen = !isOpen })) {
@@ -73,7 +70,7 @@ internal fun <T : Any> Spinner(
 
     if (isOpen) {
         // TODO use DropdownPopup.
-        Dialog(onCloseRequest = { isOpen = false }) {
+        Dialog(onDismissRequest = { isOpen = false }) {
             Surface(elevation = 1.dp) {
                 Column {
                     for (item in items) {

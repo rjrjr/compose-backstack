@@ -5,10 +5,7 @@ import android.content.ContextWrapper
 import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
 import androidx.compose.animation.core.TweenSpec
-import androidx.compose.foundation.Box
-import androidx.compose.foundation.Text
-import androidx.compose.foundation.currentTextStyle
-import androidx.compose.foundation.drawBorder
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.material.*
@@ -95,7 +92,7 @@ private fun AppControls(model: AppModel) {
         selectedItem = model.selectedTransition.first,
         onSelected = { model.selectTransition(it) }
     ) {
-        ListItem(text = "$it Transition")
+        ListItem(text = { Text("$it Transition") })
     }
 
     Row {
@@ -108,7 +105,7 @@ private fun AppControls(model: AppModel) {
         Switch(model.inspectionEnabled, onCheckedChange = { model.inspectionEnabled = it })
     }
 
-    RadioGroup {
+    Column {
         model.prefabBackstacks.forEach { backstack ->
             RadioButton(
                 text = backstack.joinToString(", "),
@@ -133,7 +130,7 @@ private fun AppScreens(model: AppModel) {
                 backstack = model.currentBackstack,
                 transition = model.selectedTransition.second,
                 animationBuilder = animation,
-                modifier = Modifier.fillMaxSize().drawBorder(size = 3.dp, color = Color.Red),
+                modifier = Modifier.fillMaxSize().border(width = 3.dp, color = Color.Red),
                 inspectionParams = inspectionParams,
                 onTransitionStarting = { from, to, direction ->
                     println(
