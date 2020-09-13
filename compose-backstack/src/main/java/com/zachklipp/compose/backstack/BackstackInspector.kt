@@ -10,10 +10,10 @@ import androidx.compose.animation.core.Spring
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.drawLayer
-import androidx.compose.ui.graphics.vectormath.radians
 import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import java.lang.Math.toRadians
 import kotlin.math.sin
 
 /**
@@ -138,10 +138,11 @@ internal class BackstackInspector(clock: AnimationClockObservable) {
 
         val offsetDpX = animate(
             if (isTop) 0f else {
-                (centerOffset * offsetDpX.value * scale *
-                        // Adjust by screenCount to squeeze more in as the count increases.
-                        // Adjust X offset by sin(rotation) so it looks 3D.
-                        (10f / screenCount) * sin(radians(rotationY.value)))
+                // Adjust by screenCount to squeeze more in as the count increases.
+                val densityFactor = 10f / screenCount
+                // Adjust X offset by sin(rotation) so it looks 3D.
+                val xRotation = sin(toRadians(rotationY.value.toDouble())).toFloat()
+                (centerOffset * offsetDpX.value * scale * densityFactor * xRotation)
             }
         )
         val offsetDpY = animate(if (isTop) 0f else (centerOffset * offsetDpY.value * scale))

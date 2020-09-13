@@ -36,7 +36,7 @@ fun InspectionGestureDetector(
     enabled: Boolean,
     children: @Composable() (InspectionParams?) -> Unit
 ) {
-    var inspectionParams: InspectionParams by state { InspectionParams() }
+    var inspectionParams: InspectionParams by remember { mutableStateOf(InspectionParams()) }
 
     val scaleObserver = remember(enabled) {
         object : ScaleObserver {

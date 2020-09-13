@@ -1,4 +1,4 @@
-import org.jetbrains.dokka.gradle.DokkaTask
+import org.jetbrains.dokka.gradle.DokkaMultiModuleTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
@@ -53,14 +53,9 @@ subprojects {
 // Dokka config for grouped docs.
 
 repositories {
-    mavenCentral()
+    jcenter()
 }
 
 plugins {
     id("org.jetbrains.dokka")
-}
-
-tasks.named<DokkaTask>("dokka") {
-    outputFormat = "html"
-    subProjects = listOf("compose-backstack", "compose-backstack-viewer")
 }

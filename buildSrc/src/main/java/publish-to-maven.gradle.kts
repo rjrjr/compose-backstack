@@ -1,5 +1,4 @@
 import org.gradle.api.plugins.JavaBasePlugin.DOCUMENTATION_GROUP
-import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.kotlin.gradle.utils.loadPropertyFromResources
 
 plugins {
@@ -25,15 +24,11 @@ val sonatypeUrl = if (isRelease) {
 val sonatypeUsername get() = (findProperty("SONATYPE_NEXUS_USERNAME") as? String).orEmpty()
 val sonatypePassword get() = (findProperty("SONATYPE_NEXUS_PASSWORD") as? String).orEmpty()
 
-val dokka by tasks.named<DokkaTask>("dokka") {
-    outputFormat = "html"
-}
-
 val dokkaJar by tasks.creating(Jar::class) {
     group = DOCUMENTATION_GROUP
     description = "Assembles Kotlin docs with Dokka"
     archiveClassifier.set("javadoc")
-    from(dokka)
+    from(tasks["dokkaHtml"])
 }
 
 afterEvaluate {
