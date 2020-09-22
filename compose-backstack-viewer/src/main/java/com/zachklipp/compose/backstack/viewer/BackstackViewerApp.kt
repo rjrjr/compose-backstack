@@ -96,12 +96,12 @@ private fun AppControls(model: AppModel) {
     }
 
     Row {
-        Text("Slow animations: ", modifier = Modifier.gravity(Alignment.CenterVertically))
+        Text("Slow animations: ", modifier = Modifier.align(Alignment.CenterVertically))
         Switch(model.slowAnimations, onCheckedChange = { model.slowAnimations = it })
     }
 
     Row {
-        Text("Inspect (pinch + drag): ", modifier = Modifier.gravity(Alignment.CenterVertically))
+        Text("Inspect (pinch + drag): ", modifier = Modifier.align(Alignment.CenterVertically))
         Switch(model.inspectionEnabled, onCheckedChange = { model.inspectionEnabled = it })
     }
 
