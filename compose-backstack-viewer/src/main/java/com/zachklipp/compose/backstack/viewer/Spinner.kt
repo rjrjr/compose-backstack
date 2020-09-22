@@ -59,7 +59,7 @@ internal fun <T : Any> Spinner(
 
     // Always draw the selected item.
     Row(Modifier.clickable(onClick = { isOpen = !isOpen })) {
-        Box(modifier = Modifier.weight(1f).gravity(Alignment.CenterVertically)) {
+        Box(modifier = Modifier.weight(1f).align(Alignment.CenterVertically)) {
             drawItem(selectedItem)
         }
         Icon(
