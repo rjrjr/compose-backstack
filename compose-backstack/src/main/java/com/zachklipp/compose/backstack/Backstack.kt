@@ -7,8 +7,7 @@ import androidx.compose.animation.core.AnimationEndReason
 import androidx.compose.animation.core.AnimationEndReason.TargetReached
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.TweenSpec
-import androidx.compose.foundation.Box
-import androidx.compose.foundation.layout.Stack
+import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.*
 import androidx.compose.runtime.savedinstancestate.UiSavedStateRegistryAmbient
 import androidx.compose.ui.Modifier
@@ -37,7 +36,7 @@ enum class TransitionDirection {
  */
 private data class ScreenWrapper<T : Any>(
   val key: T,
-  val transition: @Composable() (progress: Float, @Composable() () -> Unit) -> Unit
+  val transition: @Composable (progress: Float, @Composable () -> Unit) -> Unit
 )
 
 internal data class ScreenProperties(
@@ -136,7 +135,7 @@ fun <T : Any> Backstack(
   onTransitionStarting: ((from: List<T>, to: List<T>, TransitionDirection) -> Unit)? = null,
   onTransitionFinished: (() -> Unit)? = null,
   inspectionParams: InspectionParams? = null,
-  drawScreen: @Composable() (T) -> Unit
+  drawScreen: @Composable (T) -> Unit
 ) {
   require(backstack.isNotEmpty()) { "Backstack must contain at least 1 screen." }
   onCommit(backstack) {
@@ -255,14 +254,14 @@ fun <T : Any> Backstack(
         }
 
         Providers(UiSavedStateRegistryAmbient provides savedStateRegistry) {
-          Box(screenProperties.modifier, children = children)
+          Box(screenProperties.modifier) { children() }
         }
       }
     }
   }
 
   // Actually draw the screens.
-  Stack(modifier = modifier.clip(RectangleShape)) {
+  Box(modifier = modifier.clip(RectangleShape)) {
     activeStackDrawers.forEach { (item, transition) ->
       // Key is a convenience helper that treats its arguments as @Pivotal. This is how state
       // preservation is implemented. Even if screens are moved around within the list, as long

@@ -2,10 +2,11 @@
 
 package com.zachklipp.compose.backstack.viewer
 
-import androidx.compose.foundation.Box
+
 import androidx.compose.foundation.Icon
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
@@ -55,7 +56,7 @@ internal fun <T : Any> Spinner(
     items: List<T>,
     selectedItem: T,
     onSelected: (item: T) -> Unit,
-    drawItem: @Composable() (T) -> Unit
+    drawItem: @Composable (T) -> Unit
 ) {
   if (items.isEmpty()) return
 
@@ -63,7 +64,7 @@ internal fun <T : Any> Spinner(
 
   // Always draw the selected item.
   Row(Modifier.clickable(onClick = { isOpen = !isOpen })) {
-    Box(modifier = Modifier.weight(1f).gravity(Alignment.CenterVertically)) {
+    Box(modifier = Modifier.weight(1f).align(Alignment.CenterVertically)) {
       drawItem(selectedItem)
     }
     Icon(

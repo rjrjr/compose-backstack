@@ -8,6 +8,10 @@ android {
   defaultConfig {
     applicationId = "com.zachklipp.compose.backstack.sample"
   }
+  lintOptions {
+    // Workaround lint bug.
+    disable += "InvalidFragmentVersionForActivityResult"
+  }
 }
 
 dependencies {

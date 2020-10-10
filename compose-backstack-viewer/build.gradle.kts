@@ -6,6 +6,13 @@ plugins {
   id("publish-to-maven")
 }
 
+android {
+  lintOptions {
+    // Workaround for lint bug.
+    disable += "InvalidFragmentVersionForActivityResult"
+  }
+}
+
 dependencies {
   compileOnly(Dependencies.Compose.tooling)
 

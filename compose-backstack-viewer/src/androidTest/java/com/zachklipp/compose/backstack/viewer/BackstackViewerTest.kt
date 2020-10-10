@@ -26,15 +26,15 @@ class BackstackViewerTest {
       BackstackViewerApp()
     }
 
-    onNodeWithText("Slide Transition").assertIsDisplayed()
-    onNodeWithSubstring("Slow animations").assertIsDisplayed()
+    compose.onNodeWithText("Slide Transition").assertIsDisplayed()
+    compose.onNodeWithSubstring("Slow animations").assertIsDisplayed()
 
-    onNodeWithText("one").assertIsSelected()
-    onNodeWithText("one, two").assertIsNotSelected()
-    onNodeWithText("one, two, three").assertIsNotSelected()
+    compose.onNodeWithText("one").assertIsSelected()
+    compose.onNodeWithText("one, two").assertIsNotSelected()
+    compose.onNodeWithText("one, two, three").assertIsNotSelected()
 
-    onNodeWithText("Screen one").assertIsDisplayed()
-    onNodeWithSubstring("Counter:").assertIsDisplayed()
+    compose.onNodeWithText("Screen one").assertIsDisplayed()
+    compose.onNodeWithSubstring("Counter:").assertIsDisplayed()
   }
 
   @Test
@@ -43,8 +43,8 @@ class BackstackViewerTest {
       BackstackViewerApp()
     }
 
-    onNodeWithTag(backTestTag("one")).assertHasClickAction().performClick()
-    onNodeWithText("Screen one").assertIsDisplayed()
+    compose.onNodeWithTag(backTestTag("one")).assertHasClickAction().performClick()
+    compose.onNodeWithText("Screen one").assertIsDisplayed()
   }
 
   @Test
@@ -53,16 +53,16 @@ class BackstackViewerTest {
       BackstackViewerApp()
     }
 
-    onNodeWithText("Screen one").assertIsDisplayed()
-    onNodeWithText("Screen two").assertDoesNotExist()
+    compose.onNodeWithText("Screen one").assertIsDisplayed()
+    compose.onNodeWithText("Screen two").assertDoesNotExist()
 
-    onNodeWithText("one, two")
-        .assertIsNotSelected()
-        .performClick()
-        .assertIsSelected()
+    compose.onNodeWithText("one, two")
+      .assertIsNotSelected()
+      .performClick()
+      .assertIsSelected()
 
-    onNodeWithText("Screen one").assertDoesNotExist()
-    onNodeWithText("Screen two").assertIsDisplayed()
+    compose.onNodeWithText("Screen one").assertDoesNotExist()
+    compose.onNodeWithText("Screen two").assertIsDisplayed()
   }
 
   @Test
@@ -71,18 +71,18 @@ class BackstackViewerTest {
       BackstackViewerApp()
     }
 
-    onNodeWithText("Screen one").assertIsDisplayed()
-    onNodeWithText("Screen two").assertDoesNotExist()
-    onNodeWithText("Screen three").assertDoesNotExist()
+    compose.onNodeWithText("Screen one").assertIsDisplayed()
+    compose.onNodeWithText("Screen two").assertDoesNotExist()
+    compose.onNodeWithText("Screen three").assertDoesNotExist()
 
-    onNodeWithText("one, two, three")
-        .assertIsNotSelected()
-        .performClick()
-        .assertIsSelected()
+    compose.onNodeWithText("one, two, three")
+      .assertIsNotSelected()
+      .performClick()
+      .assertIsSelected()
 
-    onNodeWithText("Screen one").assertDoesNotExist()
-    onNodeWithText("Screen two").assertDoesNotExist()
-    onNodeWithText("Screen three").assertIsDisplayed()
+    compose.onNodeWithText("Screen one").assertDoesNotExist()
+    compose.onNodeWithText("Screen two").assertDoesNotExist()
+    compose.onNodeWithText("Screen three").assertIsDisplayed()
   }
 
   @Test
@@ -91,16 +91,16 @@ class BackstackViewerTest {
       BackstackViewerApp()
     }
 
-    onNodeWithText("one, two, three").performClick().assertIsSelected()
-    onNodeWithText("Screen three").assertIsDisplayed()
+    compose.onNodeWithText("one, two, three").performClick().assertIsSelected()
+    compose.onNodeWithText("Screen three").assertIsDisplayed()
 
-    onNodeWithTag(backTestTag("three")).performClick()
-    onNodeWithText("one, two").assertIsSelected()
-    onNodeWithText("Screen three").assertDoesNotExist()
+    compose.onNodeWithTag(backTestTag("three")).performClick()
+    compose.onNodeWithText("one, two").assertIsSelected()
+    compose.onNodeWithText("Screen three").assertDoesNotExist()
 
-    onNodeWithTag(backTestTag("two")).performClick()
-    onNodeWithText("one").assertIsSelected()
-    onNodeWithText("Screen two").assertDoesNotExist()
+    compose.onNodeWithTag(backTestTag("two")).performClick()
+    compose.onNodeWithText("one").assertIsSelected()
+    compose.onNodeWithText("Screen two").assertDoesNotExist()
   }
 
   @Test
@@ -109,9 +109,9 @@ class BackstackViewerTest {
       BackstackViewerApp()
     }
 
-    onNodeWithTag(addTestTag("one")).assertHasClickAction().performClick()
-    onNodeWithText("Screen one+").assertIsDisplayed()
-    onNodeWithTag(backTestTag("one+")).assertHasClickAction().performClick()
-    onNodeWithText("Screen one+").assertDoesNotExist()
+    compose.onNodeWithTag(addTestTag("one")).assertHasClickAction().performClick()
+    compose.onNodeWithText("Screen one+").assertIsDisplayed()
+    compose.onNodeWithTag(backTestTag("one+")).assertHasClickAction().performClick()
+    compose.onNodeWithText("Screen one+").assertDoesNotExist()
   }
 }

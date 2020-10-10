@@ -2,7 +2,7 @@
 
 package com.zachklipp.compose.backstack
 
-import androidx.compose.foundation.Box
+import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -38,7 +38,7 @@ import androidx.compose.ui.gesture.scaleGestureFilter
 @Composable
 fun InspectionGestureDetector(
   enabled: Boolean,
-  children: @Composable() (InspectionParams?) -> Unit
+  children: @Composable (InspectionParams?) -> Unit
 ) {
   var inspectionParams: InspectionParams by remember { mutableStateOf(InspectionParams()) }
 

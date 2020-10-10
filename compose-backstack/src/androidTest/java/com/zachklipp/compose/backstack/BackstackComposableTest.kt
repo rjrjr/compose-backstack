@@ -64,7 +64,7 @@ class BackstackComposableTest {
       Backstack(originalBackstack, transition = transition) { Text(it) }
     }
 
-    onNodeWithText("one").assertIsDisplayed()
+    compose.onNodeWithText("one").assertIsDisplayed()
   }
 
   private fun assertInitialStateWithMultipleScreens(transition: BackstackTransition) {
@@ -73,8 +73,8 @@ class BackstackComposableTest {
       Backstack(originalBackstack, transition = transition) { Text(it) }
     }
 
-    onNodeWithText("two").assertIsDisplayed()
-    onNodeWithText("one").assertDoesNotExist()
+    compose.onNodeWithText("two").assertIsDisplayed()
+    compose.onNodeWithText("one").assertDoesNotExist()
   }
 
   private fun assertTransition(transition: BackstackTransition) {
@@ -91,34 +91,34 @@ class BackstackComposableTest {
       }
     }
 
-    onNodeWithText("one").assertIsDisplayed()
-    onNodeWithText("two").assertDoesNotExist()
+    compose.onNodeWithText("one").assertIsDisplayed()
+    compose.onNodeWithText("two").assertDoesNotExist()
 
-    runOnUiThread {
+    compose.runOnUiThread {
       backstack = destinationBackstack
     }
 
-    onNodeWithText("one").assertIsDisplayed()
-    onNodeWithText("two").assertDoesNotExist()
+    compose.onNodeWithText("one").assertIsDisplayed()
+    compose.onNodeWithText("two").assertDoesNotExist()
 
     setTransitionTime(25)
 
-    onNodeWithText("one").assertIsDisplayed()
-    onNodeWithText("two").assertIsDisplayed()
+    compose.onNodeWithText("one").assertIsDisplayed()
+    compose.onNodeWithText("two").assertIsDisplayed()
 
     setTransitionTime(75)
 
-    onNodeWithText("one").assertIsDisplayed()
-    onNodeWithText("two").assertIsDisplayed()
+    compose.onNodeWithText("one").assertIsDisplayed()
+    compose.onNodeWithText("two").assertIsDisplayed()
 
     setTransitionTime(100)
 
-    onNodeWithText("one").assertDoesNotExist()
-    onNodeWithText("two").assertIsDisplayed()
+    compose.onNodeWithText("one").assertDoesNotExist()
+    compose.onNodeWithText("two").assertIsDisplayed()
   }
 
   private fun setTransitionTime(time: Long) {
-    runOnUiThread {
+    compose.runOnUiThread {
       clock.clockTimeMillis = time
     }
   }

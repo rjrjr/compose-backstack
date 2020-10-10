@@ -8,7 +8,6 @@ plugins {
 
 configure<BaseExtension> {
   compileSdkVersion(Versions.targetSdk)
-  buildToolsVersion = "29.0.2"
 
   compileOptions {
     sourceCompatibility = JavaVersion.VERSION_1_8

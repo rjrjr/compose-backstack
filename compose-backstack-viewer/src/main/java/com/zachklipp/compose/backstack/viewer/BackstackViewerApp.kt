@@ -5,10 +5,25 @@ import android.content.ContextWrapper
 import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
 import androidx.compose.animation.core.TweenSpec
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.Text
+import androidx.compose.foundation.border
+import androidx.compose.foundation.currentTextStyle
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.selection.selectable
-import androidx.compose.material.*
+import androidx.compose.material.ListItem
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.RadioButton
+import androidx.compose.material.Surface
+import androidx.compose.material.Switch
+import androidx.compose.material.darkColors
+import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.key
 import androidx.compose.runtime.onCommit
@@ -61,8 +76,8 @@ private fun BackstackViewerAppPreview() {
  */
 @Composable
 fun BackstackViewerApp(
-    namedCustomTransitions: List<Pair<String, BackstackTransition>> = emptyList(),
-    prefabBackstacks: List<List<String>>? = null
+  namedCustomTransitions: List<Pair<String, BackstackTransition>> = emptyList(),
+  prefabBackstacks: List<List<String>>? = null
 ) = key(namedCustomTransitions, prefabBackstacks) {
   val model = AppModel.create(
       namedTransitions = namedCustomTransitions + BUILTIN_BACKSTACK_TRANSITIONS,
@@ -96,12 +111,12 @@ private fun AppControls(model: AppModel) {
   }
 
   Row {
-    Text("Slow animations: ", modifier = Modifier.gravity(Alignment.CenterVertically))
+    Text("Slow animations: ", modifier = Modifier.align(Alignment.CenterVertically))
     Switch(model.slowAnimations, onCheckedChange = { model.slowAnimations = it })
   }
 
   Row {
-    Text("Inspect (pinch + drag): ", modifier = Modifier.gravity(Alignment.CenterVertically))
+    Text("Inspect (pinch + drag): ", modifier = Modifier.align(Alignment.CenterVertically))
     Switch(model.inspectionEnabled, onCheckedChange = { model.inspectionEnabled = it })
   }
 
@@ -156,9 +171,9 @@ private fun AppScreens(model: AppModel) {
 
 @Composable
 private fun RadioButton(
-    text: String,
-    selected: Boolean,
-    onSelect: () -> Unit
+  text: String,
+  selected: Boolean,
+  onSelect: () -> Unit
 ) {
   Box(
       modifier = Modifier.selectable(
