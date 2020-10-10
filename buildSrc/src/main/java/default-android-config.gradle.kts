@@ -3,31 +3,31 @@
 import com.android.build.gradle.BaseExtension
 
 plugins {
-    id("com.android.base")
+  id("com.android.base")
 }
 
 configure<BaseExtension> {
-    compileSdkVersion(Versions.targetSdk)
-    buildToolsVersion = "29.0.2"
+  compileSdkVersion(Versions.targetSdk)
+  buildToolsVersion = "29.0.2"
 
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-    }
+  compileOptions {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+  }
 
-    defaultConfig {
-        minSdkVersion(21)
-        targetSdkVersion(Versions.targetSdk)
-        versionCode = 1
-        versionName = "1.0"
+  defaultConfig {
+    minSdkVersion(21)
+    targetSdkVersion(Versions.targetSdk)
+    versionCode = 1
+    versionName = "1.0"
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-    }
+    testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+  }
 
-    buildFeatures.compose = true
+  buildFeatures.compose = true
 
-    composeOptions {
-        kotlinCompilerVersion = Versions.kotlin
-        kotlinCompilerExtensionVersion = Versions.compose
-    }
+  composeOptions {
+    kotlinCompilerVersion = Versions.kotlin
+    kotlinCompilerExtensionVersion = Versions.compose
+  }
 }

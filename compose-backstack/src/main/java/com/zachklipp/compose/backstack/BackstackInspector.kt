@@ -7,7 +7,11 @@ import androidx.compose.animation.animate
 import androidx.compose.animation.core.AnimationClockObservable
 import androidx.compose.animation.core.FloatSpringSpec
 import androidx.compose.animation.core.Spring
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.drawLayer
 import androidx.compose.ui.platform.DensityAmbient
@@ -36,13 +40,13 @@ import kotlin.math.sin
  */
 @Immutable
 data class InspectionParams(
-    val offsetX: Dp = 500.dp,
-    val offsetY: Dp = 10.dp,
-    val rotationXDegrees: Float = 0f,
-    val rotationYDegrees: Float = 10f,
-    val scale: Float = .5f,
-    val opacity: Float = .4f,
-    val overlayOpacity: Float = .2f
+  val offsetX: Dp = 500.dp,
+  val offsetY: Dp = 10.dp,
+  val rotationXDegrees: Float = 0f,
+  val rotationYDegrees: Float = 10f,
+  val scale: Float = .5f,
+  val opacity: Float = .4f,
+  val overlayOpacity: Float = .2f
 )
 
 /** Constrain params to reasonable limits. */
@@ -58,149 +62,149 @@ fun InspectionParams.constrained() = InspectionParams(
 
 internal class BackstackInspector(clock: AnimationClockObservable) {
 
-    private val animation = FloatSpringSpec(stiffness = Spring.StiffnessLow)
+  private val animation = FloatSpringSpec(stiffness = Spring.StiffnessLow)
 
-    /**
-     * True when the inspector is in control of rendering.
-     * Will continue to return true after setting [params] to null until it's finished animating.
-     */
-    var isInspectionActive: Boolean by mutableStateOf(false)
-        private set
+  /**
+   * True when the inspector is in control of rendering.
+   * Will continue to return true after setting [params] to null until it's finished animating.
+   */
+  var isInspectionActive: Boolean by mutableStateOf(false)
+    private set
 
-    /**
-     * Update the parameters used to display the rendering.
-     *
-     * Whenever new parameters are passed in, the display will animate towards them, and
-     * [isInspectionActive] will immediately start returning true.
-     *
-     * When null is passed, the display will animate screens back to the default state, and
-     * inspecting will start returning false _only after_ the default state is reached.
-     */
-    var params: InspectionParams? = null
-        set(value) {
-            val constrainedParams = value?.constrained()
-            if ((field == null) != (constrainedParams == null)) {
-                if (constrainedParams != null) {
-                    startInspecting()
-                } else {
-                    stopInspecting()
-                }
-            }
-            constrainedParams?.let {
-                offsetDpX.animateTo(it.offsetX.value, animation)
-                offsetDpY.animateTo(it.offsetY.value, animation)
-                rotationX.animateTo(it.rotationXDegrees, animation)
-                rotationY.animateTo(it.rotationYDegrees, animation)
-                scaleFactor.animateTo(it.scale, animation)
-                alpha.animateTo(it.opacity, animation)
-                overlayAlpha.animateTo(it.overlayOpacity)
-            }
-            field = constrainedParams
+  /**
+   * Update the parameters used to display the rendering.
+   *
+   * Whenever new parameters are passed in, the display will animate towards them, and
+   * [isInspectionActive] will immediately start returning true.
+   *
+   * When null is passed, the display will animate screens back to the default state, and
+   * inspecting will start returning false _only after_ the default state is reached.
+   */
+  var params: InspectionParams? = null
+    set(value) {
+      val constrainedParams = value?.constrained()
+      if ((field == null) != (constrainedParams == null)) {
+        if (constrainedParams != null) {
+          startInspecting()
+        } else {
+          stopInspecting()
         }
-
-    private val offsetDpX = AnimatedFloatModel(INITIAL_OFFSET_X, clock)
-    private val offsetDpY = AnimatedFloatModel(INITIAL_OFFSET_Y, clock)
-    private val rotationX = AnimatedFloatModel(INITIAL_ROTATION_X, clock)
-    private val rotationY = AnimatedFloatModel(INITIAL_ROTATION_Y, clock)
-    private val scaleFactor = AnimatedFloatModel(INITIAL_SCALE, clock)
-    private val alpha = AnimatedFloatModel(INITIAL_ALPHA, clock)
-    private val overlayAlpha = AnimatedFloatModel(INITIAL_OVERLAY_ALPHA, clock)
-
-    /**
-     * Calculates a [Modifier] to apply to a screen when in inspection mode.
-     *
-     * The top screen will be drawn without the usual translations, and only use
-     * [InspectionParams.overlayOpacity]. All other screens will be drawn as a 3D stack.
-     * All transformations are animated.
-     */
-    @Composable
-    internal fun inspectScreen(
-        screenIndex: Int,
-        screenCount: Int,
-        visibility: Float
-    ): Modifier {
-        // Draw the top screen as an overlay so it's clear where touch targets are. Once
-        // compose supports transforming inputs as well as outputs, the top screen can
-        // participate in scaling/rotation too.
-        val isTop = screenIndex == screenCount - 1
-        val density = DensityAmbient.current
-
-        // drawLayer will scale around the center of the bounds, so we need to offset relative
-        // to that so the entire stack stays centered.
-        val centerOffset = animate(
-            // Don't need to adjust the pivot point if there's only one screen.
-            if (screenCount == 1) 0f
-            // Add -1 + visibility so new screens animate "out of" the previous one.
-            else (screenIndex - 1f + visibility) - screenCount / 3f
-        )
-
-        val scale = animate(if (isTop) 1f else scaleFactor.value)
-
-        val offsetDpX = animate(
-            if (isTop) 0f else {
-                // Adjust by screenCount to squeeze more in as the count increases.
-                val densityFactor = 10f / screenCount
-                // Adjust X offset by sin(rotation) so it looks 3D.
-                val xRotation = sin(toRadians(rotationY.value.toDouble())).toFloat()
-                (centerOffset * offsetDpX.value * scale * densityFactor * xRotation)
-            }
-        )
-        val offsetDpY = animate(if (isTop) 0f else (centerOffset * offsetDpY.value * scale))
-
-        val rotationX = animate(if (isTop) 0f else (rotationX.value))
-        val rotationY = animate(if (isTop) 0f else (rotationY.value))
-
-        // This is the only transformation applied to the top screen, so it has some extra logic.
-        val alpha = animate(
-            when {
-                // If there's only one screen in the stack, don't transform it at all.
-                screenCount == 1 -> 1f
-                isTop -> overlayAlpha.value
-                else -> alpha.value
-                // Adjust alpha by visibility to make transition less jarring when adding/removing
-                // screens.
-            } * visibility
-        )
-
-        return Modifier.drawLayer(
-            scaleX = scale,
-            scaleY = scale,
-            rotationX = rotationX,
-            rotationY = rotationY,
-            translationX = with(density) { offsetDpX.dp.toPx() },
-            translationY = with(density) { offsetDpY.dp.toPx() },
-            alpha = alpha
-        )
+      }
+      constrainedParams?.let {
+        offsetDpX.animateTo(it.offsetX.value, animation)
+        offsetDpY.animateTo(it.offsetY.value, animation)
+        rotationX.animateTo(it.rotationXDegrees, animation)
+        rotationY.animateTo(it.rotationYDegrees, animation)
+        scaleFactor.animateTo(it.scale, animation)
+        alpha.animateTo(it.opacity, animation)
+        overlayAlpha.animateTo(it.overlayOpacity)
+      }
+      field = constrainedParams
     }
 
-    /** Transition to inspection mode. */
-    private fun startInspecting() {
-        isInspectionActive = true
-    }
+  private val offsetDpX = AnimatedFloatModel(INITIAL_OFFSET_X, clock)
+  private val offsetDpY = AnimatedFloatModel(INITIAL_OFFSET_Y, clock)
+  private val rotationX = AnimatedFloatModel(INITIAL_ROTATION_X, clock)
+  private val rotationY = AnimatedFloatModel(INITIAL_ROTATION_Y, clock)
+  private val scaleFactor = AnimatedFloatModel(INITIAL_SCALE, clock)
+  private val alpha = AnimatedFloatModel(INITIAL_ALPHA, clock)
+  private val overlayAlpha = AnimatedFloatModel(INITIAL_OVERLAY_ALPHA, clock)
 
-    /** Transition away from inspection mode. */
-    private fun stopInspecting() {
-        offsetDpX.animateTo(INITIAL_OFFSET_X, animation)
-        offsetDpY.animateTo(INITIAL_OFFSET_Y, animation)
-        rotationX.animateTo(INITIAL_ROTATION_X, animation)
-        rotationY.animateTo(INITIAL_ROTATION_Y, animation)
-        scaleFactor.animateTo(INITIAL_SCALE, animation)
-        alpha.animateTo(INITIAL_ALPHA, animation)
-        overlayAlpha.animateTo(INITIAL_OVERLAY_ALPHA, animation, onEnd = { _, _ ->
-            // Doesn't matter which one, but we need to listen to the end of one of the animations
-            // so we can tell the Backstack that we're done being in control.
-            isInspectionActive = false
-        })
-    }
+  /**
+   * Calculates a [Modifier] to apply to a screen when in inspection mode.
+   *
+   * The top screen will be drawn without the usual translations, and only use
+   * [InspectionParams.overlayOpacity]. All other screens will be drawn as a 3D stack.
+   * All transformations are animated.
+   */
+  @Composable
+  internal fun inspectScreen(
+    screenIndex: Int,
+    screenCount: Int,
+    visibility: Float
+  ): Modifier {
+    // Draw the top screen as an overlay so it's clear where touch targets are. Once
+    // compose supports transforming inputs as well as outputs, the top screen can
+    // participate in scaling/rotation too.
+    val isTop = screenIndex == screenCount - 1
+    val density = DensityAmbient.current
 
-    private companion object {
-        // Values to use when the inspector is not active (inspecting is false).
-        const val INITIAL_OFFSET_X = 0f
-        const val INITIAL_OFFSET_Y = 0f
-        const val INITIAL_ROTATION_X = 0f
-        const val INITIAL_ROTATION_Y = 0f
-        const val INITIAL_SCALE = 1f
-        const val INITIAL_ALPHA = 1f
-        const val INITIAL_OVERLAY_ALPHA = 1f
-    }
+    // drawLayer will scale around the center of the bounds, so we need to offset relative
+    // to that so the entire stack stays centered.
+    val centerOffset = animate(
+        // Don't need to adjust the pivot point if there's only one screen.
+        if (screenCount == 1) 0f
+        // Add -1 + visibility so new screens animate "out of" the previous one.
+        else (screenIndex - 1f + visibility) - screenCount / 3f
+    )
+
+    val scale = animate(if (isTop) 1f else scaleFactor.value)
+
+    val offsetDpX = animate(
+        if (isTop) 0f else {
+          // Adjust by screenCount to squeeze more in as the count increases.
+          val densityFactor = 10f / screenCount
+          // Adjust X offset by sin(rotation) so it looks 3D.
+          val xRotation = sin(toRadians(rotationY.value.toDouble())).toFloat()
+          (centerOffset * offsetDpX.value * scale * densityFactor * xRotation)
+        }
+    )
+    val offsetDpY = animate(if (isTop) 0f else (centerOffset * offsetDpY.value * scale))
+
+    val rotationX = animate(if (isTop) 0f else (rotationX.value))
+    val rotationY = animate(if (isTop) 0f else (rotationY.value))
+
+    // This is the only transformation applied to the top screen, so it has some extra logic.
+    val alpha = animate(
+        when {
+          // If there's only one screen in the stack, don't transform it at all.
+          screenCount == 1 -> 1f
+          isTop -> overlayAlpha.value
+          else -> alpha.value
+          // Adjust alpha by visibility to make transition less jarring when adding/removing
+          // screens.
+        } * visibility
+    )
+
+    return Modifier.drawLayer(
+        scaleX = scale,
+        scaleY = scale,
+        rotationX = rotationX,
+        rotationY = rotationY,
+        translationX = with(density) { offsetDpX.dp.toPx() },
+        translationY = with(density) { offsetDpY.dp.toPx() },
+        alpha = alpha
+    )
+  }
+
+  /** Transition to inspection mode. */
+  private fun startInspecting() {
+    isInspectionActive = true
+  }
+
+  /** Transition away from inspection mode. */
+  private fun stopInspecting() {
+    offsetDpX.animateTo(INITIAL_OFFSET_X, animation)
+    offsetDpY.animateTo(INITIAL_OFFSET_Y, animation)
+    rotationX.animateTo(INITIAL_ROTATION_X, animation)
+    rotationY.animateTo(INITIAL_ROTATION_Y, animation)
+    scaleFactor.animateTo(INITIAL_SCALE, animation)
+    alpha.animateTo(INITIAL_ALPHA, animation)
+    overlayAlpha.animateTo(INITIAL_OVERLAY_ALPHA, animation, onEnd = { _, _ ->
+      // Doesn't matter which one, but we need to listen to the end of one of the animations
+      // so we can tell the Backstack that we're done being in control.
+      isInspectionActive = false
+    })
+  }
+
+  private companion object {
+    // Values to use when the inspector is not active (inspecting is false).
+    const val INITIAL_OFFSET_X = 0f
+    const val INITIAL_OFFSET_Y = 0f
+    const val INITIAL_ROTATION_X = 0f
+    const val INITIAL_ROTATION_Y = 0f
+    const val INITIAL_SCALE = 1f
+    const val INITIAL_ALPHA = 1f
+    const val INITIAL_OVERLAY_ALPHA = 1f
+  }
 }

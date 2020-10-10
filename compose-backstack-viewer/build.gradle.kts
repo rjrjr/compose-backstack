@@ -1,26 +1,26 @@
 plugins {
-    id("com.android.library")
-    id("default-android-config")
-    kotlin("android")
-    id("org.jetbrains.dokka")
-    id("publish-to-maven")
+  id("com.android.library")
+  id("default-android-config")
+  kotlin("android")
+  id("org.jetbrains.dokka")
+  id("publish-to-maven")
 }
 
 dependencies {
-    compileOnly(Dependencies.Compose.tooling)
+  compileOnly(Dependencies.Compose.tooling)
 
-    api(project(":compose-backstack"))
+  api(project(":compose-backstack"))
 
-    implementation(Dependencies.AndroidX.appcompat)
-    implementation(Dependencies.Compose.icons)
-    implementation(Dependencies.Compose.foundation)
-    implementation(Dependencies.Compose.material)
-    implementation(Dependencies.Compose.savedstate)
-    implementation(Dependencies.Compose.tooling)
+  implementation(Dependencies.AndroidX.appcompat)
+  implementation(Dependencies.Compose.icons)
+  implementation(Dependencies.Compose.foundation)
+  implementation(Dependencies.Compose.material)
+  implementation(Dependencies.Compose.savedstate)
+  implementation(Dependencies.Compose.tooling)
 
-    testImplementation(Dependencies.Test.junit)
-    testImplementation(Dependencies.Test.truth)
+  testImplementation(Dependencies.Test.junit)
+  testImplementation(Dependencies.Test.truth)
 
-    androidTestImplementation(Dependencies.AndroidX.junitExt)
-    androidTestImplementation(Dependencies.Compose.test)
+  androidTestImplementation(Dependencies.AndroidX.junitExt)
+  androidTestImplementation(Dependencies.Compose.test)
 }

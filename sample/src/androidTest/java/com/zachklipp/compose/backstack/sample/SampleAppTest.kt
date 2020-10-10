@@ -11,16 +11,16 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class SampleAppTest {
 
-    @get:Rule
-    val compose = createAndroidComposeRule<ComposeBackstackActivity>()
+  @get:Rule
+  val compose = createAndroidComposeRule<ComposeBackstackActivity>()
 
-    @Test
-    fun launches() {
-        onNodeWithSubstring("Slow animations")
-    }
+  @Test
+  fun launches() {
+    onNodeWithSubstring("Slow animations")
+  }
 
-    @Test
-    fun showsCounter() {
-        onNodeWithSubstring("Counter:").assertIsDisplayed()
-    }
+  @Test
+  fun showsCounter() {
+    onNodeWithSubstring("Counter:").assertIsDisplayed()
+  }
 }
