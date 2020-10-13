@@ -28,58 +28,58 @@ internal fun backTestTag(screen: String) = "go back from $screen"
 @Preview
 @Composable
 private fun AppScreenPreview() {
-    AppScreen(name = "preview", showBack = false, onBack = {}, onAdd = {})
+  AppScreen(name = "preview", showBack = false, onBack = {}, onAdd = {})
 }
 
 @Composable
 internal fun AppScreen(
-    name: String,
-    showBack: Boolean,
-    onBack: () -> Unit,
-    onAdd: () -> Unit
+  name: String,
+  showBack: Boolean,
+  onBack: () -> Unit,
+  onAdd: () -> Unit
 ) {
-    Scaffold(
-        topBar = {
-            val navigationIcon = if (showBack) Icons.Default.ArrowBack else Icons.Default.Menu
-            TopAppBar(
-                navigationIcon = {
-                    IconButton(onClick = onBack, modifier = Modifier.testTag(backTestTag(name))) {
-                        Icon(navigationIcon)
-                    }
-                },
-                title = { Text("Screen $name") })
-        },
-        floatingActionButton = {
-            FloatingActionButton(onClick = onAdd, modifier = Modifier.testTag(addTestTag(name))) {
-                Icon(Icons.Default.Add)
-            }
+  Scaffold(
+      topBar = {
+        val navigationIcon = if (showBack) Icons.Default.ArrowBack else Icons.Default.Menu
+        TopAppBar(
+            navigationIcon = {
+              IconButton(onClick = onBack, modifier = Modifier.testTag(backTestTag(name))) {
+                Icon(navigationIcon)
+              }
+            },
+            title = { Text("Screen $name") })
+      },
+      floatingActionButton = {
+        FloatingActionButton(onClick = onAdd, modifier = Modifier.testTag(addTestTag(name))) {
+          Icon(Icons.Default.Add)
         }
-    ) {
-        Text(
-            text = "Counter: ${Counter(200)}",
-            modifier = Modifier.fillMaxSize().wrapContentSize(Alignment.Center)
-        )
-    }
+      }
+  ) {
+    Text(
+        text = "Counter: ${Counter(200)}",
+        modifier = Modifier.fillMaxSize().wrapContentSize(Alignment.Center)
+    )
+  }
 }
 
 @Suppress("SameParameterValue")
 @Composable
 private fun Counter(periodMs: Long): Int = key(periodMs) {
-    // If the screen is temporarily removed from the composition, the counter will effectively
-    // be "paused": it will stop incrementing, but will resume from its last value when restored to
-    // the composition.
-    var value by savedInstanceState { 0 }
-    onActive {
-        val mainHandler = Handler()
-        var disposed = false
-        onDispose { disposed = true }
-        fun schedule() {
-            mainHandler.postDelayed({
-                value++
-                if (!disposed) schedule()
-            }, periodMs)
-        }
-        schedule()
+  // If the screen is temporarily removed from the composition, the counter will effectively
+  // be "paused": it will stop incrementing, but will resume from its last value when restored to
+  // the composition.
+  var value by savedInstanceState { 0 }
+  onActive {
+    val mainHandler = Handler()
+    var disposed = false
+    onDispose { disposed = true }
+    fun schedule() {
+      mainHandler.postDelayed({
+        value++
+        if (!disposed) schedule()
+      }, periodMs)
     }
-    return@key value
+    schedule()
+  }
+  return@key value
 }

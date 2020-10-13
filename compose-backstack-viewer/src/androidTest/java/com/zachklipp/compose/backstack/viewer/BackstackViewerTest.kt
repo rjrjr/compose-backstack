@@ -1,7 +1,15 @@
 package com.zachklipp.compose.backstack.viewer
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.ui.test.*
+import androidx.ui.test.assertHasClickAction
+import androidx.ui.test.assertIsDisplayed
+import androidx.ui.test.assertIsNotSelected
+import androidx.ui.test.assertIsSelected
+import androidx.ui.test.createComposeRule
+import androidx.ui.test.onNodeWithSubstring
+import androidx.ui.test.onNodeWithTag
+import androidx.ui.test.onNodeWithText
+import androidx.ui.test.performClick
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -9,101 +17,101 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class BackstackViewerTest {
 
-    @get:Rule
-    val compose = createComposeRule()
+  @get:Rule
+  val compose = createComposeRule()
 
-    @Test
-    fun initialState() {
-        compose.setContent {
-            BackstackViewerApp()
-        }
-
-        onNodeWithText("Slide Transition").assertIsDisplayed()
-        onNodeWithSubstring("Slow animations").assertIsDisplayed()
-
-        onNodeWithText("one").assertIsSelected()
-        onNodeWithText("one, two").assertIsNotSelected()
-        onNodeWithText("one, two, three").assertIsNotSelected()
-
-        onNodeWithText("Screen one").assertIsDisplayed()
-        onNodeWithSubstring("Counter:").assertIsDisplayed()
+  @Test
+  fun initialState() {
+    compose.setContent {
+      BackstackViewerApp()
     }
 
-    @Test
-    fun transitionBackFromSingleScreen() {
-        compose.setContent {
-            BackstackViewerApp()
-        }
+    compose.onNodeWithText("Slide Transition").assertIsDisplayed()
+    compose.onNodeWithSubstring("Slow animations").assertIsDisplayed()
 
-        onNodeWithTag(backTestTag("one")).assertHasClickAction().performClick()
-        onNodeWithText("Screen one").assertIsDisplayed()
+    compose.onNodeWithText("one").assertIsSelected()
+    compose.onNodeWithText("one, two").assertIsNotSelected()
+    compose.onNodeWithText("one, two, three").assertIsNotSelected()
+
+    compose.onNodeWithText("Screen one").assertIsDisplayed()
+    compose.onNodeWithSubstring("Counter:").assertIsDisplayed()
+  }
+
+  @Test
+  fun transitionBackFromSingleScreen() {
+    compose.setContent {
+      BackstackViewerApp()
     }
 
-    @Test
-    fun transitionToSecondPrefabBackstack() {
-        compose.setContent {
-            BackstackViewerApp()
-        }
+    compose.onNodeWithTag(backTestTag("one")).assertHasClickAction().performClick()
+    compose.onNodeWithText("Screen one").assertIsDisplayed()
+  }
 
-        onNodeWithText("Screen one").assertIsDisplayed()
-        onNodeWithText("Screen two").assertDoesNotExist()
-
-        onNodeWithText("one, two")
-            .assertIsNotSelected()
-            .performClick()
-            .assertIsSelected()
-
-        onNodeWithText("Screen one").assertDoesNotExist()
-        onNodeWithText("Screen two").assertIsDisplayed()
+  @Test
+  fun transitionToSecondPrefabBackstack() {
+    compose.setContent {
+      BackstackViewerApp()
     }
 
-    @Test
-    fun transitionToThirdPrefabBackstack() {
-        compose.setContent {
-            BackstackViewerApp()
-        }
+    compose.onNodeWithText("Screen one").assertIsDisplayed()
+    compose.onNodeWithText("Screen two").assertDoesNotExist()
 
-        onNodeWithText("Screen one").assertIsDisplayed()
-        onNodeWithText("Screen two").assertDoesNotExist()
-        onNodeWithText("Screen three").assertDoesNotExist()
+    compose.onNodeWithText("one, two")
+      .assertIsNotSelected()
+      .performClick()
+      .assertIsSelected()
 
-        onNodeWithText("one, two, three")
-            .assertIsNotSelected()
-            .performClick()
-            .assertIsSelected()
+    compose.onNodeWithText("Screen one").assertDoesNotExist()
+    compose.onNodeWithText("Screen two").assertIsDisplayed()
+  }
 
-        onNodeWithText("Screen one").assertDoesNotExist()
-        onNodeWithText("Screen two").assertDoesNotExist()
-        onNodeWithText("Screen three").assertIsDisplayed()
+  @Test
+  fun transitionToThirdPrefabBackstack() {
+    compose.setContent {
+      BackstackViewerApp()
     }
 
-    @Test
-    fun transitionBackFromPrefabBackstack() {
-        compose.setContent {
-            BackstackViewerApp()
-        }
+    compose.onNodeWithText("Screen one").assertIsDisplayed()
+    compose.onNodeWithText("Screen two").assertDoesNotExist()
+    compose.onNodeWithText("Screen three").assertDoesNotExist()
 
-        onNodeWithText("one, two, three").performClick().assertIsSelected()
-        onNodeWithText("Screen three").assertIsDisplayed()
+    compose.onNodeWithText("one, two, three")
+      .assertIsNotSelected()
+      .performClick()
+      .assertIsSelected()
 
-        onNodeWithTag(backTestTag("three")).performClick()
-        onNodeWithText("one, two").assertIsSelected()
-        onNodeWithText("Screen three").assertDoesNotExist()
+    compose.onNodeWithText("Screen one").assertDoesNotExist()
+    compose.onNodeWithText("Screen two").assertDoesNotExist()
+    compose.onNodeWithText("Screen three").assertIsDisplayed()
+  }
 
-        onNodeWithTag(backTestTag("two")).performClick()
-        onNodeWithText("one").assertIsSelected()
-        onNodeWithText("Screen two").assertDoesNotExist()
+  @Test
+  fun transitionBackFromPrefabBackstack() {
+    compose.setContent {
+      BackstackViewerApp()
     }
 
-    @Test
-    fun addScreenWithFab() {
-        compose.setContent {
-            BackstackViewerApp()
-        }
+    compose.onNodeWithText("one, two, three").performClick().assertIsSelected()
+    compose.onNodeWithText("Screen three").assertIsDisplayed()
 
-        onNodeWithTag(addTestTag("one")).assertHasClickAction().performClick()
-        onNodeWithText("Screen one+").assertIsDisplayed()
-        onNodeWithTag(backTestTag("one+")).assertHasClickAction().performClick()
-        onNodeWithText("Screen one+").assertDoesNotExist()
+    compose.onNodeWithTag(backTestTag("three")).performClick()
+    compose.onNodeWithText("one, two").assertIsSelected()
+    compose.onNodeWithText("Screen three").assertDoesNotExist()
+
+    compose.onNodeWithTag(backTestTag("two")).performClick()
+    compose.onNodeWithText("one").assertIsSelected()
+    compose.onNodeWithText("Screen two").assertDoesNotExist()
+  }
+
+  @Test
+  fun addScreenWithFab() {
+    compose.setContent {
+      BackstackViewerApp()
     }
+
+    compose.onNodeWithTag(addTestTag("one")).assertHasClickAction().performClick()
+    compose.onNodeWithText("Screen one+").assertIsDisplayed()
+    compose.onNodeWithTag(backTestTag("one+")).assertHasClickAction().performClick()
+    compose.onNodeWithText("Screen one+").assertDoesNotExist()
+  }
 }
