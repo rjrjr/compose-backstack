@@ -1,6 +1,12 @@
 Changelog
 =========
 
+## v0.6.0+alpha04
+
+_2020-10-13_
+
+ * Upgrade: Compose to 0.1.0-alpha04. (#37)
+
 ## v0.5.0+dev16
 
 _2020-08-09_
