@@ -5,9 +5,9 @@ import android.content.ContextWrapper
 import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
 import androidx.compose.animation.core.TweenSpec
+import androidx.compose.foundation.AmbientTextStyle
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.border
-import androidx.compose.foundation.currentTextStyle
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -176,22 +176,22 @@ private fun RadioButton(
   onSelect: () -> Unit
 ) {
   Box(
-      modifier = Modifier.selectable(
-          selected = selected,
-          onClick = { if (!selected) onSelect() }
-      ),
-      children = {
-          Box {
-              Row(Modifier.fillMaxWidth().padding(16.dp)) {
-                  RadioButton(selected = selected, onClick = onSelect)
-                  Text(
-                      text = text,
-                      style = MaterialTheme.typography.body1.merge(other = currentTextStyle()),
-                      modifier = Modifier.padding(start = 16.dp)
-                  )
-              }
-          }
+    modifier = Modifier.selectable(
+      selected = selected,
+      onClick = { if (!selected) onSelect() }
+    ),
+    children = {
+      Box {
+        Row(Modifier.fillMaxWidth().padding(16.dp)) {
+          RadioButton(selected = selected, onClick = onSelect)
+          Text(
+            text = text,
+            style = MaterialTheme.typography.body1.merge(other = AmbientTextStyle.current),
+            modifier = Modifier.padding(start = 16.dp)
+          )
+        }
       }
+    }
   )
 }
 
