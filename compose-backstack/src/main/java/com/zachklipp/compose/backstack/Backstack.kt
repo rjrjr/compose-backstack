@@ -175,7 +175,7 @@ fun <T : Any> Backstack(
   val inspector = remember { BackstackInspector(clock) }
   inspector.params = inspectionParams
 
-  val restorableStateHolder = rememberRestorableStateHolder<T>()
+  val restorableStateHolder = rememberRestorableStateHolder<T>(shouldSave = { it in activeKeys })
 
   if (direction == null && activeKeys != backstack) {
     // Not in the middle of a transition and we got a new backstack.

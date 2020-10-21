@@ -43,13 +43,16 @@ interface RestorableStateHolder<T : Any> {
  * @param T type of the keys.
  */
 @Composable
-fun <T : Any> rememberRestorableStateHolder(): RestorableStateHolder<T> =
+fun <T : Any> rememberRestorableStateHolder(
+  shouldSave: ((T) -> Boolean)? = null
+): RestorableStateHolder<T> =
   rememberSavedInstanceState(
     saver = DisposedCompositionsStateHolderImpl.Saver()
   ) {
     DisposedCompositionsStateHolderImpl<T>()
   }.apply {
     parentSavedStateRegistry = UiSavedStateRegistryAmbient.current
+    this.shouldSave = shouldSave
   }
 
 private class DisposedCompositionsStateHolderImpl<T : Any>(
@@ -57,6 +60,7 @@ private class DisposedCompositionsStateHolderImpl<T : Any>(
 ) : RestorableStateHolder<T> {
   private var registries = mutableMapOf<Int, UiSavedStateRegistry>()
   var parentSavedStateRegistry: UiSavedStateRegistry? = null
+  var shouldSave: ((T) -> Boolean)? = null
 
   @OptIn(ExperimentalComposeApi::class)
   @Composable
@@ -74,7 +78,9 @@ private class DisposedCompositionsStateHolderImpl<T : Any>(
         savedStates.remove(saveKey)
         registries[saveKey] = registry
         onDispose {
-          savedStates[saveKey] = registry.performSave()
+          if (shouldSave?.invoke(key) != false) {
+            savedStates[saveKey] = registry.performSave()
+          }
           registries.remove(saveKey)
         }
       }
