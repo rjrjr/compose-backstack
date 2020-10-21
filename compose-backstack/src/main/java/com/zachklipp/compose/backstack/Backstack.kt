@@ -9,7 +9,7 @@ import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.*
-import androidx.compose.runtime.savedinstancestate.UiSavedStateRegistryAmbient
+import androidx.compose.runtime.savedinstancestate.rememberRestorableStateHolder
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawOpacity
@@ -126,6 +126,7 @@ private val DefaultBackstackAnimation: AnimationSpec<Float>
  * controlled by touch gestures.
  * @param drawScreen Called with each element of [backstack] to render it.
  */
+@OptIn(ExperimentalComposeApi::class)
 @Composable
 fun <T : Any> Backstack(
   backstack: List<T>,
@@ -173,6 +174,9 @@ fun <T : Any> Backstack(
   val clock = AnimationClockAmbient.current
   val inspector = remember { BackstackInspector(clock) }
   inspector.params = inspectionParams
+
+  // T must be bundleable.
+  val restorableStateHolder = rememberRestorableStateHolder<Int>()
 
   if (direction == null && activeKeys != backstack) {
     // Not in the middle of a transition and we got a new backstack.
@@ -242,18 +246,13 @@ fun <T : Any> Backstack(
           calculateRegularModifier(transition, index, activeKeys.size, progress)
         }
 
-        // This must be called even if the screen is not visible, so the screen's state gets
-        // cached before it's removed from the composition.
-        val savedStateRegistry = ChildSavedStateRegistry(screenProperties.isVisible)
-
         if (!screenProperties.isVisible) {
           // Remove the screen from the composition.
-          // This must be done after updating the savedState visibility so it has a chance
-          // to query providers before they're unregistered.
           return@ScreenWrapper
         }
 
-        Providers(UiSavedStateRegistryAmbient provides savedStateRegistry) {
+        val saveStateKey = currentComposer.currentCompoundKeyHash
+        restorableStateHolder.withRestorableState(saveStateKey) {
           Box(screenProperties.modifier) { children() }
         }
       }
