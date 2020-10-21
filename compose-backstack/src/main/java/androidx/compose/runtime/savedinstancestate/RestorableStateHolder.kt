@@ -1,7 +1,9 @@
 package androidx.compose.runtime.savedinstancestate
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.Providers
+import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.key
 import androidx.compose.runtime.onActive
 import androidx.compose.runtime.remember
@@ -20,8 +22,7 @@ import androidx.compose.runtime.remember
  * this content. Next time [withRestorableState] will be used with the same key its state will be
  * restored.
  *
- * @param T type of the keys. Note that on Android you can only use types which can be stored
- * inside the Bundle.
+ * @param T type of the keys.
  */
 interface RestorableStateHolder<T : Any> {
   /**
@@ -30,8 +31,7 @@ interface RestorableStateHolder<T : Any> {
    * before disposing the content and will restore the states when you compose with this key
    * again.
    *
-   * @param key to be used for saving and restoring the states for the subtree. Note that on
-   * Android you can only use types which can be stored inside the Bundle.
+   * @param key to be used for saving and restoring the states for the subtree.
    */
   @Composable
   fun withRestorableState(key: T, content: @Composable () -> Unit)
@@ -40,8 +40,7 @@ interface RestorableStateHolder<T : Any> {
 /**
  * Creates and remembers the instance of [RestorableStateHolder].
  *
- * @param T type of the keys. Note that on Android you can only use types which can be stored
- * inside the Bundle.
+ * @param T type of the keys.
  */
 @Composable
 fun <T : Any> rememberRestorableStateHolder(): RestorableStateHolder<T> =
@@ -54,37 +53,35 @@ fun <T : Any> rememberRestorableStateHolder(): RestorableStateHolder<T> =
   }
 
 private class DisposedCompositionsStateHolderImpl<T : Any>(
-  private val savedStates: MutableMap<T, Map<String, List<Any?>>> = mutableMapOf()
+  private val savedStates: MutableMap<Int, Map<String, List<Any?>>> = mutableMapOf()
 ) : RestorableStateHolder<T> {
-  private var registries = mutableMapOf<T, UiSavedStateRegistry>()
+  private var registries = mutableMapOf<Int, UiSavedStateRegistry>()
   var parentSavedStateRegistry: UiSavedStateRegistry? = null
 
+  @OptIn(ExperimentalComposeApi::class)
   @Composable
   override fun withRestorableState(key: T, content: @Composable () -> Unit) {
     key(key) {
+      val saveKey = currentComposer.currentCompoundKeyHash
       val registry = remember {
-        require(parentSavedStateRegistry?.canBeSaved(key) ?: true) {
-          "Type of the key used for withRestorableState is not supported. On Android " +
-              "you can only use types which can be stored inside the Bundle."
-        }
-        UiSavedStateRegistry(savedStates[key]) {
+        UiSavedStateRegistry(savedStates[saveKey]) {
           parentSavedStateRegistry?.canBeSaved(it) ?: true
         }
       }
       Providers(UiSavedStateRegistryAmbient provides registry, children = content)
       onActive {
-        require(!registries.contains(key))
-        savedStates.remove(key)
-        registries[key] = registry
+        require(!registries.contains(saveKey))
+        savedStates.remove(saveKey)
+        registries[saveKey] = registry
         onDispose {
-          savedStates[key] = registry.performSave()
-          registries.remove(key)
+          savedStates[saveKey] = registry.performSave()
+          registries.remove(saveKey)
         }
       }
     }
   }
 
-  private fun saveAll(): MutableMap<T, Map<String, List<Any?>>> {
+  private fun saveAll(): MutableMap<Int, Map<String, List<Any?>>> {
     val map = savedStates.toMutableMap()
     registries.forEach { (key, registry) ->
       map[key] = registry.performSave()
@@ -95,7 +92,7 @@ private class DisposedCompositionsStateHolderImpl<T : Any>(
   companion object {
     private val Saver: Saver<DisposedCompositionsStateHolderImpl<*>, *> = Saver(
       save = { it.saveAll() },
-      restore = { DisposedCompositionsStateHolderImpl(it) }
+      restore = { DisposedCompositionsStateHolderImpl<Any>(it) }
     )
 
     @Suppress("UNCHECKED_CAST")

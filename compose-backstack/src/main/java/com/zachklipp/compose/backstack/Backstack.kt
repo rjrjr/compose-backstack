@@ -175,8 +175,7 @@ fun <T : Any> Backstack(
   val inspector = remember { BackstackInspector(clock) }
   inspector.params = inspectionParams
 
-  // T must be bundleable.
-  val restorableStateHolder = rememberRestorableStateHolder<Int>()
+  val restorableStateHolder = rememberRestorableStateHolder<T>()
 
   if (direction == null && activeKeys != backstack) {
     // Not in the middle of a transition and we got a new backstack.
@@ -251,8 +250,7 @@ fun <T : Any> Backstack(
           return@ScreenWrapper
         }
 
-        val saveStateKey = currentComposer.currentCompoundKeyHash
-        restorableStateHolder.withRestorableState(saveStateKey) {
+        restorableStateHolder.withRestorableState(key) {
           Box(screenProperties.modifier) { children() }
         }
       }
