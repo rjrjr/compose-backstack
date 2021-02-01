@@ -1,9 +1,9 @@
 package com.zachklipp.compose.backstack.sample
 
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onNodeWithSubstring
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.ui.test.assertIsDisplayed
-import androidx.ui.test.createAndroidComposeRule
-import androidx.ui.test.onNodeWithSubstring
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith

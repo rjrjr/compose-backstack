@@ -40,8 +40,8 @@ object Dependencies {
     val icons = "androidx.compose.material:material-icons-extended:${Versions.compose}"
     val material = "androidx.compose.material:material:${Versions.compose}"
     val savedstate = "androidx.compose.runtime:runtime-saved-instance-state:${Versions.compose}"
-    val test = "androidx.ui:ui-test:${Versions.compose}"
-    val tooling = "androidx.ui:ui-tooling:${Versions.compose}"
+    val test = "androidx.compose.ui:ui-test-junit4:${Versions.compose}"
+    val tooling = "androidx.compose.ui:ui-tooling:${Versions.compose}"
     val util = "androidx.compose.ui:ui-util:${Versions.compose}"
   }
 

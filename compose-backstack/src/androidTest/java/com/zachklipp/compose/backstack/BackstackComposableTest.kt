@@ -2,17 +2,16 @@ package com.zachklipp.compose.backstack
 
 import androidx.compose.animation.core.ManualAnimationClock
 import androidx.compose.animation.core.TweenSpec
-import androidx.compose.foundation.Text
+import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.AnimationClockAmbient
+import androidx.compose.ui.platform.AmbientAnimationClock
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.ui.test.assertIsDisplayed
-import androidx.ui.test.createComposeRule
-import androidx.ui.test.onNodeWithText
-import androidx.ui.test.runOnUiThread
 import com.zachklipp.compose.backstack.BackstackTransition.Crossfade
 import com.zachklipp.compose.backstack.BackstackTransition.Slide
 import org.junit.Rule
@@ -61,7 +60,7 @@ class BackstackComposableTest {
   private fun assertInitialStateWithSingleScreen(transition: BackstackTransition) {
     val originalBackstack = listOf("one")
     compose.setContent {
-      Backstack(originalBackstack, transition = transition) { Text(it) }
+      Backstack(originalBackstack, transition = transition) { BasicText(it) }
     }
 
     compose.onNodeWithText("one").assertIsDisplayed()
@@ -70,7 +69,7 @@ class BackstackComposableTest {
   private fun assertInitialStateWithMultipleScreens(transition: BackstackTransition) {
     val originalBackstack = listOf("one", "two")
     compose.setContent {
-      Backstack(originalBackstack, transition = transition) { Text(it) }
+      Backstack(originalBackstack, transition = transition) { BasicText(it) }
     }
 
     compose.onNodeWithText("two").assertIsDisplayed()
@@ -82,12 +81,12 @@ class BackstackComposableTest {
     val destinationBackstack = listOf("one", "two")
     var backstack by mutableStateOf(originalBackstack)
     compose.setContent {
-      Providers(AnimationClockAmbient provides clock) {
+      Providers(AmbientAnimationClock provides clock) {
         Backstack(
-            backstack,
-            animationBuilder = animation,
-            transition = transition
-        ) { Text(it) }
+          backstack,
+          animationBuilder = animation,
+          transition = transition
+        ) { BasicText(it) }
       }
     }
 

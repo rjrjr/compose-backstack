@@ -1,28 +1,29 @@
 package com.zachklipp.compose.backstack
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLifecycleObserver
 import androidx.compose.runtime.ExperimentalComposeApi
+import androidx.compose.runtime.RememberObserver
 import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.savedinstancestate.AmbientUiSavedStateRegistry
 import androidx.compose.runtime.savedinstancestate.UiSavedStateRegistry
-import androidx.compose.runtime.savedinstancestate.UiSavedStateRegistryAmbient
 
 /**
  * Returns a [UiSavedStateRegistry] that will automatically save values from all its registered
  * providers whenever [childWillBeComposed] transitions from true to false, and make those values available
  * to be restored when [childWillBeComposed] transitions from false to true.
  */
+@Suppress("ComposableNaming")
 @OptIn(ExperimentalComposeApi::class)
 @Composable
 fun ChildSavedStateRegistry(childWillBeComposed: Boolean): UiSavedStateRegistry {
-  val parent = UiSavedStateRegistryAmbient.current
+  val parent = AmbientUiSavedStateRegistry.current
   val key = currentComposer.currentCompoundKeyHash.toString()
   val holder = remember { SavedStateHolder(key) }
   return holder.updateAndReturnRegistry(parent, childWillBeComposed)
 }
 
-internal class SavedStateHolder(private val key: String) : CompositionLifecycleObserver {
+internal class SavedStateHolder(private val key: String) : RememberObserver {
   private var parent: UiSavedStateRegistry? = null
   private var isScreenVisible = false
   private var values: Map<String, List<Any?>>? = null
@@ -79,11 +80,15 @@ internal class SavedStateHolder(private val key: String) : CompositionLifecycleO
     return registry
   }
 
-  override fun onEnter() {
+  override fun onAbandoned() {
+    parent?.unregisterProvider(key, valueProvider)
+  }
+
+  override fun onRemembered() {
     // No-op
   }
 
-  override fun onLeave() {
+  override fun onForgotten() {
     parent?.unregisterProvider(key, valueProvider)
   }
 

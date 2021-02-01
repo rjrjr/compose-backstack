@@ -26,6 +26,7 @@ interface BackstackTransition {
    * visible, then the top screen is always transitioning _out_, and non-top screens are either
    * transitioning out or invisible.
    */
+  @Suppress("ModifierFactoryExtensionFunction")
   fun modifierForScreen(
     visibility: Float,
     isTop: Boolean
@@ -35,6 +36,7 @@ interface BackstackTransition {
    * A simple transition that slides screens horizontally.
    */
   object Slide : BackstackTransition {
+    @Suppress("ModifierFactoryExtensionFunction")
     override fun modifierForScreen(
       visibility: Float,
       isTop: Boolean
@@ -47,6 +49,7 @@ interface BackstackTransition {
    * A simple transition that crossfades between screens.
    */
   object Crossfade : BackstackTransition {
+    @Suppress("ModifierFactoryExtensionFunction")
     override fun modifierForScreen(
       visibility: Float,
       isTop: Boolean

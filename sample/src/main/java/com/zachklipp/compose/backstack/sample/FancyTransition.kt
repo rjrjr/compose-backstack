@@ -2,6 +2,7 @@ package com.zachklipp.compose.backstack.sample
 
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.drawLayer
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.util.lerp
 import com.zachklipp.compose.backstack.BackstackTransition
 import com.zachklipp.compose.backstack.BackstackTransition.Crossfade
@@ -13,6 +14,7 @@ import kotlin.math.pow
  * with some additional math and other transformations.
  */
 object FancyTransition : BackstackTransition {
+  @Suppress("ModifierFactoryExtensionFunction")
   override fun modifierForScreen(
     visibility: Float,
     isTop: Boolean
@@ -25,7 +27,7 @@ object FancyTransition : BackstackTransition {
     } else {
       // Move the non-top screen back, but only a little.
       val scaleVisibility = lerp(.9f, 1f, visibility)
-      Modifier.drawLayer(scaleX = scaleVisibility, scaleY = scaleVisibility)
+      Modifier.graphicsLayer(scaleX = scaleVisibility, scaleY = scaleVisibility)
           .then(Crossfade.modifierForScreen(visibility.pow(.5f), isTop))
     }
   }

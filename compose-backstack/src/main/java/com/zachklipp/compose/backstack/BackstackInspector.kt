@@ -7,6 +7,7 @@ import androidx.compose.animation.animate
 import androidx.compose.animation.core.AnimationClockObservable
 import androidx.compose.animation.core.FloatSpringSpec
 import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.getValue
@@ -14,6 +15,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.drawLayer
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.AmbientDensity
 import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -117,6 +120,7 @@ internal class BackstackInspector(clock: AnimationClockObservable) {
    * [InspectionParams.overlayOpacity]. All other screens will be drawn as a 3D stack.
    * All transformations are animated.
    */
+  @Suppress("ComposableModifierFactory", "ModifierFactoryExtensionFunction")
   @Composable
   internal fun inspectScreen(
     screenIndex: Int,
@@ -127,53 +131,53 @@ internal class BackstackInspector(clock: AnimationClockObservable) {
     // compose supports transforming inputs as well as outputs, the top screen can
     // participate in scaling/rotation too.
     val isTop = screenIndex == screenCount - 1
-    val density = DensityAmbient.current
+    val density = AmbientDensity.current
 
     // drawLayer will scale around the center of the bounds, so we need to offset relative
     // to that so the entire stack stays centered.
-    val centerOffset = animate(
-        // Don't need to adjust the pivot point if there's only one screen.
-        if (screenCount == 1) 0f
-        // Add -1 + visibility so new screens animate "out of" the previous one.
-        else (screenIndex - 1f + visibility) - screenCount / 3f
+    val centerOffset by animateFloatAsState(
+      // Don't need to adjust the pivot point if there's only one screen.
+      if (screenCount == 1) 0f
+      // Add -1 + visibility so new screens animate "out of" the previous one.
+      else (screenIndex - 1f + visibility) - screenCount / 3f
     )
 
-    val scale = animate(if (isTop) 1f else scaleFactor.value)
+    val scale by animateFloatAsState(if (isTop) 1f else scaleFactor.value)
 
-    val offsetDpX = animate(
-        if (isTop) 0f else {
-          // Adjust by screenCount to squeeze more in as the count increases.
-          val densityFactor = 10f / screenCount
-          // Adjust X offset by sin(rotation) so it looks 3D.
-          val xRotation = sin(toRadians(rotationY.value.toDouble())).toFloat()
-          (centerOffset * offsetDpX.value * scale * densityFactor * xRotation)
-        }
+    val offsetDpX by animateFloatAsState(
+      if (isTop) 0f else {
+        // Adjust by screenCount to squeeze more in as the count increases.
+        val densityFactor = 10f / screenCount
+        // Adjust X offset by sin(rotation) so it looks 3D.
+        val xRotation = sin(toRadians(rotationY.value.toDouble())).toFloat()
+        (centerOffset * offsetDpX.value * scale * densityFactor * xRotation)
+      }
     )
-    val offsetDpY = animate(if (isTop) 0f else (centerOffset * offsetDpY.value * scale))
+    val offsetDpY by animateFloatAsState(if (isTop) 0f else (centerOffset * offsetDpY.value * scale))
 
-    val rotationX = animate(if (isTop) 0f else (rotationX.value))
-    val rotationY = animate(if (isTop) 0f else (rotationY.value))
+    val rotationX by animateFloatAsState(if (isTop) 0f else (rotationX.value))
+    val rotationY by animateFloatAsState(if (isTop) 0f else (rotationY.value))
 
     // This is the only transformation applied to the top screen, so it has some extra logic.
-    val alpha = animate(
-        when {
-          // If there's only one screen in the stack, don't transform it at all.
-          screenCount == 1 -> 1f
-          isTop -> overlayAlpha.value
-          else -> alpha.value
-          // Adjust alpha by visibility to make transition less jarring when adding/removing
-          // screens.
-        } * visibility
+    val alpha by animateFloatAsState(
+      when {
+        // If there's only one screen in the stack, don't transform it at all.
+        screenCount == 1 -> 1f
+        isTop -> overlayAlpha.value
+        else -> alpha.value
+        // Adjust alpha by visibility to make transition less jarring when adding/removing
+        // screens.
+      } * visibility
     )
 
-    return Modifier.drawLayer(
-        scaleX = scale,
-        scaleY = scale,
-        rotationX = rotationX,
-        rotationY = rotationY,
-        translationX = with(density) { offsetDpX.dp.toPx() },
-        translationY = with(density) { offsetDpY.dp.toPx() },
-        alpha = alpha
+    return Modifier.graphicsLayer(
+      scaleX = scale,
+      scaleY = scale,
+      rotationX = rotationX,
+      rotationY = rotationY,
+      translationX = with(density) { offsetDpX.dp.toPx() },
+      translationY = with(density) { offsetDpY.dp.toPx() },
+      alpha = alpha
     )
   }
 

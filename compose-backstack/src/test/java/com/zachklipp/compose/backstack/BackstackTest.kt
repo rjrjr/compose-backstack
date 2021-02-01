@@ -152,6 +152,7 @@ class BackstackTest {
   }
 
   private object TestTransition : BackstackTransition {
+    @Suppress("ModifierFactoryExtensionFunction")
     override fun modifierForScreen(
       visibility: Float,
       isTop: Boolean

@@ -5,8 +5,6 @@ import android.content.ContextWrapper
 import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
 import androidx.compose.animation.core.TweenSpec
-import androidx.compose.foundation.AmbientTextStyle
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,23 +15,28 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.selection.selectable
+import androidx.compose.material.AmbientTextStyle
 import androidx.compose.material.ListItem
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.RadioButton
 import androidx.compose.material.Surface
 import androidx.compose.material.Switch
+import androidx.compose.material.Text
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.key
-import androidx.compose.runtime.onCommit
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.ContextAmbient
+import androidx.compose.ui.platform.AmbientContext
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.text
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.ui.tooling.preview.Preview
 import com.zachklipp.compose.backstack.Backstack
 import com.zachklipp.compose.backstack.BackstackTransition
 import com.zachklipp.compose.backstack.BackstackTransition.Crossfade
@@ -91,7 +94,11 @@ fun BackstackViewerApp(
 
   MaterialTheme(colors = darkColors()) {
     Surface {
-      Column(modifier = Modifier.padding(16.dp).fillMaxSize()) {
+      Column(
+        modifier = Modifier
+          .padding(16.dp)
+          .fillMaxSize()
+      ) {
         AppControls(model)
         Spacer(Modifier.preferredHeight(24.dp))
         AppScreens(model)
@@ -142,20 +149,22 @@ private fun AppScreens(model: AppModel) {
   MaterialTheme(colors = lightColors()) {
     InspectionGestureDetector(enabled = model.inspectionEnabled) { inspectionParams ->
       Backstack(
-          backstack = model.currentBackstack,
-          transition = model.selectedTransition.second,
-          animationBuilder = animation,
-          modifier = Modifier.fillMaxSize().border(width = 3.dp, color = Color.Red),
-          inspectionParams = inspectionParams,
-          onTransitionStarting = { from, to, direction ->
-              println(
-                  """
-                          Transitioning $direction:
-                            from: $from
-                              to: $to
-                        """.trimIndent()
-              )
-          },
+        backstack = model.currentBackstack,
+        transition = model.selectedTransition.second,
+        animationBuilder = animation,
+        modifier = Modifier
+          .fillMaxSize()
+          .border(width = 3.dp, color = Color.Red),
+        inspectionParams = inspectionParams,
+        onTransitionStarting = { from, to, direction ->
+          println(
+            """
+              Transitioning $direction:
+                from: $from
+                  to: $to
+            """.trimIndent()
+          )
+        },
           onTransitionFinished = { println("Transition finished.") }
       ) { screen ->
         AppScreen(
@@ -176,13 +185,21 @@ private fun RadioButton(
   onSelect: () -> Unit
 ) {
   Box(
-    modifier = Modifier.selectable(
-      selected = selected,
-      onClick = { if (!selected) onSelect() }
-    ),
-    children = {
+    modifier = Modifier
+      .selectable(
+        selected = selected,
+        onClick = { if (!selected) onSelect() }
+      )
+      .semantics {
+        this.text = buildAnnotatedString { append(text) }
+      },
+    content = {
       Box {
-        Row(Modifier.fillMaxWidth().padding(16.dp)) {
+        Row(
+          Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+        ) {
           RadioButton(selected = selected, onClick = onSelect)
           Text(
             text = text,
@@ -197,9 +214,9 @@ private fun RadioButton(
 
 @Composable
 private fun OnBackPressed(onPressed: () -> Unit) {
-  val context = ContextAmbient.current
-  onCommit(context, onPressed) {
-    val activity = context.findComponentActivity() ?: return@onCommit
+  val context = AmbientContext.current
+  DisposableEffect(context, onPressed) {
+    val activity = context.findComponentActivity() ?: return@DisposableEffect onDispose {}
     val callback = object : OnBackPressedCallback(true) {
       override fun handleOnBackPressed() {
         onPressed()

@@ -9,18 +9,18 @@ import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.*
-import androidx.compose.runtime.savedinstancestate.UiSavedStateRegistryAmbient
+import androidx.compose.runtime.savedinstancestate.AmbientUiSavedStateRegistry
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawOpacity
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.platform.AnimationClockAmbient
-import androidx.compose.ui.platform.ContextAmbient
+import androidx.compose.ui.platform.AmbientAnimationClock
+import androidx.compose.ui.platform.AmbientContext
 import com.zachklipp.compose.backstack.TransitionDirection.Backward
 import com.zachklipp.compose.backstack.TransitionDirection.Forward
 
 /** Used to hide screens when not transitioning. */
-internal val HIDDEN_MODIFIER = Modifier.drawOpacity(0f)
+internal val HIDDEN_MODIFIER = Modifier.alpha(0f)
 
 /**
  * Identifies which direction a transition is being performed in.
@@ -44,12 +44,11 @@ internal data class ScreenProperties(
   val isVisible: Boolean
 )
 
-@Composable
 private val DefaultBackstackAnimation: AnimationSpec<Float>
-  get() {
-    val context = ContextAmbient.current
+  @Composable get() {
+    val context = AmbientContext.current
     return TweenSpec(
-        durationMillis = context.resources.getInteger(android.R.integer.config_shortAnimTime)
+      durationMillis = context.resources.getInteger(android.R.integer.config_shortAnimTime)
     )
   }
 
@@ -138,10 +137,8 @@ fun <T : Any> Backstack(
   drawScreen: @Composable (T) -> Unit
 ) {
   require(backstack.isNotEmpty()) { "Backstack must contain at least 1 screen." }
-  onCommit(backstack) {
-    require(backstack.distinct().size == backstack.size) {
-      "Backstack must not contain duplicates: $backstack"
-    }
+  require(backstack.distinct().size == backstack.size) {
+    "Backstack must not contain duplicates: $backstack"
   }
 
   // When transitioning, contains a stable cache of the screens actually being displayed. Will not
@@ -170,7 +167,7 @@ fun <T : Any> Backstack(
     }
   }
   val animation = animationBuilder ?: DefaultBackstackAnimation
-  val clock = AnimationClockAmbient.current
+  val clock = AmbientAnimationClock.current
   val inspector = remember { BackstackInspector(clock) }
   inspector.params = inspectionParams
 
@@ -253,7 +250,7 @@ fun <T : Any> Backstack(
           return@ScreenWrapper
         }
 
-        Providers(UiSavedStateRegistryAmbient provides savedStateRegistry) {
+        Providers(AmbientUiSavedStateRegistry provides savedStateRegistry) {
           Box(screenProperties.modifier) { children() }
         }
       }

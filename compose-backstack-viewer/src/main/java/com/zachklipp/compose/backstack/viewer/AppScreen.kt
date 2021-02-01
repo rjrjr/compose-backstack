@@ -3,13 +3,13 @@
 package com.zachklipp.compose.backstack.viewer
 
 import android.os.Handler
-import androidx.compose.foundation.Icon
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.FloatingActionButton
+import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -20,7 +20,7 @@ import androidx.compose.runtime.savedinstancestate.savedInstanceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
-import androidx.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.Preview
 
 internal fun addTestTag(screen: String) = "add screen to $screen"
 internal fun backTestTag(screen: String) = "go back from $screen"
@@ -44,20 +44,22 @@ internal fun AppScreen(
         TopAppBar(
             navigationIcon = {
               IconButton(onClick = onBack, modifier = Modifier.testTag(backTestTag(name))) {
-                Icon(navigationIcon)
+                Icon(navigationIcon, contentDescription = "Back")
               }
             },
             title = { Text("Screen $name") })
       },
       floatingActionButton = {
         FloatingActionButton(onClick = onAdd, modifier = Modifier.testTag(addTestTag(name))) {
-          Icon(Icons.Default.Add)
+          Icon(Icons.Default.Add, contentDescription = "Add screen")
         }
       }
   ) {
     Text(
-        text = "Counter: ${Counter(200)}",
-        modifier = Modifier.fillMaxSize().wrapContentSize(Alignment.Center)
+      text = "Counter: ${Counter(200)}",
+      modifier = Modifier
+        .fillMaxSize()
+        .wrapContentSize(Alignment.Center)
     )
   }
 }
@@ -69,10 +71,9 @@ private fun Counter(periodMs: Long): Int = key(periodMs) {
   // be "paused": it will stop incrementing, but will resume from its last value when restored to
   // the composition.
   var value by savedInstanceState { 0 }
-  onActive {
+  DisposableEffect(periodMs) {
     val mainHandler = Handler()
     var disposed = false
-    onDispose { disposed = true }
     fun schedule() {
       mainHandler.postDelayed({
         value++
@@ -80,6 +81,7 @@ private fun Counter(periodMs: Long): Int = key(periodMs) {
       }, periodMs)
     }
     schedule()
+    onDispose { disposed = true }
   }
   return@key value
 }
