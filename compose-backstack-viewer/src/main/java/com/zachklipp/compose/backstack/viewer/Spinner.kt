@@ -3,16 +3,16 @@
 package com.zachklipp.compose.backstack.viewer
 
 
-import androidx.compose.foundation.Icon
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.preferredWidth
+import androidx.compose.foundation.layout.width
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
+import androidx.compose.material.Text
 import androidx.compose.material.darkColors
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
@@ -24,9 +24,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import androidx.ui.tooling.preview.Preview
 
 @Preview
 @Composable
@@ -64,12 +64,17 @@ internal fun <T : Any> Spinner(
 
   // Always draw the selected item.
   Row(Modifier.clickable(onClick = { isOpen = !isOpen })) {
-    Box(modifier = Modifier.weight(1f).align(Alignment.CenterVertically)) {
+    Box(modifier = Modifier
+      .weight(1f)
+      .align(Alignment.CenterVertically)) {
       drawItem(selectedItem)
     }
     Icon(
-        Icons.Default.ArrowDropDown,
-        modifier = Modifier.preferredWidth(48.dp).aspectRatio(1f)
+      Icons.Default.ArrowDropDown,
+      contentDescription = "Open spinner",
+      modifier = Modifier
+        .width(48.dp)
+        .aspectRatio(1f)
     )
   }
 

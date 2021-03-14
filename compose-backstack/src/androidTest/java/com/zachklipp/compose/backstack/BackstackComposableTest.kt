@@ -1,18 +1,14 @@
 package com.zachklipp.compose.backstack
 
-import androidx.compose.animation.core.ManualAnimationClock
 import androidx.compose.animation.core.TweenSpec
-import androidx.compose.foundation.Text
-import androidx.compose.runtime.Providers
+import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.AnimationClockAmbient
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.ui.test.assertIsDisplayed
-import androidx.ui.test.createComposeRule
-import androidx.ui.test.onNodeWithText
-import androidx.ui.test.runOnUiThread
 import com.zachklipp.compose.backstack.BackstackTransition.Crossfade
 import com.zachklipp.compose.backstack.BackstackTransition.Slide
 import org.junit.Rule
@@ -25,8 +21,7 @@ class BackstackComposableTest {
   @get:Rule
   val compose = createComposeRule()
 
-  private val clock = ManualAnimationClock(0)
-  private val animation = TweenSpec<Float>(durationMillis = 100)
+  private val animation = TweenSpec<Float>(durationMillis = 1000)
 
   @Test
   fun initialStateWithSingleScreen_slide() {
@@ -61,7 +56,7 @@ class BackstackComposableTest {
   private fun assertInitialStateWithSingleScreen(transition: BackstackTransition) {
     val originalBackstack = listOf("one")
     compose.setContent {
-      Backstack(originalBackstack, transition = transition) { Text(it) }
+      Backstack(originalBackstack, transition = transition) { BasicText(it) }
     }
 
     compose.onNodeWithText("one").assertIsDisplayed()
@@ -70,7 +65,7 @@ class BackstackComposableTest {
   private fun assertInitialStateWithMultipleScreens(transition: BackstackTransition) {
     val originalBackstack = listOf("one", "two")
     compose.setContent {
-      Backstack(originalBackstack, transition = transition) { Text(it) }
+      Backstack(originalBackstack, transition = transition) { BasicText(it) }
     }
 
     compose.onNodeWithText("two").assertIsDisplayed()
@@ -81,14 +76,13 @@ class BackstackComposableTest {
     val originalBackstack = listOf("one")
     val destinationBackstack = listOf("one", "two")
     var backstack by mutableStateOf(originalBackstack)
+    compose.mainClock.autoAdvance = false
     compose.setContent {
-      Providers(AnimationClockAmbient provides clock) {
         Backstack(
-            backstack,
-            animationBuilder = animation,
-            transition = transition
-        ) { Text(it) }
-      }
+          backstack,
+          animationBuilder = animation,
+          transition = transition
+        ) { BasicText(it) }
     }
 
     compose.onNodeWithText("one").assertIsDisplayed()
@@ -101,25 +95,19 @@ class BackstackComposableTest {
     compose.onNodeWithText("one").assertIsDisplayed()
     compose.onNodeWithText("two").assertDoesNotExist()
 
-    setTransitionTime(25)
+    compose.mainClock.advanceTimeBy(250)
 
     compose.onNodeWithText("one").assertIsDisplayed()
     compose.onNodeWithText("two").assertIsDisplayed()
 
-    setTransitionTime(75)
+    compose.mainClock.advanceTimeBy(750)
 
     compose.onNodeWithText("one").assertIsDisplayed()
     compose.onNodeWithText("two").assertIsDisplayed()
 
-    setTransitionTime(100)
+    compose.mainClock.advanceTimeBy(1000)
 
     compose.onNodeWithText("one").assertDoesNotExist()
     compose.onNodeWithText("two").assertIsDisplayed()
-  }
-
-  private fun setTransitionTime(time: Long) {
-    compose.runOnUiThread {
-      clock.clockTimeMillis = time
-    }
   }
 }

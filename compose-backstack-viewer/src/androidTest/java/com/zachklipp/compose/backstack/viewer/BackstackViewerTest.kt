@@ -1,15 +1,14 @@
 package com.zachklipp.compose.backstack.viewer
 
+import androidx.compose.ui.test.assertHasClickAction
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotSelected
+import androidx.compose.ui.test.assertIsSelected
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.ui.test.assertHasClickAction
-import androidx.ui.test.assertIsDisplayed
-import androidx.ui.test.assertIsNotSelected
-import androidx.ui.test.assertIsSelected
-import androidx.ui.test.createComposeRule
-import androidx.ui.test.onNodeWithSubstring
-import androidx.ui.test.onNodeWithTag
-import androidx.ui.test.onNodeWithText
-import androidx.ui.test.performClick
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -27,14 +26,14 @@ class BackstackViewerTest {
     }
 
     compose.onNodeWithText("Slide Transition").assertIsDisplayed()
-    compose.onNodeWithSubstring("Slow animations").assertIsDisplayed()
+    compose.onNodeWithText("Slow animations", substring = true).assertIsDisplayed()
 
     compose.onNodeWithText("one").assertIsSelected()
     compose.onNodeWithText("one, two").assertIsNotSelected()
     compose.onNodeWithText("one, two, three").assertIsNotSelected()
 
     compose.onNodeWithText("Screen one").assertIsDisplayed()
-    compose.onNodeWithSubstring("Counter:").assertIsDisplayed()
+    compose.onNodeWithText("Counter:", substring = true).assertIsDisplayed()
   }
 
   @Test

@@ -29,4 +29,9 @@ configure<BaseExtension> {
     kotlinCompilerVersion = Versions.kotlin
     kotlinCompilerExtensionVersion = Versions.compose
   }
+
+  packagingOptions {
+    excludes += "META-INF/AL2.0"
+    excludes += "META-INF/LGPL2.1"
+  }
 }

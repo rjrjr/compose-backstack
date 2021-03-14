@@ -17,6 +17,7 @@ android {
 dependencies {
   implementation(project(":compose-backstack-viewer"))
   implementation(Dependencies.AndroidX.appcompat)
+  implementation(Dependencies.Compose.activity)
   implementation(Dependencies.Compose.foundation)
   implementation(Dependencies.Compose.util)
 

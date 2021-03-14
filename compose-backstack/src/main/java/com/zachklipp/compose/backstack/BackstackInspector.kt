@@ -2,21 +2,23 @@
 
 package com.zachklipp.compose.backstack
 
-import androidx.compose.animation.AnimatedFloatModel
-import androidx.compose.animation.animate
-import androidx.compose.animation.core.AnimationClockObservable
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FloatSpringSpec
 import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.drawLayer
-import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import java.lang.Math.toRadians
 import kotlin.math.sin
 
@@ -60,7 +62,7 @@ fun InspectionParams.constrained() = InspectionParams(
     overlayOpacity = overlayOpacity.coerceIn(0f, 1f)
 )
 
-internal class BackstackInspector(clock: AnimationClockObservable) {
+internal class BackstackInspector(private val scope: CoroutineScope) {
 
   private val animation = FloatSpringSpec(stiffness = Spring.StiffnessLow)
 
@@ -91,24 +93,24 @@ internal class BackstackInspector(clock: AnimationClockObservable) {
         }
       }
       constrainedParams?.let {
-        offsetDpX.animateTo(it.offsetX.value, animation)
-        offsetDpY.animateTo(it.offsetY.value, animation)
-        rotationX.animateTo(it.rotationXDegrees, animation)
-        rotationY.animateTo(it.rotationYDegrees, animation)
-        scaleFactor.animateTo(it.scale, animation)
-        alpha.animateTo(it.opacity, animation)
-        overlayAlpha.animateTo(it.overlayOpacity)
+        scope.launch { offsetDpX.animateTo(it.offsetX.value, animation) }
+        scope.launch { offsetDpY.animateTo(it.offsetY.value, animation) }
+        scope.launch { rotationX.animateTo(it.rotationXDegrees, animation) }
+        scope.launch { rotationY.animateTo(it.rotationYDegrees, animation) }
+        scope.launch { scaleFactor.animateTo(it.scale, animation) }
+        scope.launch { alpha.animateTo(it.opacity, animation) }
+        scope.launch { overlayAlpha.animateTo(it.overlayOpacity) }
       }
       field = constrainedParams
     }
 
-  private val offsetDpX = AnimatedFloatModel(INITIAL_OFFSET_X, clock)
-  private val offsetDpY = AnimatedFloatModel(INITIAL_OFFSET_Y, clock)
-  private val rotationX = AnimatedFloatModel(INITIAL_ROTATION_X, clock)
-  private val rotationY = AnimatedFloatModel(INITIAL_ROTATION_Y, clock)
-  private val scaleFactor = AnimatedFloatModel(INITIAL_SCALE, clock)
-  private val alpha = AnimatedFloatModel(INITIAL_ALPHA, clock)
-  private val overlayAlpha = AnimatedFloatModel(INITIAL_OVERLAY_ALPHA, clock)
+  private val offsetDpX = Animatable(INITIAL_OFFSET_X)
+  private val offsetDpY = Animatable(INITIAL_OFFSET_Y)
+  private val rotationX = Animatable(INITIAL_ROTATION_X)
+  private val rotationY = Animatable(INITIAL_ROTATION_Y)
+  private val scaleFactor = Animatable(INITIAL_SCALE)
+  private val alpha = Animatable(INITIAL_ALPHA)
+  private val overlayAlpha = Animatable(INITIAL_OVERLAY_ALPHA)
 
   /**
    * Calculates a [Modifier] to apply to a screen when in inspection mode.
@@ -117,6 +119,7 @@ internal class BackstackInspector(clock: AnimationClockObservable) {
    * [InspectionParams.overlayOpacity]. All other screens will be drawn as a 3D stack.
    * All transformations are animated.
    */
+  @Suppress("ComposableModifierFactory", "ModifierFactoryExtensionFunction")
   @Composable
   internal fun inspectScreen(
     screenIndex: Int,
@@ -127,53 +130,53 @@ internal class BackstackInspector(clock: AnimationClockObservable) {
     // compose supports transforming inputs as well as outputs, the top screen can
     // participate in scaling/rotation too.
     val isTop = screenIndex == screenCount - 1
-    val density = DensityAmbient.current
+    val density = LocalDensity.current
 
     // drawLayer will scale around the center of the bounds, so we need to offset relative
     // to that so the entire stack stays centered.
-    val centerOffset = animate(
-        // Don't need to adjust the pivot point if there's only one screen.
-        if (screenCount == 1) 0f
-        // Add -1 + visibility so new screens animate "out of" the previous one.
-        else (screenIndex - 1f + visibility) - screenCount / 3f
+    val centerOffset by animateFloatAsState(
+      // Don't need to adjust the pivot point if there's only one screen.
+      if (screenCount == 1) 0f
+      // Add -1 + visibility so new screens animate "out of" the previous one.
+      else (screenIndex - 1f + visibility) - screenCount / 3f
     )
 
-    val scale = animate(if (isTop) 1f else scaleFactor.value)
+    val scale by animateFloatAsState(if (isTop) 1f else scaleFactor.value)
 
-    val offsetDpX = animate(
-        if (isTop) 0f else {
-          // Adjust by screenCount to squeeze more in as the count increases.
-          val densityFactor = 10f / screenCount
-          // Adjust X offset by sin(rotation) so it looks 3D.
-          val xRotation = sin(toRadians(rotationY.value.toDouble())).toFloat()
-          (centerOffset * offsetDpX.value * scale * densityFactor * xRotation)
-        }
+    val offsetDpX by animateFloatAsState(
+      if (isTop) 0f else {
+        // Adjust by screenCount to squeeze more in as the count increases.
+        val densityFactor = 10f / screenCount
+        // Adjust X offset by sin(rotation) so it looks 3D.
+        val xRotation = sin(toRadians(rotationY.value.toDouble())).toFloat()
+        (centerOffset * offsetDpX.value * scale * densityFactor * xRotation)
+      }
     )
-    val offsetDpY = animate(if (isTop) 0f else (centerOffset * offsetDpY.value * scale))
+    val offsetDpY by animateFloatAsState(if (isTop) 0f else (centerOffset * offsetDpY.value * scale))
 
-    val rotationX = animate(if (isTop) 0f else (rotationX.value))
-    val rotationY = animate(if (isTop) 0f else (rotationY.value))
+    val rotationX by animateFloatAsState(if (isTop) 0f else (rotationX.value))
+    val rotationY by animateFloatAsState(if (isTop) 0f else (rotationY.value))
 
     // This is the only transformation applied to the top screen, so it has some extra logic.
-    val alpha = animate(
-        when {
-          // If there's only one screen in the stack, don't transform it at all.
-          screenCount == 1 -> 1f
-          isTop -> overlayAlpha.value
-          else -> alpha.value
-          // Adjust alpha by visibility to make transition less jarring when adding/removing
-          // screens.
-        } * visibility
+    val alpha by animateFloatAsState(
+      when {
+        // If there's only one screen in the stack, don't transform it at all.
+        screenCount == 1 -> 1f
+        isTop -> overlayAlpha.value
+        else -> alpha.value
+        // Adjust alpha by visibility to make transition less jarring when adding/removing
+        // screens.
+      } * visibility
     )
 
-    return Modifier.drawLayer(
-        scaleX = scale,
-        scaleY = scale,
-        rotationX = rotationX,
-        rotationY = rotationY,
-        translationX = with(density) { offsetDpX.dp.toPx() },
-        translationY = with(density) { offsetDpY.dp.toPx() },
-        alpha = alpha
+    return Modifier.graphicsLayer(
+      scaleX = scale,
+      scaleY = scale,
+      rotationX = rotationX,
+      rotationY = rotationY,
+      translationX = with(density) { offsetDpX.dp.toPx() },
+      translationY = with(density) { offsetDpY.dp.toPx() },
+      alpha = alpha
     )
   }
 
@@ -184,17 +187,20 @@ internal class BackstackInspector(clock: AnimationClockObservable) {
 
   /** Transition away from inspection mode. */
   private fun stopInspecting() {
-    offsetDpX.animateTo(INITIAL_OFFSET_X, animation)
-    offsetDpY.animateTo(INITIAL_OFFSET_Y, animation)
-    rotationX.animateTo(INITIAL_ROTATION_X, animation)
-    rotationY.animateTo(INITIAL_ROTATION_Y, animation)
-    scaleFactor.animateTo(INITIAL_SCALE, animation)
-    alpha.animateTo(INITIAL_ALPHA, animation)
-    overlayAlpha.animateTo(INITIAL_OVERLAY_ALPHA, animation, onEnd = { _, _ ->
-      // Doesn't matter which one, but we need to listen to the end of one of the animations
-      // so we can tell the Backstack that we're done being in control.
+    scope.launch {
+      coroutineScope {
+        launch { offsetDpX.animateTo(INITIAL_OFFSET_X, animation) }
+        launch { offsetDpY.animateTo(INITIAL_OFFSET_Y, animation) }
+        launch { rotationX.animateTo(INITIAL_ROTATION_X, animation) }
+        launch { rotationY.animateTo(INITIAL_ROTATION_Y, animation) }
+        launch { scaleFactor.animateTo(INITIAL_SCALE, animation) }
+        launch { alpha.animateTo(INITIAL_ALPHA, animation) }
+        launch { overlayAlpha.animateTo(INITIAL_OVERLAY_ALPHA, animation) }
+      }
+      // Once all the animations are done we need to tell the Backstack that we're done being in
+      // control.
       isInspectionActive = false
-    })
+    }
   }
 
   private companion object {

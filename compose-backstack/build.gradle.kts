@@ -10,7 +10,6 @@ dependencies {
   compileOnly(Dependencies.Compose.tooling)
 
   implementation(Dependencies.Compose.foundation)
-  implementation(Dependencies.Compose.savedstate)
 
   testImplementation(Dependencies.Test.junit)
   testImplementation(Dependencies.Test.truth)
