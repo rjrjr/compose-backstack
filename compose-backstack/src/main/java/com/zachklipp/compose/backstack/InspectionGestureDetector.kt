@@ -2,6 +2,8 @@
 
 package com.zachklipp.compose.backstack
 
+import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.zoomable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -9,11 +11,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.gesture.DragObserver
-import androidx.compose.ui.gesture.ScaleObserver
-import androidx.compose.ui.gesture.dragGestureFilter
-import androidx.compose.ui.gesture.scaleGestureFilter
+import androidx.compose.ui.input.pointer.pointerInput
 
 /**
  * Wrap your [Backstack] with this composable to get convenient gesture-based control of the
@@ -42,34 +40,24 @@ fun InspectionGestureDetector(
 ) {
   var inspectionParams: InspectionParams by remember { mutableStateOf(InspectionParams()) }
 
-  val scaleObserver = remember(enabled) {
-    object : ScaleObserver {
-      override fun onScale(scaleFactor: Float) {
-        if (!enabled) return
+  val controlModifier = if (!enabled) Modifier else {
+    Modifier
+      .zoomable { delta ->
         inspectionParams = inspectionParams.copy(
-            scale = inspectionParams.scale * scaleFactor
+          scale = inspectionParams.scale * delta
         ).constrained()
       }
-    }
-  }
-  val dragObserver = remember(enabled) {
-    object : DragObserver {
-      override fun onDrag(dragDistance: Offset): Offset {
-        if (!enabled) return Offset.Zero
-        inspectionParams = inspectionParams.copy(
+      .pointerInput(Unit) {
+        detectDragGestures { _, dragDistance ->
+          inspectionParams = inspectionParams.copy(
             // Dragging left-and-right rotates around the vertical Y axis.
             rotationYDegrees = inspectionParams.rotationYDegrees + (dragDistance.x / 5f)
-        ).constrained()
-        return dragDistance
+          ).constrained()
+        }
       }
-    }
   }
 
-  Box(
-      modifier = Modifier
-          .scaleGestureFilter(scaleObserver = scaleObserver)
-          .dragGestureFilter(dragObserver = dragObserver)
-  ) {
+  Box(modifier = controlModifier) {
     children(inspectionParams.takeIf { enabled })
   }
 }

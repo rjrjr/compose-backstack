@@ -22,7 +22,6 @@ dependencies {
   implementation(Dependencies.Compose.icons)
   implementation(Dependencies.Compose.foundation)
   implementation(Dependencies.Compose.material)
-  implementation(Dependencies.Compose.savedstate)
   implementation(Dependencies.Compose.tooling)
 
   testImplementation(Dependencies.Test.junit)

@@ -5,12 +5,9 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotSelected
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.onNodeWithSubstring
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.printToLog
-import androidx.compose.ui.test.printToString
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import org.junit.Rule
 import org.junit.Test
@@ -29,14 +26,14 @@ class BackstackViewerTest {
     }
 
     compose.onNodeWithText("Slide Transition").assertIsDisplayed()
-    compose.onNodeWithSubstring("Slow animations").assertIsDisplayed()
+    compose.onNodeWithText("Slow animations", substring = true).assertIsDisplayed()
 
     compose.onNodeWithText("one").assertIsSelected()
     compose.onNodeWithText("one, two").assertIsNotSelected()
     compose.onNodeWithText("one, two, three").assertIsNotSelected()
 
     compose.onNodeWithText("Screen one").assertIsDisplayed()
-    compose.onNodeWithSubstring("Counter:").assertIsDisplayed()
+    compose.onNodeWithText("Counter:", substring = true).assertIsDisplayed()
   }
 
   @Test

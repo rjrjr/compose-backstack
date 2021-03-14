@@ -2,22 +2,24 @@
 
 package com.zachklipp.compose.backstack
 
-import androidx.compose.animation.animatedFloat
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationEndReason
-import androidx.compose.animation.core.AnimationEndReason.TargetReached
+import androidx.compose.animation.core.AnimationEndReason.Finished
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.*
-import androidx.compose.runtime.savedinstancestate.AmbientUiSavedStateRegistry
+import androidx.compose.runtime.saveable.LocalSaveableStateRegistry
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.platform.AmbientAnimationClock
-import androidx.compose.ui.platform.AmbientContext
+import androidx.compose.ui.platform.LocalContext
 import com.zachklipp.compose.backstack.TransitionDirection.Backward
 import com.zachklipp.compose.backstack.TransitionDirection.Forward
+import kotlinx.coroutines.CoroutineStart.UNDISPATCHED
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.launch
 
 /** Used to hide screens when not transitioning. */
 internal val HIDDEN_MODIFIER = Modifier.alpha(0f)
@@ -46,7 +48,7 @@ internal data class ScreenProperties(
 
 private val DefaultBackstackAnimation: AnimationSpec<Float>
   @Composable get() {
-    val context = AmbientContext.current
+    val context = LocalContext.current
     return TweenSpec(
       durationMillis = context.resources.getInteger(android.R.integer.config_shortAnimTime)
     )
@@ -125,6 +127,7 @@ private val DefaultBackstackAnimation: AnimationSpec<Float>
  * controlled by touch gestures.
  * @param drawScreen Called with each element of [backstack] to render it.
  */
+@OptIn(ExperimentalCoroutinesApi::class)
 @Composable
 fun <T : Any> Backstack(
   backstack: List<T>,
@@ -140,6 +143,7 @@ fun <T : Any> Backstack(
   require(backstack.distinct().size == backstack.size) {
     "Backstack must not contain duplicates: $backstack"
   }
+  val scope = rememberCoroutineScope()
 
   // When transitioning, contains a stable cache of the screens actually being displayed. Will not
   // change even if backstack changes during the transition.
@@ -153,22 +157,23 @@ fun <T : Any> Backstack(
   // Defines the progress of the current transition animation in terms of visibility of the top
   // screen. 1 means top screen is visible, 0 means top screen is entirely hidden. Must be 1 when
   // no transition in progress.
-  val transitionProgress = animatedFloat(1f)
+  val transitionProgress = remember { Animatable(1f) }
   // Null means not transitioning.
   var direction by remember { mutableStateOf<TransitionDirection?>(null) }
   // Callback passed to animations to cleanup after the transition is done.
   val onTransitionEnd = remember {
     { reason: AnimationEndReason, _: Float ->
-      if (reason == TargetReached) {
+      if (reason == Finished) {
         direction = null
-        transitionProgress.snapTo(1f)
-        onTransitionFinished?.invoke()
+        scope.launch {
+          transitionProgress.snapTo(1f)
+          onTransitionFinished?.invoke()
+        }
       }
     }
   }
   val animation = animationBuilder ?: DefaultBackstackAnimation
-  val clock = AmbientAnimationClock.current
-  val inspector = remember { BackstackInspector(clock) }
+  val inspector = remember { BackstackInspector(scope) }
   inspector.params = inspectionParams
 
   if (direction == null && activeKeys != backstack) {
@@ -199,8 +204,12 @@ fun <T : Any> Backstack(
         newKeys += oldTop
 
         // When going back the top screen needs to start off as visible.
-        transitionProgress.snapTo(1f)
-        transitionProgress.animateTo(0f, anim = animation, onEnd = onTransitionEnd)
+        // Need to start the coroutine undispatched so the snap happens before the frame is drawn.
+        scope.launch(start = UNDISPATCHED) {
+          transitionProgress.snapTo(1f)
+          val result = transitionProgress.animateTo(0f, animationSpec = animation)
+          onTransitionEnd(result.endReason, result.endState.value)
+        }
       } else {
         // If the current screen is not the new second-last screen, we need to move it to that
         // position so it animates out when going forward. This is true whether or not the current
@@ -211,8 +220,11 @@ fun <T : Any> Backstack(
         newKeys += targetTop
 
         // When going forward, the top screen needs to start off as invisible.
-        transitionProgress.snapTo(0f)
-        transitionProgress.animateTo(1f, anim = animation, onEnd = onTransitionEnd)
+        scope.launch(start = UNDISPATCHED) {
+          transitionProgress.snapTo(0f)
+          val result = transitionProgress.animateTo(1f, animationSpec = animation)
+          onTransitionEnd(result.endReason, result.endState.value)
+        }
       }
       onTransitionStarting?.invoke(activeKeys, backstack, direction!!)
       activeKeys = newKeys
@@ -250,7 +262,7 @@ fun <T : Any> Backstack(
           return@ScreenWrapper
         }
 
-        Providers(AmbientUiSavedStateRegistry provides savedStateRegistry) {
+        Providers(LocalSaveableStateRegistry provides savedStateRegistry) {
           Box(screenProperties.modifier) { children() }
         }
       }
@@ -293,8 +305,8 @@ internal fun calculateRegularModifier(
     else -> transition.modifierForScreen(visibility, index == count - 1)
   }
   return ScreenProperties(
-      modifier = screenModifier,
-      isVisible = visibility != 0f
+    modifier = screenModifier,
+    isVisible = visibility != 0f
   )
 }
 

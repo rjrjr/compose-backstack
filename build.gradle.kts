@@ -42,9 +42,7 @@ subprojects {
       apiVersion = "1.3"
 
       freeCompilerArgs = listOf(
-          "-Xopt-in=kotlin.RequiresOptIn",
-          "-Xallow-jvm-ir-dependencies",
-          "-Xskip-prerelease-check"
+          "-Xopt-in=kotlin.RequiresOptIn"
       )
     }
   }

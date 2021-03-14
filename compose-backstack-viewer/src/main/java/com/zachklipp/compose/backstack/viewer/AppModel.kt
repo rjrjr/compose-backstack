@@ -4,8 +4,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.savedinstancestate.listSaver
-import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
+import androidx.compose.runtime.saveable.listSaver
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import com.zachklipp.compose.backstack.BackstackTransition
 
@@ -51,14 +51,14 @@ internal class AppModel private constructor(
 
   companion object {
     /**
-     * Creates an instance of [AppModel] and saves it using [rememberSavedInstanceState].
+     * Creates an instance of [AppModel] and saves it using [rememberSaveable].
      */
     @Composable
     fun create(
       namedTransitions: List<Pair<String, BackstackTransition>>,
       prefabBackstacks: List<List<String>>
     ): AppModel {
-      return rememberSavedInstanceState(saver = saver(namedTransitions, prefabBackstacks)) {
+      return rememberSaveable(saver = saver(namedTransitions, prefabBackstacks)) {
         AppModel(namedTransitions, prefabBackstacks)
       }
     }

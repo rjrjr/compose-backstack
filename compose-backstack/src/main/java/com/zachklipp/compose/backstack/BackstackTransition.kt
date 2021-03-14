@@ -3,7 +3,7 @@
 package com.zachklipp.compose.backstack
 
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawOpacity
+import androidx.compose.ui.draw.alpha
 import com.zachklipp.compose.backstack.BackstackTransition.Crossfade
 import com.zachklipp.compose.backstack.BackstackTransition.Slide
 
@@ -53,6 +53,6 @@ interface BackstackTransition {
     override fun modifierForScreen(
       visibility: Float,
       isTop: Boolean
-    ): Modifier = Modifier.drawOpacity(visibility)
+    ): Modifier = Modifier.alpha(visibility)
   }
 }

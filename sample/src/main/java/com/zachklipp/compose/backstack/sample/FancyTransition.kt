@@ -1,7 +1,6 @@
 package com.zachklipp.compose.backstack.sample
 
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.drawLayer
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.util.lerp
 import com.zachklipp.compose.backstack.BackstackTransition

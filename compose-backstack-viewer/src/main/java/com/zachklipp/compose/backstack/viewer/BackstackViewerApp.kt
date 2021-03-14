@@ -15,8 +15,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.preferredHeight
 import androidx.compose.foundation.selection.selectable
-import androidx.compose.material.AmbientTextStyle
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ListItem
+import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.RadioButton
 import androidx.compose.material.Surface
@@ -31,7 +32,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.AmbientContext
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.text
 import androidx.compose.ui.text.buildAnnotatedString
@@ -107,6 +108,7 @@ fun BackstackViewerApp(
   }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun AppControls(model: AppModel) {
   Spinner(
@@ -203,7 +205,7 @@ private fun RadioButton(
           RadioButton(selected = selected, onClick = onSelect)
           Text(
             text = text,
-            style = MaterialTheme.typography.body1.merge(other = AmbientTextStyle.current),
+            style = MaterialTheme.typography.body1.merge(other = LocalTextStyle.current),
             modifier = Modifier.padding(start = 16.dp)
           )
         }
@@ -214,7 +216,7 @@ private fun RadioButton(
 
 @Composable
 private fun OnBackPressed(onPressed: () -> Unit) {
-  val context = AmbientContext.current
+  val context = LocalContext.current
   DisposableEffect(context, onPressed) {
     val activity = context.findComponentActivity() ?: return@DisposableEffect onDispose {}
     val callback = object : OnBackPressedCallback(true) {

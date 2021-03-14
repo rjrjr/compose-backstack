@@ -16,7 +16,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.*
-import androidx.compose.runtime.savedinstancestate.savedInstanceState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -56,7 +56,7 @@ internal fun AppScreen(
       }
   ) {
     Text(
-      text = "Counter: ${Counter(200)}",
+      text = "Counter: ${rememberCounter(200)}",
       modifier = Modifier
         .fillMaxSize()
         .wrapContentSize(Alignment.Center)
@@ -66,11 +66,11 @@ internal fun AppScreen(
 
 @Suppress("SameParameterValue")
 @Composable
-private fun Counter(periodMs: Long): Int = key(periodMs) {
+private fun rememberCounter(periodMs: Long): Int = key(periodMs) {
   // If the screen is temporarily removed from the composition, the counter will effectively
   // be "paused": it will stop incrementing, but will resume from its last value when restored to
   // the composition.
-  var value by savedInstanceState { 0 }
+  var value by rememberSaveable { mutableStateOf(0) }
   DisposableEffect(periodMs) {
     val mainHandler = Handler()
     var disposed = false
