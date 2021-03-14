@@ -2,8 +2,7 @@
 
 package com.zachklipp.compose.backstack
 
-import androidx.compose.foundation.gestures.detectDragGestures
-import androidx.compose.foundation.gestures.zoomable
+import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -41,20 +40,15 @@ fun InspectionGestureDetector(
   var inspectionParams: InspectionParams by remember { mutableStateOf(InspectionParams()) }
 
   val controlModifier = if (!enabled) Modifier else {
-    Modifier
-      .zoomable { delta ->
+    Modifier.pointerInput(Unit) {
+      detectTransformGestures { _, pan, zoom, _ ->
         inspectionParams = inspectionParams.copy(
-          scale = inspectionParams.scale * delta
-        ).constrained()
+          scale = inspectionParams.scale * zoom,
+          // Dragging left-and-right rotates around the vertical Y axis.
+          rotationYDegrees = inspectionParams.rotationYDegrees + (pan.x / 5f)
+        )
       }
-      .pointerInput(Unit) {
-        detectDragGestures { _, dragDistance ->
-          inspectionParams = inspectionParams.copy(
-            // Dragging left-and-right rotates around the vertical Y axis.
-            rotationYDegrees = inspectionParams.rotationYDegrees + (dragDistance.x / 5f)
-          ).constrained()
-        }
-      }
+    }
   }
 
   Box(modifier = controlModifier) {

@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.preferredWidth
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -73,7 +73,7 @@ internal fun <T : Any> Spinner(
       Icons.Default.ArrowDropDown,
       contentDescription = "Open spinner",
       modifier = Modifier
-        .preferredWidth(48.dp)
+        .width(48.dp)
         .aspectRatio(1f)
     )
   }

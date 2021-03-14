@@ -8,10 +8,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.LocalSaveableStateRegistry
 import androidx.compose.runtime.saveable.SaveableStateRegistry
 import androidx.compose.runtime.saveable.SaveableStateRegistry.Entry
-import androidx.compose.runtime.savedinstancestate.UiSavedStateRegistry
 
 /**
- * Returns a [UiSavedStateRegistry] that will automatically save values from all its registered
+ * Returns a [SaveableStateRegistry] that will automatically save values from all its registered
  * providers whenever [childWillBeComposed] transitions from true to false, and make those values available
  * to be restored when [childWillBeComposed] transitions from false to true.
  */
@@ -20,7 +19,7 @@ import androidx.compose.runtime.savedinstancestate.UiSavedStateRegistry
 @Composable
 fun ChildSavedStateRegistry(childWillBeComposed: Boolean): SaveableStateRegistry {
   val parent = LocalSaveableStateRegistry.current
-  val key = currentCompositeKeyHash().toString()
+  val key = currentCompositeKeyHash.toString()
   val holder = remember { SavedStateHolder(key) }
   return holder.updateAndReturnRegistry(parent, childWillBeComposed)
 }

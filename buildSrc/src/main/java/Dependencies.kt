@@ -15,7 +15,7 @@ object Dependencies {
   val androidGradlePlugin = "com.android.tools.build:gradle:${Versions.agp}"
 
   object AndroidX {
-    const val appcompat = "androidx.appcompat:appcompat:1.1.0"
+    const val appcompat = "androidx.appcompat:appcompat:1.3.0-beta01"
 
     // Note that we're not using the actual androidx material dep yet, it's still alpha.
     const val material = "com.google.android.material:material:1.1.0"

@@ -262,7 +262,7 @@ fun <T : Any> Backstack(
           return@ScreenWrapper
         }
 
-        Providers(LocalSaveableStateRegistry provides savedStateRegistry) {
+        CompositionLocalProvider(LocalSaveableStateRegistry provides savedStateRegistry) {
           Box(screenProperties.modifier) { children() }
         }
       }
