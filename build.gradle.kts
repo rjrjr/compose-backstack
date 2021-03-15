@@ -1,4 +1,3 @@
-import org.jetbrains.dokka.gradle.DokkaMultiModuleTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
@@ -11,10 +10,16 @@ buildscript {
 
   dependencies {
     classpath(Dependencies.androidGradlePlugin)
+    classpath(Dependencies.Kotlin.binaryCompatibilityValidatorPlugin)
     classpath(Dependencies.Kotlin.dokka)
     classpath(Dependencies.Kotlin.gradlePlugin)
     classpath(Dependencies.ktlint)
   }
+}
+
+apply(plugin = "binary-compatibility-validator")
+extensions.configure<kotlinx.validation.ApiValidationExtension> {
+  ignoredProjects.add("sample")
 }
 
 // See https://stackoverflow.com/questions/25324880/detect-ide-environment-with-gradle

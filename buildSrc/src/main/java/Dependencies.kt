@@ -35,7 +35,7 @@ object Dependencies {
 
   object Kotlin {
     const val binaryCompatibilityValidatorPlugin =
-      "org.jetbrains.kotlinx:binary-compatibility-validator:0.2.1"
+      "org.jetbrains.kotlinx:binary-compatibility-validator:0.2.3"
     val dokka = "org.jetbrains.dokka:dokka-gradle-plugin:${Versions.dokka}"
     val gradlePlugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:${Versions.kotlin}"
 
