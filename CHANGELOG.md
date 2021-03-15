@@ -1,6 +1,21 @@
 Changelog
 =========
 
+## v0.8.0+beta02
+
+_2021-03-15_
+
+ * Upgrade: Compose to beta02. (#39, #47)
+ * Completely rewrote most of the internals and APIs: (#50)
+   * All the actual transition logic is moved out of the `Backstack` composable and into `TransitionController`.
+   * `BackstackInspector` and `InspectionGestureDetector` are replaced with a single API in a new, dedicated module: `xrayed()`.
+   * `Backstack` now just handles the container and managing saveable state.
+   * Introduces `FrameController`, an abstraction which can be used to implement both transitions, the inspector functionality, and things like #17.
+   * Removes the spring animations from the inspector. They added unnecessary lag to the gestures.
+   * Adds more tests for state handling.
+   * Fixed some races that caused navigation animation glitches.
+ * Use Material DropdownMenu for spinner. (#51)
+
 ## v0.6.0+alpha04
 
 _2020-10-13_
