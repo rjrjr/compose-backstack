@@ -1,0 +1,4 @@
+public final class com/zachklipp/compose/backstack/xray/XrayControllerKt {
+	public static final fun xrayed (Lcom/zachklipp/compose/backstack/FrameController;ZLandroidx/compose/runtime/Composer;I)Lcom/zachklipp/compose/backstack/FrameController;
+}
+

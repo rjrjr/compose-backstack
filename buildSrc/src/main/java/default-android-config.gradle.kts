@@ -23,7 +23,10 @@ configure<BaseExtension> {
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
   }
 
-  buildFeatures.compose = true
+  buildFeatures.apply {
+    buildConfig = false
+    compose = true
+  }
 
   composeOptions {
     kotlinCompilerVersion = Versions.kotlin

@@ -14,12 +14,11 @@ class IntOffsetSubject(
   fun isEqualTo(
     x: Int,
     y: Int
-  ) =
-    check("IntPxPosition(x, y)").that(actual).isEqualTo(IntOffset(x, y))
+  ) = check("IntPxPosition(x, y)").that(actual).isEqualTo(IntOffset(x, y))
 
   companion object {
     @JvmStatic
-    fun assertThat(actual: IntOffset?) = assertAbout(intPxPositions()).that(actual)
+    fun assertThat(actual: IntOffset?): IntOffsetSubject = assertAbout(intPxPositions()).that(actual)
 
     @JvmStatic
     fun intPxPositions(): Factory<IntOffsetSubject, IntOffset> =

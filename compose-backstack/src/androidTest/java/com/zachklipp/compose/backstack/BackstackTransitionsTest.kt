@@ -16,7 +16,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class BackstackComposableTest {
+class BackstackTransitionsTest {
 
   @get:Rule
   val compose = createComposeRule()
@@ -44,13 +44,23 @@ class BackstackComposableTest {
   }
 
   @Test
-  fun transition_slide() {
-    assertTransition(Slide)
+  fun transition_slide_forward() {
+    assertTransition(Slide, forward = true)
   }
 
   @Test
-  fun transition_crossfade() {
-    assertTransition(Crossfade)
+  fun transition_crossfade_forward() {
+    assertTransition(Crossfade, forward = true)
+  }
+
+  @Test
+  fun transition_slide_backward() {
+    assertTransition(Slide, forward = false)
+  }
+
+  @Test
+  fun transition_crossfade_backward() {
+    assertTransition(Crossfade, forward = false)
   }
 
   private fun assertInitialStateWithSingleScreen(transition: BackstackTransition) {
@@ -72,42 +82,46 @@ class BackstackComposableTest {
     compose.onNodeWithText("one").assertDoesNotExist()
   }
 
-  private fun assertTransition(transition: BackstackTransition) {
-    val originalBackstack = listOf("one")
-    val destinationBackstack = listOf("one", "two")
-    var backstack by mutableStateOf(originalBackstack)
+  private fun assertTransition(transition: BackstackTransition, forward: Boolean) {
+    val firstBackstack = listOf("one")
+    val secondBackstack = listOf("one", "two")
+    var backstack by mutableStateOf(if (forward) firstBackstack else secondBackstack)
     compose.mainClock.autoAdvance = false
     compose.setContent {
-        Backstack(
-          backstack,
-          animationBuilder = animation,
+      Backstack(
+        backstack,
+        frameController = rememberTransitionController(
+          animationSpec = animation,
           transition = transition
-        ) { BasicText(it) }
+        )
+      ) { BasicText(it) }
     }
+    val initialText = if (forward) "one" else "two"
+    val newText = if (forward) "two" else "one"
 
-    compose.onNodeWithText("one").assertIsDisplayed()
-    compose.onNodeWithText("two").assertDoesNotExist()
+    compose.onNodeWithText(initialText).assertIsDisplayed()
+    compose.onNodeWithText(newText).assertDoesNotExist()
 
     compose.runOnUiThread {
-      backstack = destinationBackstack
+      backstack = if (forward) secondBackstack else firstBackstack
     }
 
-    compose.onNodeWithText("one").assertIsDisplayed()
-    compose.onNodeWithText("two").assertDoesNotExist()
+    compose.onNodeWithText(initialText).assertIsDisplayed()
+    compose.onNodeWithText(newText).assertDoesNotExist()
 
     compose.mainClock.advanceTimeBy(250)
 
-    compose.onNodeWithText("one").assertIsDisplayed()
-    compose.onNodeWithText("two").assertIsDisplayed()
+    compose.onNodeWithText(initialText).assertIsDisplayed()
+    compose.onNodeWithText(newText).assertIsDisplayed()
 
     compose.mainClock.advanceTimeBy(750)
 
-    compose.onNodeWithText("one").assertIsDisplayed()
-    compose.onNodeWithText("two").assertIsDisplayed()
+    compose.onNodeWithText(initialText).assertIsDisplayed()
+    compose.onNodeWithText(newText).assertIsDisplayed()
 
     compose.mainClock.advanceTimeBy(1000)
 
-    compose.onNodeWithText("one").assertDoesNotExist()
-    compose.onNodeWithText("two").assertIsDisplayed()
+    compose.onNodeWithText(initialText).assertDoesNotExist()
+    compose.onNodeWithText(newText).assertIsDisplayed()
   }
 }
