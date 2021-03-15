@@ -1,64 +1,56 @@
-public final class com/zachklipp/compose/backstack/BackstackInspectorKt {
-	public static final fun constrained (Lcom/zachklipp/compose/backstack/InspectionParams;)Lcom/zachklipp/compose/backstack/InspectionParams;
-}
-
 public final class com/zachklipp/compose/backstack/BackstackKt {
-	public static final fun Backstack (Ljava/util/List;Landroidx/compose/ui/Modifier;Lcom/zachklipp/compose/backstack/BackstackTransition;Landroidx/compose/animation/core/AnimationSpec;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function0;Lcom/zachklipp/compose/backstack/InspectionParams;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;II)V
+	public static final fun Backstack (Ljava/util/List;Landroidx/compose/ui/Modifier;Lcom/zachklipp/compose/backstack/BackstackTransition;Landroidx/compose/animation/core/AnimationSpec;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function0;Ljava/lang/Object;Lkotlin/jvm/functions/Function3;)V
+	public static final fun Backstack (Ljava/util/List;Landroidx/compose/ui/Modifier;Lcom/zachklipp/compose/backstack/BackstackTransition;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;II)V
+	public static final fun Backstack (Ljava/util/List;Landroidx/compose/ui/Modifier;Lcom/zachklipp/compose/backstack/FrameController;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;II)V
+	public static synthetic fun Backstack$default (Ljava/util/List;Landroidx/compose/ui/Modifier;Lcom/zachklipp/compose/backstack/BackstackTransition;Landroidx/compose/animation/core/AnimationSpec;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function0;Ljava/lang/Object;Lkotlin/jvm/functions/Function3;ILjava/lang/Object;)V
 }
 
 public abstract interface class com/zachklipp/compose/backstack/BackstackTransition {
-	public abstract fun modifierForScreen (FZ)Landroidx/compose/ui/Modifier;
+	public abstract fun modifierForScreen (Landroidx/compose/ui/Modifier;Landroidx/compose/runtime/State;Z)Landroidx/compose/ui/Modifier;
 }
 
 public final class com/zachklipp/compose/backstack/BackstackTransition$Crossfade : com/zachklipp/compose/backstack/BackstackTransition {
 	public static final field $stable I
 	public static final field INSTANCE Lcom/zachklipp/compose/backstack/BackstackTransition$Crossfade;
-	public fun modifierForScreen (FZ)Landroidx/compose/ui/Modifier;
+	public fun modifierForScreen (Landroidx/compose/ui/Modifier;Landroidx/compose/runtime/State;Z)Landroidx/compose/ui/Modifier;
 }
 
 public final class com/zachklipp/compose/backstack/BackstackTransition$Slide : com/zachklipp/compose/backstack/BackstackTransition {
 	public static final field $stable I
 	public static final field INSTANCE Lcom/zachklipp/compose/backstack/BackstackTransition$Slide;
-	public fun modifierForScreen (FZ)Landroidx/compose/ui/Modifier;
+	public fun modifierForScreen (Landroidx/compose/ui/Modifier;Landroidx/compose/runtime/State;Z)Landroidx/compose/ui/Modifier;
 }
 
-public final class com/zachklipp/compose/backstack/BuildConfig {
-	public static final field BUILD_TYPE Ljava/lang/String;
-	public static final field DEBUG Z
-	public static final field LIBRARY_PACKAGE_NAME Ljava/lang/String;
-	public fun <init> ()V
+public final class com/zachklipp/compose/backstack/BackstackTransitionKt {
+	public static final fun modifierForScreen (Lcom/zachklipp/compose/backstack/BackstackTransition;Landroidx/compose/runtime/State;Z)Landroidx/compose/ui/Modifier;
 }
 
-public final class com/zachklipp/compose/backstack/ChildSavedStateRegistryKt {
-	public static final fun ChildSavedStateRegistry (ZLandroidx/compose/runtime/Composer;I)Landroidx/compose/runtime/saveable/SaveableStateRegistry;
+public abstract interface class com/zachklipp/compose/backstack/FrameController {
+	public abstract fun getActiveFrames ()Ljava/util/List;
+	public abstract fun updateBackstack (Ljava/util/List;)V
 }
 
-public final class com/zachklipp/compose/backstack/InspectionGestureDetectorKt {
-	public static final fun InspectionGestureDetector (ZLkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;I)V
-}
-
-public final class com/zachklipp/compose/backstack/InspectionParams {
-	public synthetic fun <init> (FFFFFFFILkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public synthetic fun <init> (FFFFFFFLkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public final fun component1-D9Ej5fM ()F
-	public final fun component2-D9Ej5fM ()F
-	public final fun component3 ()F
-	public final fun component4 ()F
-	public final fun component5 ()F
-	public final fun component6 ()F
-	public final fun component7 ()F
-	public final fun copy-pBklqvs (FFFFFFF)Lcom/zachklipp/compose/backstack/InspectionParams;
-	public static synthetic fun copy-pBklqvs$default (Lcom/zachklipp/compose/backstack/InspectionParams;FFFFFFFILjava/lang/Object;)Lcom/zachklipp/compose/backstack/InspectionParams;
+public final class com/zachklipp/compose/backstack/FrameController$BackstackFrame {
+	public fun <init> (Ljava/lang/Object;Landroidx/compose/ui/Modifier;)V
+	public synthetic fun <init> (Ljava/lang/Object;Landroidx/compose/ui/Modifier;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/lang/Object;
+	public final fun component2 ()Landroidx/compose/ui/Modifier;
+	public final fun copy (Ljava/lang/Object;Landroidx/compose/ui/Modifier;)Lcom/zachklipp/compose/backstack/FrameController$BackstackFrame;
+	public static synthetic fun copy$default (Lcom/zachklipp/compose/backstack/FrameController$BackstackFrame;Ljava/lang/Object;Landroidx/compose/ui/Modifier;ILjava/lang/Object;)Lcom/zachklipp/compose/backstack/FrameController$BackstackFrame;
 	public fun equals (Ljava/lang/Object;)Z
-	public final fun getOffsetX-D9Ej5fM ()F
-	public final fun getOffsetY-D9Ej5fM ()F
-	public final fun getOpacity ()F
-	public final fun getOverlayOpacity ()F
-	public final fun getRotationXDegrees ()F
-	public final fun getRotationYDegrees ()F
-	public final fun getScale ()F
+	public final fun getKey ()Ljava/lang/Object;
+	public final fun getModifier ()Landroidx/compose/ui/Modifier;
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/zachklipp/compose/backstack/FrameControllerKt {
+	public static final fun NoopFrameController ()Lcom/zachklipp/compose/backstack/FrameController;
+}
+
+public final class com/zachklipp/compose/backstack/TransitionControllerKt {
+	public static final fun defaultBackstackAnimation (Landroidx/compose/runtime/Composer;I)Landroidx/compose/animation/core/AnimationSpec;
+	public static final fun rememberTransitionController (Lcom/zachklipp/compose/backstack/BackstackTransition;Landroidx/compose/animation/core/AnimationSpec;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function0;Landroidx/compose/runtime/Composer;II)Lcom/zachklipp/compose/backstack/FrameController;
 }
 
 public final class com/zachklipp/compose/backstack/TransitionDirection : java/lang/Enum {

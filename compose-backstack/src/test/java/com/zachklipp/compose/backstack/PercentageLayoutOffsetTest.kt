@@ -2,6 +2,7 @@
 
 package com.zachklipp.compose.backstack
 
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
@@ -46,7 +47,7 @@ class PercentageLayoutOffsetTest {
   private fun BackstackTransition.applyModifiedPosition(
     visibility: Float
   ): IntOffset {
-    val modifier = modifierForScreen(visibility, isTop) as PercentageLayoutOffset
+    val modifier = modifierForScreen(mutableStateOf(visibility), isTop) as PercentageLayoutOffset
     return modifier.offsetPosition(containerSize)
   }
 }

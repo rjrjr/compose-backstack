@@ -2,6 +2,9 @@
 
 package com.zachklipp.compose.backstack
 
+import android.annotation.SuppressLint
+import androidx.compose.runtime.State
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import com.zachklipp.compose.backstack.BackstackTransition.Crossfade
@@ -14,7 +17,7 @@ import com.zachklipp.compose.backstack.BackstackTransition.Slide
  * @see Slide
  * @see Crossfade
  */
-interface BackstackTransition {
+fun interface BackstackTransition {
 
   /**
    * Returns a [Modifier] to use to draw screen in a [Backstack].
@@ -26,9 +29,8 @@ interface BackstackTransition {
    * visible, then the top screen is always transitioning _out_, and non-top screens are either
    * transitioning out or invisible.
    */
-  @Suppress("ModifierFactoryExtensionFunction")
-  fun modifierForScreen(
-    visibility: Float,
+  fun Modifier.modifierForScreen(
+    visibility: State<Float>,
     isTop: Boolean
   ): Modifier
 
@@ -36,23 +38,30 @@ interface BackstackTransition {
    * A simple transition that slides screens horizontally.
    */
   object Slide : BackstackTransition {
-    @Suppress("ModifierFactoryExtensionFunction")
-    override fun modifierForScreen(
-      visibility: Float,
+    override fun Modifier.modifierForScreen(
+      visibility: State<Float>,
       isTop: Boolean
-    ): Modifier = PercentageLayoutOffset(
-        offset = if (isTop) 1f - visibility else -1 + visibility
-    )
+    ): Modifier = then(PercentageLayoutOffset(
+      rawOffset = derivedStateOf { if (isTop) 1f - visibility.value else -1 + visibility.value }
+    ))
   }
 
   /**
    * A simple transition that crossfades between screens.
    */
   object Crossfade : BackstackTransition {
-    @Suppress("ModifierFactoryExtensionFunction")
-    override fun modifierForScreen(
-      visibility: Float,
+    override fun Modifier.modifierForScreen(
+      visibility: State<Float>,
       isTop: Boolean
-    ): Modifier = Modifier.alpha(visibility)
+    ): Modifier = alpha(visibility.value)
   }
 }
+
+/**
+ * Convenience function to make it easier to make composition transitions.
+ */
+@SuppressLint("ModifierFactoryExtensionFunction")
+fun BackstackTransition.modifierForScreen(
+  visibility: State<Float>,
+  isTop: Boolean
+): Modifier = Modifier.modifierForScreen(visibility, isTop)

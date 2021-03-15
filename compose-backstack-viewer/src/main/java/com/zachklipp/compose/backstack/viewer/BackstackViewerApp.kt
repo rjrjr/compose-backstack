@@ -42,7 +42,9 @@ import com.zachklipp.compose.backstack.Backstack
 import com.zachklipp.compose.backstack.BackstackTransition
 import com.zachklipp.compose.backstack.BackstackTransition.Crossfade
 import com.zachklipp.compose.backstack.BackstackTransition.Slide
-import com.zachklipp.compose.backstack.InspectionGestureDetector
+import com.zachklipp.compose.backstack.defaultBackstackAnimation
+import com.zachklipp.compose.backstack.rememberTransitionController
+import com.zachklipp.compose.backstack.xray.xrayed
 
 private val DEFAULT_BACKSTACKS = listOf(
     listOf("one"),
@@ -143,31 +145,29 @@ private fun AppControls(model: AppModel) {
 @Composable
 private fun AppScreens(model: AppModel) {
   val animation = if (model.slowAnimations) {
-    remember {
-      TweenSpec<Float>(durationMillis = 2000)
-    }
+    remember { TweenSpec<Float>(durationMillis = 2000) }
   } else null
 
   MaterialTheme(colors = lightColors()) {
-    InspectionGestureDetector(enabled = model.inspectionEnabled) { inspectionParams ->
       Backstack(
         backstack = model.currentBackstack,
-        transition = model.selectedTransition.second,
-        animationBuilder = animation,
+        frameController = rememberTransitionController<String>(
+          transition = model.selectedTransition.second,
+          animationSpec = animation ?: defaultBackstackAnimation(),
+          onTransitionStarting = { from, to, direction ->
+            println(
+              """
+                Transitioning $direction:
+                  from: $from
+                    to: $to
+              """.trimIndent()
+            )
+          },
+          onTransitionFinished = { println("Transition finished.") }
+        ).xrayed(model.inspectionEnabled),
         modifier = Modifier
           .fillMaxSize()
           .border(width = 3.dp, color = Color.Red),
-        inspectionParams = inspectionParams,
-        onTransitionStarting = { from, to, direction ->
-          println(
-            """
-              Transitioning $direction:
-                from: $from
-                  to: $to
-            """.trimIndent()
-          )
-        },
-          onTransitionFinished = { println("Transition finished.") }
       ) { screen ->
         AppScreen(
             name = screen,
@@ -178,7 +178,6 @@ private fun AppScreens(model: AppModel) {
       }
     }
   }
-}
 
 @Composable
 private fun RadioButton(

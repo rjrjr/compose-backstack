@@ -14,15 +14,9 @@ android {
 }
 
 dependencies {
-  compileOnly(Dependencies.Compose.tooling)
-
   api(project(":compose-backstack"))
-  api(project(":compose-backstack-xray"))
 
-  implementation(Dependencies.AndroidX.appcompat)
-  implementation(Dependencies.Compose.icons)
   implementation(Dependencies.Compose.foundation)
-  implementation(Dependencies.Compose.material)
   implementation(Dependencies.Compose.tooling)
 
   testImplementation(Dependencies.Test.junit)

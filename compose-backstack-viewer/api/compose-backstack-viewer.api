@@ -2,13 +2,6 @@ public final class com/zachklipp/compose/backstack/viewer/BackstackViewerAppKt {
 	public static final fun BackstackViewerApp (Ljava/util/List;Ljava/util/List;Landroidx/compose/runtime/Composer;II)V
 }
 
-public final class com/zachklipp/compose/backstack/viewer/BuildConfig {
-	public static final field BUILD_TYPE Ljava/lang/String;
-	public static final field DEBUG Z
-	public static final field LIBRARY_PACKAGE_NAME Ljava/lang/String;
-	public fun <init> ()V
-}
-
 public final class com/zachklipp/compose/backstack/viewer/ComposableSingletons$AppScreenKt {
 	public static final field INSTANCE Lcom/zachklipp/compose/backstack/viewer/ComposableSingletons$AppScreenKt;
 	public static field lambda-1 Lkotlin/jvm/functions/Function2;

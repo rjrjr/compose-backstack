@@ -1,0 +1,7 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.zachklipp.compose.backstack.xray.test">
+
+    <application>
+        <activity android:name="android.app.Activity" android:theme="@style/TestTheme"/>
+    </application>
+</manifest>
