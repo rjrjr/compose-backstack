@@ -17,7 +17,7 @@ The entry point to the library is the `Backstack` composable. It essentially loo
 ```kotlin
 @Composable fun <T : Any> Backstack(
     backstack: List<T>,
-    drawScreen: @Composable() (T) -> Unit
+    content: @Composable() (T) -> Unit
 )
 ```
 
@@ -45,7 +45,7 @@ details!
  )
 
  @Composable fun App() {
-   var backstack by state { listOf(Screen.ContactList) }
+   var backstack: List<Screen> by remember { mutableStateOf(listOf(Screen.ContactList)) }
    val navigator = remember {
      Navigator(
        push = { backstack += it },
@@ -69,21 +69,18 @@ Transitions between screens are defined by implementing the `BackstackTransition
 passing the implementation to the `Backstack` composable. This interface has a single method:
 
 ```kotlin
-fun modifierForScreen(
-    visibility: Float,
+fun Modifier.modifierForScreen(
+    visibility: State<Float>,
     isTop: Boolean
 ): Modifier
 ```
 
-The `modifierForScreen` method is called for every screen in the backstack (even ones that are
-completely hidden), and must return a [`Modifier`](https://developer.android.com/reference/kotlin/androidx/ui/core/Modifier)
+The `modifierForScreen` method is called for every active/visible screen in the backstack, and must return a [`Modifier`](https://developer.android.com/reference/kotlin/androidx/ui/core/Modifier)
 that will be applied to the entire screen. Compose has many `Modifier`s built-in, which can be used
 to do a wide variety of visual transformations such as adjust position, size, transparency, etc.
 
-When not currently transitioning, `visibility` will be 0 for all screens except the top one, for
-which `visibility` will be 1. When animating between two screens, `visibility` will be somewhere
-between 0 and 1 for both the top screen and the screen immediately under the top one. The visibility
-of all other screens in the stack will continue to be 0.
+When animating between two screens, `visibility` will be somewhere
+between 0 and 1 for both the top screen and the screen immediately under the top one.
 
 The `isTop` flag indicates if the returned modifier will be applied to the top screen or not, and
 can be used to display a different animation for the top vs under-top screens. For example, the
@@ -101,16 +98,15 @@ below.
 
 ## Inspecting the backstack
 
-The `Backstack` composable takes an optional `InspectionParams` parameter. When not null, the entire
-backstack will be rendered as a translucent 3D stack. The top-most screen in the stack will still
-be rendered in its regular position, but with a very low opacity, and will still be interactive. The
-`BackstackInspectorParams` controls how the stack is rendered, including rotation, scaling,
-opacity, etc.
-
-You can wrap your `Backstack` with the `InspectionGestureDetector` composable to automatically
-control the inspector mode using touch gestures.
+The `compose-backstack-xray` gives you a single extension function: `FrameController.xrayed(Boolean)`. This function returns a `FrameController` that will wrap its receiver and, when passed `true`, display it in an interactive, translucent, pseudo-3D stack – similar to Android Studio's Layout Inspector.
+The top-most screen in the stack will still
+be rendered in its regular position, but with a very low opacity, and will still be interactive.
 
 ![Backstack inspector](.images/inspector.gif)
+
+## Advanced usage: `FrameController`
+
+Both transition animations and the xray tool are implemented via the `FrameController` API. This is the lowest-level way to plug into the `Backstack` function. More advanced features (e.g. stack peeking like the iOS back gesture) can be implemented by writing custom `FrameController`s. For more information, see the kdoc in the source: [`FrameController.kt`](compose-backstack/src/main/java/com/zachklipp/compose/backstack/FrameController.kt).
 
 ## Samples
 
