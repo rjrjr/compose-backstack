@@ -5,10 +5,11 @@ package com.zachklipp.compose.backstack.viewer
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -26,7 +27,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
 
 @Preview
 @Composable
@@ -62,35 +62,32 @@ internal fun <T : Any> Spinner(
 
   var isOpen by remember { mutableStateOf(false) }
 
-  // Always draw the selected item.
-  Row(Modifier.clickable(onClick = { isOpen = !isOpen })) {
-    Box(modifier = Modifier
-      .weight(1f)
-      .align(Alignment.CenterVertically)) {
-      drawItem(selectedItem)
+  Box {
+    // Always draw the selected item.
+    Row(Modifier.clickable(onClick = { isOpen = !isOpen })) {
+      Box(
+        modifier = Modifier
+          .weight(1f)
+          .align(Alignment.CenterVertically)
+      ) {
+        drawItem(selectedItem)
+      }
+      Icon(
+        Icons.Default.ArrowDropDown,
+        contentDescription = "Open spinner",
+        modifier = Modifier
+          .width(48.dp)
+          .aspectRatio(1f)
+      )
     }
-    Icon(
-      Icons.Default.ArrowDropDown,
-      contentDescription = "Open spinner",
-      modifier = Modifier
-        .width(48.dp)
-        .aspectRatio(1f)
-    )
-  }
 
-  if (isOpen) {
-    // TODO use DropdownPopup.
-    Dialog(onDismissRequest = { isOpen = false }) {
-      Surface(elevation = 1.dp) {
-        Column {
-          for (item in items) {
-            Box(Modifier.clickable(onClick = {
-                isOpen = false
-                if (item != selectedItem) onSelected(item)
-            })) {
-              drawItem(item)
-            }
-          }
+    DropdownMenu(expanded = isOpen, onDismissRequest = { isOpen = false }) {
+      for (item in items) {
+        DropdownMenuItem(onClick = {
+          isOpen = false
+          if (item != selectedItem) onSelected(item)
+        }) {
+          drawItem(item)
         }
       }
     }
