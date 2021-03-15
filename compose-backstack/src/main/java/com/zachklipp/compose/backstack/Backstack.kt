@@ -65,7 +65,7 @@ enum class TransitionDirection {
  * )
  *
  * @Composable fun App() {
- *   var backstack by remember { mutableStateOf(listOf(Screen.ContactList)) }
+ *   var backstack: List<Screen> by remember { mutableStateOf(listOf(Screen.ContactList)) }
  *   val navigator = remember {
  *     Navigator(
  *       push = { backstack += it },
