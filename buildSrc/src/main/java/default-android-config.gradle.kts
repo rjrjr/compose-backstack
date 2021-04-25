@@ -29,7 +29,6 @@ configure<BaseExtension> {
   }
 
   composeOptions {
-    kotlinCompilerVersion = Versions.kotlin
     kotlinCompilerExtensionVersion = Versions.compose
   }
 
