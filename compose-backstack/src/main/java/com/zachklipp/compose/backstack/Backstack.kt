@@ -8,9 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.SaveableStateHolder
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.RectangleShape
@@ -99,8 +97,7 @@ fun <T : Any> Backstack(
   frameController: FrameController<T>,
   content: @Composable (T) -> Unit
 ) {
-  val stateHolder = rememberSaveableStateHolder()
-  val stateCustodian = remember { BackstackStateCustodian(stateHolder) }
+  val stateHolder = rememberSaveableScreenStateHolder<T>()
 
   // Notify the frame controller that the backstack has changed to allow it to do stuff like start
   // animating transitions. This call should eventually cause activeFrames to change, but that might
@@ -113,25 +110,17 @@ fun <T : Any> Backstack(
   // updates.
   frameController.updateBackstack(backstack)
 
-  // Remove stale state from keys no longer in the backstack, but only once the composition has been
-  // committed.
-  SideEffect {
-    stateCustodian.removeStaleKeys(backstack)
-  }
-
   // Actually draw the screens.
   Box(modifier = modifier.clip(RectangleShape)) {
     // The frame controller is in complete control of what we actually show. The activeFrames
     // property should be backed by a snapshot state object, so this will recompose automatically
     // if the controller changes its frames.
     frameController.activeFrames.forEach { (item, frameControlModifier) ->
-      // Key is a convenience helper that treats its arguments as @Pivotal. This is how state
-      // preservation is implemented. Even if screens are moved around within the list, as long
-      // as they're invoked through the exact same sequence of source locations from within this
-      // key lambda, they will keep their state.
+      // Even if screens are moved around within the list, as long as they're invoked through the
+      // exact same sequence of source locations from within this key lambda, they will keep their
+      // state.
       key(item) {
-        // This function will automatically save and restore saveable state when it's skipped or
-        // composed again.
+        // This call must be inside the key(){} wrapper.
         stateHolder.SaveableStateProvider(item) {
           Box(frameControlModifier) {
             content(item)
@@ -139,6 +128,12 @@ fun <T : Any> Backstack(
         }
       }
     }
+  }
+
+  // Remove stale state from keys no longer in the backstack, but only once the composition has
+  // successfully completed.
+  SideEffect {
+    stateHolder.removeStaleKeys(backstack)
   }
 }
 
@@ -179,19 +174,4 @@ fun <T : Any> Backstack(
   drawScreen: @Composable (T) -> Unit
 ) {
   throw UnsupportedOperationException("This function exists only for migration assistance.")
-}
-
-/**
- * Wrapper around a [SaveableStateHolder] that removes keys after they're removed from the
- * backstack.
- */
-private class BackstackStateCustodian(private val holder: SaveableStateHolder) {
-
-  private var knownKeys = emptySet<Any>()
-
-  fun removeStaleKeys(backstack: List<Any>) {
-    val staleKeys = knownKeys - backstack
-    knownKeys = backstack.toSet()
-    staleKeys.forEach(holder::removeState)
-  }
 }

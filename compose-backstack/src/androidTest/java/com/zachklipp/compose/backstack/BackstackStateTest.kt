@@ -10,9 +10,11 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.junit4.AndroidComposeTestRule
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.test.ext.junit.rules.ActivityScenarioRule
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
@@ -134,5 +136,35 @@ class BackstackStateTest {
     compose.waitForIdle()
 
     assertThat(transcript).containsExactly("-two", "+one")
+  }
+
+  @Test fun screen_state_is_restored_when_not_bundleable() {
+    data class Screen(val name: String)
+
+    val backstack = mutableStateListOf(Screen("one"))
+    compose.setContent {
+      Backstack(backstack, frameController = NoopFrameController()) {
+        var counter by rememberSaveable { mutableStateOf(0) }
+        BasicText("${it.name}: $counter", Modifier.clickable { counter++ })
+      }
+    }
+
+    // Update some state on the first screen.
+    compose.onNodeWithText("one: 0").assertIsDisplayed().performClick()
+    compose.onNodeWithText("one: 1").assertIsDisplayed()
+
+    // Navigate forward to another screen.
+    backstack += Screen("two")
+    compose.waitForIdle()
+
+    compose.onNodeWithText("one", substring = true).assertDoesNotExist()
+    compose.onNodeWithText("two: 0").assertIsDisplayed()
+
+    // Navigate back.
+    backstack -= Screen("two")
+    compose.waitForIdle()
+
+    // Make sure the state was restored.
+    compose.onNodeWithText("one: 1").assertIsDisplayed()
   }
 }
