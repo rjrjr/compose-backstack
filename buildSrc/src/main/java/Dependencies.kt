@@ -1,19 +1,9 @@
-import org.jetbrains.kotlin.gradle.utils.loadPropertyFromResources
-
 object Versions {
-  private const val versionsFile = "versions.properties"
-
   const val targetSdk = 29
-  val agp = loadPropertyFromResources(versionsFile, "androidGradlePluginVersion")
-  private val composeDev = loadPropertyFromResources(versionsFile, "composeDevVersion")
-  val compose = "1.0.0-$composeDev"
-  val kotlin = loadPropertyFromResources(versionsFile, "kotlinVersion")
-  val dokka = loadPropertyFromResources(versionsFile, "dokkaVersion")
+  const val compose = "1.0.0-beta05"
 }
 
 object Dependencies {
-  val androidGradlePlugin = "com.android.tools.build:gradle:${Versions.agp}"
-
   object AndroidX {
     const val appcompat = "androidx.appcompat:appcompat:1.3.0-beta01"
 
@@ -25,19 +15,17 @@ object Dependencies {
 
   object Compose {
     const val activity = "androidx.activity:activity-compose:1.3.0-alpha02"
-    val foundation = "androidx.compose.foundation:foundation:${Versions.compose}"
-    val icons = "androidx.compose.material:material-icons-extended:${Versions.compose}"
-    val material = "androidx.compose.material:material:${Versions.compose}"
-    val test = "androidx.compose.ui:ui-test-junit4:${Versions.compose}"
-    val tooling = "androidx.compose.ui:ui-tooling:${Versions.compose}"
-    val util = "androidx.compose.ui:ui-util:${Versions.compose}"
+    const val foundation = "androidx.compose.foundation:foundation:${Versions.compose}"
+    const val icons = "androidx.compose.material:material-icons-extended:${Versions.compose}"
+    const val material = "androidx.compose.material:material:${Versions.compose}"
+    const val test = "androidx.compose.ui:ui-test-junit4:${Versions.compose}"
+    const val tooling = "androidx.compose.ui:ui-tooling:${Versions.compose}"
+    const val util = "androidx.compose.ui:ui-util:${Versions.compose}"
   }
 
   object Kotlin {
     const val binaryCompatibilityValidatorPlugin =
       "org.jetbrains.kotlinx:binary-compatibility-validator:0.2.3"
-    val dokka = "org.jetbrains.dokka:dokka-gradle-plugin:${Versions.dokka}"
-    val gradlePlugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:${Versions.kotlin}"
 
     object Test {
       const val common = "org.jetbrains.kotlin:kotlin-test-common"
