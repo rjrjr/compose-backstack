@@ -47,13 +47,13 @@ import com.zachklipp.compose.backstack.rememberTransitionController
 import com.zachklipp.compose.backstack.xray.xrayed
 
 private val DEFAULT_BACKSTACKS = listOf(
-    listOf("one"),
-    listOf("one", "two"),
-    listOf("one", "two", "three")
+  listOf("one"),
+  listOf("one", "two"),
+  listOf("one", "two", "three")
 )
 
 private val BUILTIN_BACKSTACK_TRANSITIONS = listOf(Slide, Crossfade)
-    .map { Pair(it::class.java.simpleName, it) }
+  .map { Pair(it::class.java.simpleName, it) }
 
 @Preview
 @Composable
@@ -86,8 +86,8 @@ fun BackstackViewerApp(
   prefabBackstacks: List<List<String>>? = null
 ) = key(namedCustomTransitions, prefabBackstacks) {
   val model = AppModel.create(
-      namedTransitions = namedCustomTransitions + BUILTIN_BACKSTACK_TRANSITIONS,
-      prefabBackstacks = (prefabBackstacks?.takeUnless { it.isEmpty() } ?: DEFAULT_BACKSTACKS)
+    namedTransitions = namedCustomTransitions + BUILTIN_BACKSTACK_TRANSITIONS,
+    prefabBackstacks = (prefabBackstacks?.takeUnless { it.isEmpty() } ?: DEFAULT_BACKSTACKS)
   )
 
   // When we're on the first screen, let the activity handle the back press.
@@ -114,9 +114,9 @@ fun BackstackViewerApp(
 @Composable
 private fun AppControls(model: AppModel) {
   Spinner(
-      items = model.namedTransitions.map { it.first },
-      selectedItem = model.selectedTransition.first,
-      onSelected = { model.selectTransition(it) }
+    items = model.namedTransitions.map { it.first },
+    selectedItem = model.selectedTransition.first,
+    onSelected = { model.selectTransition(it) }
   ) {
     ListItem(text = { Text("$it Transition") })
   }
@@ -134,9 +134,9 @@ private fun AppControls(model: AppModel) {
   Column {
     model.prefabBackstacks.forEach { backstack ->
       RadioButton(
-          text = backstack.joinToString(", "),
-          selected = backstack == model.currentBackstack,
-          onSelect = { model.currentBackstack = backstack }
+        text = backstack.joinToString(", "),
+        selected = backstack == model.currentBackstack,
+        onSelect = { model.currentBackstack = backstack }
       )
     }
   }
@@ -149,35 +149,35 @@ private fun AppScreens(model: AppModel) {
   } else null
 
   MaterialTheme(colors = lightColors()) {
-      Backstack(
-        backstack = model.currentBackstack,
-        frameController = rememberTransitionController<String>(
-          transition = model.selectedTransition.second,
-          animationSpec = animation ?: defaultBackstackAnimation(),
-          onTransitionStarting = { from, to, direction ->
-            println(
-              """
+    Backstack(
+      backstack = model.currentBackstack,
+      frameController = rememberTransitionController<String>(
+        transition = model.selectedTransition.second,
+        animationSpec = animation ?: defaultBackstackAnimation(),
+        onTransitionStarting = { from, to, direction ->
+          println(
+            """
                 Transitioning $direction:
                   from: $from
                     to: $to
               """.trimIndent()
-            )
-          },
-          onTransitionFinished = { println("Transition finished.") }
-        ).xrayed(model.inspectionEnabled),
-        modifier = Modifier
-          .fillMaxSize()
-          .border(width = 3.dp, color = Color.Red),
-      ) { screen ->
-        AppScreen(
-            name = screen,
-            showBack = screen != model.bottomScreen,
-            onAdd = { model.pushScreen("$screen+") },
-            onBack = model::popScreen
-        )
-      }
+          )
+        },
+        onTransitionFinished = { println("Transition finished.") }
+      ).xrayed(model.inspectionEnabled),
+      modifier = Modifier
+        .fillMaxSize()
+        .border(width = 3.dp, color = Color.Red),
+    ) { screen ->
+      AppScreen(
+        name = screen,
+        showBack = screen != model.bottomScreen,
+        onAdd = { model.pushScreen("$screen+") },
+        onBack = model::popScreen
+      )
     }
   }
+}
 
 @Composable
 private fun RadioButton(
@@ -190,10 +190,7 @@ private fun RadioButton(
       .selectable(
         selected = selected,
         onClick = { if (!selected) onSelect() }
-      )
-      .semantics {
-        this.text = buildAnnotatedString { append(text) }
-      },
+      ),
     content = {
       Box {
         Row(
@@ -230,8 +227,8 @@ private fun OnBackPressed(onPressed: () -> Unit) {
 
 private tailrec fun Context.findComponentActivity(): ComponentActivity? {
   return when (this) {
-      is ComponentActivity -> this
-      is ContextWrapper -> baseContext.findComponentActivity()
+    is ComponentActivity -> this
+    is ContextWrapper -> baseContext.findComponentActivity()
     else -> null
   }
 }
