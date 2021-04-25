@@ -1,9 +1,7 @@
 plugins {
   id("com.android.library")
   id("default-android-config")
-  kotlin("android")
-  id("org.jetbrains.dokka")
-  id("publish-to-maven")
+  id("release-config")
 }
 
 android {

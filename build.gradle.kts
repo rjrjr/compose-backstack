@@ -9,10 +9,7 @@ buildscript {
   }
 
   dependencies {
-    classpath(Dependencies.androidGradlePlugin)
     classpath(Dependencies.Kotlin.binaryCompatibilityValidatorPlugin)
-    classpath(Dependencies.Kotlin.dokka)
-    classpath(Dependencies.Kotlin.gradlePlugin)
     classpath(Dependencies.ktlint)
   }
 }
