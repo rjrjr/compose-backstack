@@ -1,10 +1,13 @@
 package com.zachklipp.compose.backstack
 
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import com.zachklipp.compose.backstack.FrameController.BackstackFrame
 
@@ -25,17 +28,23 @@ interface FrameController<T : Any> {
    * The frames that are currently being active. All active frames will be composed. When a frame
    * that is in the backstack stops appearing in this list, its state will be saved.
    *
-   * Should be backed by either a `MutableState<List<T>>` or a `MutableStateList<T>`. This property
+   * Should be backed by either a [MutableState] or a [SnapshotStateList]. This property
    * will not be read until after [updateBackstack] is called at least once.
    */
   val activeFrames: List<BackstackFrame<T>>
 
   /**
-   * Notifies the controller that a new backstack was passed in. This should probably result in the
+   * Notifies the controller that a new backstack was passed in. This method must initialize
+   * [activeFrames] first time it's called, and subsequently should probably result in
    * [activeFrames] being updated to show new keys or hide old ones, although the controller may
    * choose to do that later (e.g. if one of the active frames is currently being animated).
    *
-   * [keys] will always contain at least one element.
+   * This method will be called _directly from the composition_ – it must not perform side effects
+   * or update any state that is not backed by snapshot state objects (such as [MutableState]s,
+   * lists created by [mutableStateListOf], etc.).
+   *
+   * @param keys The latest backstack passed to [Backstack]. Will always contain at least one
+   * element.
    */
   fun updateBackstack(keys: List<T>)
 
