@@ -22,8 +22,8 @@ class DefaultAndroidConfigPlugin : Plugin<Project> {
       }
 
       defaultConfig {
-        minSdkVersion(21)
-        targetSdkVersion(Versions.targetSdk)
+        minSdk = 21
+        targetSdk = Versions.targetSdk
         versionCode = 1
         versionName = "1.0"
 
