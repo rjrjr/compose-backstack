@@ -1,6 +1,14 @@
 Changelog
 =========
 
+## v0.9.0+beta07
+
+_2021-05-19_
+
+ * Upgrade: Compose to beta07. (#55, #59)
+ * Fix state saving for screens that are not saveable/bundleable. (#57)
+ * Fix TransitionController to no longer perform side effects directly in composition. (#58)
+
 ## v0.8.0+beta02
 
 _2021-03-15_
