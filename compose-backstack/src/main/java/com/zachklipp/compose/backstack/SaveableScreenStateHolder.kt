@@ -7,6 +7,7 @@ import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.SaveableStateHolder
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
+import androidx.compose.ui.layout.SubcomposeLayout
 
 @Composable internal fun <T> rememberSaveableScreenStateHolder(): SaveableScreenStateHolder<T> {
   val stateHolder = rememberSaveableStateHolder()
@@ -62,7 +63,9 @@ internal class SaveableScreenStateHolder<T>(private val holder: SaveableStateHol
     // composed again. We have to use the compose-generated int stateKey, even though this function
     // accepts Any, because it doesn't _actually_ accept Any – it only accepts values that are
     // saveable, and the backstack item may not be saveable.
-    holder.SaveableStateProvider(stateKey, content)
+    holder.SaveableStateProvider(stateKey) {
+      WorkaroundComposeStateBug(content)
+    }
   }
 
   /**
@@ -79,6 +82,20 @@ internal class SaveableScreenStateHolder<T>(private val holder: SaveableStateHol
           holder.removeState(stateKey)
           remove()
         }
+      }
+    }
+  }
+
+  /**
+   * TODO Remove this when the bug is fixed.
+   * See https://issuetracker.google.com/issues/188567661#comment2.
+   */
+  @Composable private fun WorkaroundComposeStateBug(content: @Composable () -> Unit) {
+    SubcomposeLayout { constraints ->
+      val measurable = subcompose(Unit, content).single()
+      val placeable = measurable.measure(constraints)
+      layout(placeable.width, placeable.height) {
+        placeable.placeRelative(0, 0)
       }
     }
   }
