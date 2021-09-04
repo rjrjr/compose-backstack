@@ -1,11 +1,11 @@
 object Versions {
-  const val targetSdk = 29
-  const val compose = "1.0.0-beta07"
+  const val targetSdk = 30
+  const val compose = "1.0.1"
 }
 
 object Dependencies {
   object AndroidX {
-    const val appcompat = "androidx.appcompat:appcompat:1.3.0"
+    const val appcompat = "androidx.appcompat:appcompat:1.3.1"
 
     // Note that we're not using the actual androidx material dep yet, it's still alpha.
     const val material = "com.google.android.material:material:1.1.0"
@@ -14,7 +14,7 @@ object Dependencies {
   }
 
   object Compose {
-    const val activity = "androidx.activity:activity-compose:1.3.0-alpha08"
+    const val activity = "androidx.activity:activity-compose:1.3.1"
     const val foundation = "androidx.compose.foundation:foundation:${Versions.compose}"
     const val icons = "androidx.compose.material:material-icons-extended:${Versions.compose}"
     const val material = "androidx.compose.material:material:${Versions.compose}"
@@ -25,7 +25,7 @@ object Dependencies {
 
   object Kotlin {
     const val binaryCompatibilityValidatorPlugin =
-      "org.jetbrains.kotlinx:binary-compatibility-validator:0.2.3"
+      "org.jetbrains.kotlinx:binary-compatibility-validator:0.7.1"
 
     object Test {
       const val common = "org.jetbrains.kotlin:kotlin-test-common"
