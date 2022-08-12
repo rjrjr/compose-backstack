@@ -33,9 +33,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.text
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.zachklipp.compose.backstack.Backstack
@@ -67,7 +64,7 @@ private fun BackstackViewerAppPreview() {
  *
  * This composable can be used to interact with your own custom transitions. It lets the user select
  * from the available transitions, and then toggle between various pre-defined backstacks. The
- * backstacks are simply strings, and each string will be rendered as a Material [Scaffold] with
+ * backstacks are simply strings, and each string will be rendered as a Material `Scaffold` with
  * that string, and a counter value that will automatically increase over time, to demonstrate
  * state retention. The demo screens also allow the user to push additional copies of the current
  * screen to the backstack, or pop the current screen.
@@ -192,19 +189,20 @@ private fun RadioButton(
         onClick = { if (!selected) onSelect() }
       ),
     content = {
-      Box {
-        Row(
-          Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
-        ) {
-          RadioButton(selected = selected, onClick = onSelect)
-          Text(
-            text = text,
-            style = MaterialTheme.typography.body1.merge(other = LocalTextStyle.current),
-            modifier = Modifier.padding(start = 16.dp)
-          )
-        }
+      Row(
+        Modifier.fillMaxWidth()
+      ) {
+        RadioButton(
+          modifier = Modifier.align(Alignment.CenterVertically),
+          selected = selected,
+          onClick = onSelect
+        )
+        Text(
+          text = text,
+          style = MaterialTheme.typography.body1.merge(other = LocalTextStyle.current),
+          modifier = Modifier.align(Alignment.CenterVertically)
+            .padding(start = 16.dp)
+        )
       }
     }
   )

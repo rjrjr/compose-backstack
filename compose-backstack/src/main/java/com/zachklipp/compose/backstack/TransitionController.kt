@@ -84,8 +84,6 @@ internal class TransitionController<T : Any>(
     val popping: Boolean
   )
 
-  // These aren't MutableStates because they're only read when a backstack change happens. They
-  // don't need to trigger anything when they're changed.
   var transition: BackstackTransition? by mutableStateOf(null)
   var animationSpec: AnimationSpec<Float>? by mutableStateOf(null)
   var onTransitionStarting: ((from: List<T>, to: List<T>, TransitionDirection) -> Unit)?

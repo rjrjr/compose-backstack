@@ -1,6 +1,8 @@
 object Versions {
+  const val compileSdk = 31
+  const val minSdk = 21
   const val targetSdk = 30
-  const val compose = "1.0.1"
+  const val compose = "1.1.0"
 }
 
 object Dependencies {

@@ -1,5 +1,3 @@
-@file:Suppress("RemoveEmptyParenthesesFromAnnotationEntry", "DEPRECATION")
-
 package com.zachklipp.compose.backstack
 
 import android.annotation.SuppressLint

@@ -14,7 +14,7 @@ class DefaultAndroidConfigPlugin : Plugin<Project> {
     target.apply(plugin = "kotlin-android")
 
     target.configure<BaseExtension> {
-      compileSdkVersion(Versions.targetSdk)
+      compileSdkVersion(Versions.compileSdk)
 
       compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
@@ -22,7 +22,7 @@ class DefaultAndroidConfigPlugin : Plugin<Project> {
       }
 
       defaultConfig {
-        minSdk = 21
+        minSdk = Versions.minSdk
         targetSdk = Versions.targetSdk
         versionCode = 1
         versionName = "1.0"

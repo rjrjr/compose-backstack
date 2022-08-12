@@ -12,7 +12,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.RectangleShape
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlin.DeprecationLevel.ERROR
 
 /**
@@ -89,7 +88,6 @@ enum class TransitionDirection {
  * that takes a [BackstackTransition] instead.
  * @param content Called with each element of [backstack] to render it.
  */
-@OptIn(ExperimentalCoroutinesApi::class)
 @Composable
 fun <T : Any> Backstack(
   backstack: List<T>,
