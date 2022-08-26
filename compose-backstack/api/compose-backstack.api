@@ -1,8 +1,11 @@
+public abstract interface class com/zachklipp/compose/backstack/BackstackFrame {
+	public abstract fun Content (Landroidx/compose/runtime/Composer;I)V
+	public abstract fun getKey ()Ljava/lang/Object;
+}
+
 public final class com/zachklipp/compose/backstack/BackstackKt {
-	public static final fun Backstack (Ljava/util/List;Landroidx/compose/ui/Modifier;Lcom/zachklipp/compose/backstack/BackstackTransition;Landroidx/compose/animation/core/AnimationSpec;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function0;Ljava/lang/Object;Lkotlin/jvm/functions/Function3;)V
-	public static final fun Backstack (Ljava/util/List;Landroidx/compose/ui/Modifier;Lcom/zachklipp/compose/backstack/BackstackTransition;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;II)V
-	public static final fun Backstack (Ljava/util/List;Landroidx/compose/ui/Modifier;Lcom/zachklipp/compose/backstack/FrameController;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;II)V
-	public static synthetic fun Backstack$default (Ljava/util/List;Landroidx/compose/ui/Modifier;Lcom/zachklipp/compose/backstack/BackstackTransition;Landroidx/compose/animation/core/AnimationSpec;Lkotlin/jvm/functions/Function3;Lkotlin/jvm/functions/Function0;Ljava/lang/Object;Lkotlin/jvm/functions/Function3;ILjava/lang/Object;)V
+	public static final fun Backstack (Ljava/util/List;Landroidx/compose/ui/Modifier;Lcom/zachklipp/compose/backstack/BackstackTransition;Landroidx/compose/runtime/Composer;II)V
+	public static final fun Backstack (Ljava/util/List;Landroidx/compose/ui/Modifier;Lcom/zachklipp/compose/backstack/FrameController;Landroidx/compose/runtime/Composer;II)V
 }
 
 public abstract interface class com/zachklipp/compose/backstack/BackstackTransition {
@@ -30,15 +33,15 @@ public abstract interface class com/zachklipp/compose/backstack/FrameController 
 	public abstract fun updateBackstack (Ljava/util/List;)V
 }
 
-public final class com/zachklipp/compose/backstack/FrameController$BackstackFrame {
-	public fun <init> (Ljava/lang/Object;Landroidx/compose/ui/Modifier;)V
-	public synthetic fun <init> (Ljava/lang/Object;Landroidx/compose/ui/Modifier;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public final fun component1 ()Ljava/lang/Object;
+public final class com/zachklipp/compose/backstack/FrameController$FrameAndModifier {
+	public fun <init> (Lcom/zachklipp/compose/backstack/BackstackFrame;Landroidx/compose/ui/Modifier;)V
+	public synthetic fun <init> (Lcom/zachklipp/compose/backstack/BackstackFrame;Landroidx/compose/ui/Modifier;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Lcom/zachklipp/compose/backstack/BackstackFrame;
 	public final fun component2 ()Landroidx/compose/ui/Modifier;
-	public final fun copy (Ljava/lang/Object;Landroidx/compose/ui/Modifier;)Lcom/zachklipp/compose/backstack/FrameController$BackstackFrame;
-	public static synthetic fun copy$default (Lcom/zachklipp/compose/backstack/FrameController$BackstackFrame;Ljava/lang/Object;Landroidx/compose/ui/Modifier;ILjava/lang/Object;)Lcom/zachklipp/compose/backstack/FrameController$BackstackFrame;
+	public final fun copy (Lcom/zachklipp/compose/backstack/BackstackFrame;Landroidx/compose/ui/Modifier;)Lcom/zachklipp/compose/backstack/FrameController$FrameAndModifier;
+	public static synthetic fun copy$default (Lcom/zachklipp/compose/backstack/FrameController$FrameAndModifier;Lcom/zachklipp/compose/backstack/BackstackFrame;Landroidx/compose/ui/Modifier;ILjava/lang/Object;)Lcom/zachklipp/compose/backstack/FrameController$FrameAndModifier;
 	public fun equals (Ljava/lang/Object;)Z
-	public final fun getKey ()Ljava/lang/Object;
+	public final fun getFrame ()Lcom/zachklipp/compose/backstack/BackstackFrame;
 	public final fun getModifier ()Landroidx/compose/ui/Modifier;
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;

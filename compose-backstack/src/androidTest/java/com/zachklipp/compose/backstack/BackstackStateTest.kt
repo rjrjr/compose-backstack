@@ -10,11 +10,9 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.junit4.AndroidComposeTestRule
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import androidx.test.ext.junit.rules.ActivityScenarioRule
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
@@ -24,13 +22,15 @@ class BackstackStateTest {
   @get:Rule
   val compose = createComposeRule()
 
+  private fun List<String>.toCounters() = toBackstackModel {
+    var counter by rememberSaveable { mutableStateOf(0) }
+    BasicText("$it: $counter", Modifier.clickable { counter++ })
+  }
+
   @Test fun screen_state_is_restored_on_pop() {
     val backstack = mutableStateListOf("one")
     compose.setContent {
-      Backstack(backstack, frameController = NoopFrameController()) {
-        var counter by rememberSaveable { mutableStateOf(0) }
-        BasicText("$it: $counter", Modifier.clickable { counter++ })
-      }
+      Backstack(backstack.toCounters(), frameController = NoopFrameController())
     }
 
     // Update some state on the first screen.
@@ -55,10 +55,7 @@ class BackstackStateTest {
   @Test fun screen_state_is_discarded_after_pop() {
     val backstack = mutableStateListOf("one", "two")
     compose.setContent {
-      Backstack(backstack, frameController = NoopFrameController()) {
-        var counter by rememberSaveable { mutableStateOf(0) }
-        BasicText("$it: $counter", Modifier.clickable { counter++ })
-      }
+      Backstack(backstack.toCounters(), frameController = NoopFrameController())
     }
 
     // Update some state on the second screen.
@@ -78,10 +75,7 @@ class BackstackStateTest {
   @Test fun screen_state_is_discarded_when_removed_from_backstack_while_hidden() {
     var backstack by mutableStateOf(listOf("one"))
     compose.setContent {
-      Backstack(backstack, frameController = NoopFrameController()) {
-        var counter by rememberSaveable { mutableStateOf(0) }
-        BasicText("$it: $counter", Modifier.clickable { counter++ })
-      }
+      Backstack(backstack.toCounters(), frameController = NoopFrameController())
     }
 
     // Update some state on the first screen.
@@ -112,13 +106,16 @@ class BackstackStateTest {
     val backstack = mutableStateListOf("one")
     val transcript = mutableListOf<String>()
     compose.setContent {
-      Backstack(backstack, frameController = NoopFrameController()) {
-        BasicText(it)
-        DisposableEffect(Unit) {
-          transcript += "+$it"
-          onDispose { transcript += "-$it" }
-        }
-      }
+      Backstack(
+        backstack.toBackstackModel {
+          BasicText(it)
+          DisposableEffect(Unit) {
+            transcript += "+$it"
+            onDispose { transcript += "-$it" }
+          }
+        },
+        frameController = NoopFrameController()
+      )
     }
 
     assertThat(transcript).containsExactly("+one")
@@ -143,10 +140,13 @@ class BackstackStateTest {
 
     val backstack = mutableStateListOf(Screen("one"))
     compose.setContent {
-      Backstack(backstack, frameController = NoopFrameController()) {
-        var counter by rememberSaveable { mutableStateOf(0) }
-        BasicText("${it.name}: $counter", Modifier.clickable { counter++ })
-      }
+      Backstack(
+        backstack.toBackstackModel {
+          var counter by rememberSaveable { mutableStateOf(0) }
+          BasicText("${it.name}: $counter", Modifier.clickable { counter++ })
+        },
+        frameController = NoopFrameController()
+      )
     }
 
     // Update some state on the first screen.

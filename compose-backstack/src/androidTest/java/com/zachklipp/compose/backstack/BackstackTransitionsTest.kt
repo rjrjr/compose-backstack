@@ -63,10 +63,12 @@ class BackstackTransitionsTest {
     assertTransition(Crossfade, forward = false)
   }
 
+  private fun List<String>.toBackstack() = toBackstackModel { BasicText(it) }
+
   private fun assertInitialStateWithSingleScreen(transition: BackstackTransition) {
     val originalBackstack = listOf("one")
     compose.setContent {
-      Backstack(originalBackstack, transition = transition) { BasicText(it) }
+      Backstack(originalBackstack.toBackstack(), transition = transition)
     }
 
     compose.onNodeWithText("one").assertIsDisplayed()
@@ -75,7 +77,7 @@ class BackstackTransitionsTest {
   private fun assertInitialStateWithMultipleScreens(transition: BackstackTransition) {
     val originalBackstack = listOf("one", "two")
     compose.setContent {
-      Backstack(originalBackstack, transition = transition) { BasicText(it) }
+      Backstack(originalBackstack.toBackstack(), transition = transition)
     }
 
     compose.onNodeWithText("two").assertIsDisplayed()
@@ -87,15 +89,17 @@ class BackstackTransitionsTest {
     val secondBackstack = listOf("one", "two")
     var backstack by mutableStateOf(if (forward) firstBackstack else secondBackstack)
     compose.mainClock.autoAdvance = false
+
     compose.setContent {
       Backstack(
-        backstack,
+        backstack.toBackstack(),
         frameController = rememberTransitionController(
           animationSpec = animation,
           transition = transition
         )
-      ) { BasicText(it) }
+      )
     }
+
     val initialText = if (forward) "one" else "two"
     val newText = if (forward) "two" else "one"
 

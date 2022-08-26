@@ -12,8 +12,9 @@ import androidx.compose.ui.graphics.DefaultCameraDistance
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
+import com.zachklipp.compose.backstack.BackstackFrame
 import com.zachklipp.compose.backstack.FrameController
-import com.zachklipp.compose.backstack.FrameController.BackstackFrame
+import com.zachklipp.compose.backstack.FrameController.FrameAndModifier
 import com.zachklipp.compose.backstack.NoopFrameController
 import kotlin.math.sin
 
@@ -22,16 +23,16 @@ import kotlin.math.sin
  * the screens in the backstack in pseudo-3D space. The 3D stack can be navigated via touch
  * gestures.
  */
-@Composable fun <T : Any> FrameController<T>.xrayed(enabled: Boolean): FrameController<T> =
-  remember { XrayController<T>() }.also {
+@Composable fun <K : Any> FrameController<K>.xrayed(enabled: Boolean): FrameController<K> =
+  remember { XrayController<K>() }.also {
     it.enabled = enabled
     it.wrappedController = this
   }
 
-private class XrayController<T : Any> : FrameController<T> {
+private class XrayController<K : Any> : FrameController<K> {
 
   var enabled: Boolean by mutableStateOf(false)
-  var wrappedController: FrameController<T> by mutableStateOf(NoopFrameController())
+  var wrappedController: FrameController<K> by mutableStateOf(NoopFrameController())
 
   private var offsetDpX by mutableStateOf(500.dp)
   private var offsetDpY by mutableStateOf(10.dp)
@@ -41,7 +42,7 @@ private class XrayController<T : Any> : FrameController<T> {
   private var alpha by mutableStateOf(.4f)
   private var overlayAlpha by mutableStateOf(.2f)
 
-  private var activeKeys by mutableStateOf(emptyList<T>())
+  private var activeKeys by mutableStateOf(emptyList<BackstackFrame<K>>())
 
   private val controlModifier = Modifier.pointerInput(Unit) {
     detectTransformGestures { _, pan, zoom, _ ->
@@ -56,14 +57,14 @@ private class XrayController<T : Any> : FrameController<T> {
     if (!enabled) wrappedController.activeFrames else {
       activeKeys.mapIndexed { index, key ->
         val modifier = Modifier.modifierForFrame(index, activeKeys.size, 1f)
-        return@mapIndexed BackstackFrame(key, modifier)
+        return@mapIndexed FrameAndModifier(key, modifier)
       }
     }
   }
 
-  override fun updateBackstack(keys: List<T>) {
-    activeKeys = keys
-    wrappedController.updateBackstack(keys)
+  override fun updateBackstack(frames: List<BackstackFrame<K>>) {
+    activeKeys = frames
+    wrappedController.updateBackstack(frames)
   }
 
   /**
