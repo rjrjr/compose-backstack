@@ -12,6 +12,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.RectangleShape
+import com.zachklipp.compose.backstack.FrameController.BackstackFrame
 import kotlin.DeprecationLevel.ERROR
 
 /**
@@ -106,14 +107,16 @@ fun <T : Any> Backstack(
   // However, we do need to give the controller the chance to initialize itself with the initial
   // stack before we ask for its activeFrames, so this is a lazy way to do both that and subsequent
   // updates.
-  frameController.updateBackstack(backstack)
+  frameController.updateBackstack(backstack.map {
+    BackstackFrame(it) { content(it) }
+  })
 
   // Actually draw the screens.
   Box(modifier = modifier.clip(RectangleShape)) {
     // The frame controller is in complete control of what we actually show. The activeFrames
     // property should be backed by a snapshot state object, so this will recompose automatically
     // if the controller changes its frames.
-    frameController.activeFrames.forEach { (item, frameControlModifier) ->
+    frameController.activeFrames.forEach { (item, frameControlModifier, frameContent) ->
       // Even if screens are moved around within the list, as long as they're invoked through the
       // exact same sequence of source locations from within this key lambda, they will keep their
       // state.
@@ -121,7 +124,7 @@ fun <T : Any> Backstack(
         // This call must be inside the key(){} wrapper.
         stateHolder.SaveableStateProvider(item) {
           Box(frameControlModifier) {
-            content(item)
+            frameContent()
           }
         }
       }

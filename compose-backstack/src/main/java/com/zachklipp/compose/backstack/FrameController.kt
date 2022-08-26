@@ -1,5 +1,6 @@
 package com.zachklipp.compose.backstack
 
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.Stable
@@ -43,10 +44,10 @@ interface FrameController<T : Any> {
    * or update any state that is not backed by snapshot state objects (such as [MutableState]s,
    * lists created by [mutableStateListOf], etc.).
    *
-   * @param keys The latest backstack passed to [Backstack]. Will always contain at least one
+   * @param frames The latest backstack passed to [Backstack]. Will always contain at least one
    * element.
    */
-  fun updateBackstack(keys: List<T>)
+  fun updateBackstack(frames: List<BackstackFrame<T>>)
 
   /**
    * A frame controlled by a [FrameController], to be shown by [Backstack].
@@ -54,7 +55,8 @@ interface FrameController<T : Any> {
   @Immutable
   data class BackstackFrame<out T : Any>(
     val key: T,
-    val modifier: Modifier = Modifier
+    val modifier: Modifier = Modifier,
+    val content: @Composable () -> Unit
   )
 }
 
@@ -70,7 +72,7 @@ private object NoopFrameController : FrameController<Any> {
   override val activeFrames: List<BackstackFrame<Any>>
     get() = topFrame?.let { listOf(it) } ?: emptyList()
 
-  override fun updateBackstack(keys: List<Any>) {
-    topFrame = BackstackFrame(keys.last())
+  override fun updateBackstack(frames: List<BackstackFrame<Any>>) {
+    topFrame = frames.last()
   }
 }

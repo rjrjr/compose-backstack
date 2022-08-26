@@ -41,7 +41,7 @@ private class XrayController<T : Any> : FrameController<T> {
   private var alpha by mutableStateOf(.4f)
   private var overlayAlpha by mutableStateOf(.2f)
 
-  private var activeKeys by mutableStateOf(emptyList<T>())
+  private var _activeFrames by mutableStateOf(emptyList<BackstackFrame<T>>())
 
   private val controlModifier = Modifier.pointerInput(Unit) {
     detectTransformGestures { _, pan, zoom, _ ->
@@ -54,16 +54,16 @@ private class XrayController<T : Any> : FrameController<T> {
   // Use derivedStateOf to cache the mapped list.
   override val activeFrames by derivedStateOf {
     if (!enabled) wrappedController.activeFrames else {
-      activeKeys.mapIndexed { index, key ->
-        val modifier = Modifier.modifierForFrame(index, activeKeys.size, 1f)
-        return@mapIndexed BackstackFrame(key, modifier)
+      _activeFrames.mapIndexed { index, frame ->
+        val modifier = Modifier.modifierForFrame(index, _activeFrames.size, 1f)
+        return@mapIndexed frame.copy(modifier = modifier)
       }
     }
   }
 
-  override fun updateBackstack(keys: List<T>) {
-    activeKeys = keys
-    wrappedController.updateBackstack(keys)
+  override fun updateBackstack(frames: List<BackstackFrame<T>>) {
+    _activeFrames = frames
+    wrappedController.updateBackstack(frames)
   }
 
   /**
