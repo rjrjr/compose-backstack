@@ -83,19 +83,21 @@ class BackstackTransitionsTest {
   }
 
   private fun assertTransition(transition: BackstackTransition, forward: Boolean) {
-    val firstBackstack = listOf("one")
-    val secondBackstack = listOf("one", "two")
+    val firstBackstack = mapOf(1 to "one")
+    val secondBackstack = mapOf(1 to "one", 2 to "two")
     var backstack by mutableStateOf(if (forward) firstBackstack else secondBackstack)
     compose.mainClock.autoAdvance = false
+
     compose.setContent {
       Backstack(
-        backstack,
+        backstack.keys.toList(),
         frameController = rememberTransitionController(
           animationSpec = animation,
           transition = transition
         )
-      ) { BasicText(it) }
+      ) { BasicText(backstack.getValue(it)) }
     }
+
     val initialText = if (forward) "one" else "two"
     val newText = if (forward) "two" else "one"
 
