@@ -1,5 +1,6 @@
 package com.zachklipp.compose.backstack
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.MutableState
@@ -53,11 +54,17 @@ interface FrameController<T : Any> {
    * A frame controlled by a [FrameController], to be shown by [Backstack].
    */
   @Immutable
-  data class BackstackFrame<out T : Any>(
+  data class BackstackFrame<T : Any>(
     val key: T,
     val modifier: Modifier = Modifier,
-    val content: @Composable () -> Unit
-  )
+    val content: @Composable (T) -> Unit
+  ) {
+    @Composable fun Content() {
+      Box(modifier) {
+        content(key)
+      }
+    }
+  }
 }
 
 /**

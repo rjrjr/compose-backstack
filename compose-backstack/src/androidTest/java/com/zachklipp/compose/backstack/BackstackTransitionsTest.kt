@@ -89,13 +89,15 @@ class BackstackTransitionsTest {
     compose.mainClock.autoAdvance = false
 
     compose.setContent {
+      val capture = backstack
+
       Backstack(
-        backstack.keys.toList(),
+        capture.keys.toList(),
         frameController = rememberTransitionController(
           animationSpec = animation,
           transition = transition
         )
-      ) { BasicText(backstack.getValue(it)) }
+      ) { BasicText(capture.getValue(it)) }
     }
 
     val initialText = if (forward) "one" else "two"
