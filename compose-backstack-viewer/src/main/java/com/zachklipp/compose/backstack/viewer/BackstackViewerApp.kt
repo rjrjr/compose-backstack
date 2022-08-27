@@ -41,6 +41,7 @@ import com.zachklipp.compose.backstack.BackstackTransition.Crossfade
 import com.zachklipp.compose.backstack.BackstackTransition.Slide
 import com.zachklipp.compose.backstack.defaultBackstackAnimation
 import com.zachklipp.compose.backstack.rememberTransitionController
+import com.zachklipp.compose.backstack.toBackstackModel
 import com.zachklipp.compose.backstack.xray.xrayed
 
 private val DEFAULT_BACKSTACKS = listOf(
@@ -147,7 +148,14 @@ private fun AppScreens(model: AppModel) {
 
   MaterialTheme(colors = lightColors()) {
     Backstack(
-      backstack = model.currentBackstack,
+      frames = model.currentBackstack.toBackstackModel { screen ->
+        AppScreen(
+          name = screen,
+          showBack = screen != model.bottomScreen,
+          onAdd = { model.pushScreen("$screen+") },
+          onBack = model::popScreen
+        )
+      },
       frameController = rememberTransitionController<String>(
         transition = model.selectedTransition.second,
         animationSpec = animation ?: defaultBackstackAnimation(),
@@ -165,14 +173,7 @@ private fun AppScreens(model: AppModel) {
       modifier = Modifier
         .fillMaxSize()
         .border(width = 3.dp, color = Color.Red),
-    ) { screen ->
-      AppScreen(
-        name = screen,
-        showBack = screen != model.bottomScreen,
-        onAdd = { model.pushScreen("$screen+") },
-        onBack = model::popScreen
-      )
-    }
+    )
   }
 }
 

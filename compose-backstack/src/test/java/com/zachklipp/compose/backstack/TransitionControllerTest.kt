@@ -3,7 +3,7 @@ package com.zachklipp.compose.backstack
 import androidx.compose.animation.core.TweenSpec
 import com.google.common.truth.Truth.assertThat
 import com.zachklipp.compose.backstack.BackstackTransition.Crossfade
-import com.zachklipp.compose.backstack.FrameController.BackstackFrame
+import com.zachklipp.compose.backstack.FrameController.FrameAndModifier
 import kotlinx.coroutines.CoroutineScope
 import org.junit.Test
 import kotlin.coroutines.EmptyCoroutineContext
@@ -22,7 +22,8 @@ class TransitionControllerTest {
   }
 
   @Test fun `initial update sets activeFrames`() {
-    controller.updateBackstack(listOf("hello"))
-    assertThat(controller.activeFrames).containsExactly(BackstackFrame("hello"))
+    val frame = BackstackFrame("hello", "hello") {}
+    controller.updateBackstack(listOf(frame))
+    assertThat(controller.activeFrames).containsExactly(FrameAndModifier(frame))
   }
 }

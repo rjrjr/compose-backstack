@@ -2,7 +2,6 @@
 
 package com.zachklipp.compose.backstack
 
-import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
@@ -12,7 +11,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.RectangleShape
-import kotlin.DeprecationLevel.ERROR
 
 /**
  * Identifies which direction a transition is being performed in.
@@ -23,14 +21,14 @@ enum class TransitionDirection {
 }
 
 /**
- * Renders the top of a stack of screens (as [T]s) and animates between screens when the top
- * value changes. Any state used by a screen will be preserved as long as it remains in the stack
- * (i.e. result of [remember] calls).
+ * Renders the top of a stack of screens (modeled as [BackstackFrame]s with keys of type [K])
+ * and animates between screens when the top value changes. Any state used by a screen
+ * will be preserved as long as it remains in the stack (i.e. result of [remember] calls).
  *
- * The [backstack] must follow some rules:
+ * The [frames] list must follow some rules:
  *  - Must always contain at least one item.
- *  - Items in the stack must implement `equals` and not change over the lifetime of the screen.
- *    If an item changes, it will be considered a new screen and any state held by the screen will
+ *  - Keys must implement `equals` and cannot change over the lifetime of the screen.
+ *    If a key changes, it will be considered a new screen and any state held by the screen will
  *    be lost.
  *  - If items in the stack are reordered between compositions, the stack should not contain
  *    duplicates. If it does, due to how `@Pivotal` works, the states of those screens will be
@@ -70,32 +68,32 @@ enum class TransitionDirection {
  *     )
  *   }
  *
- *   Backstack(backstack) { screen ->
- *     when(screen) {
- *       Screen.ContactList -> ShowContactList(navigator)
- *       is Screen.ContactDetails -> ShowContact(screen.id, navigator)
- *       is Screen.EditContact -> ShowEditContact(screen.id, navigator)
+ *   Backstack(
+ *     backstack.toBackstackModel { screen ->
+ *       when(screen) {
+ *         Screen.ContactList -> ShowContactList(navigator)
+ *         is Screen.ContactDetails -> ShowContact(screen.id, navigator)
+ *         is Screen.EditContact -> ShowEditContact(screen.id, navigator)
+ *       }
  *     }
- *   }
+ *   )
  * }
  * ```
  *
- * @param backstack The stack of screen values.
+ * @param frames The stack of screen values.
  * @param modifier [Modifier] that will be applied to the container of screens. Neither affects nor
  * is affected by transition animations.
  * @param frameController The [FrameController] that manages things like transition animations.
  * Use [rememberTransitionController] for a reasonable default, or use the overload of this function
  * that takes a [BackstackTransition] instead.
- * @param content Called with each element of [backstack] to render it.
  */
 @Composable
-fun <T : Any> Backstack(
-  backstack: List<T>,
+fun <K : Any> Backstack(
+  frames: List<BackstackFrame<K>>,
   modifier: Modifier = Modifier,
-  frameController: FrameController<T>,
-  content: @Composable (T) -> Unit
+  frameController: FrameController<K>
 ) {
-  val stateHolder = rememberSaveableScreenStateHolder<T>()
+  val stateHolder = rememberSaveableScreenStateHolder<K>()
 
   // Notify the frame controller that the backstack has changed to allow it to do stuff like start
   // animating transitions. This call should eventually cause activeFrames to change, but that might
@@ -106,22 +104,22 @@ fun <T : Any> Backstack(
   // However, we do need to give the controller the chance to initialize itself with the initial
   // stack before we ask for its activeFrames, so this is a lazy way to do both that and subsequent
   // updates.
-  frameController.updateBackstack(backstack)
+  frameController.updateBackstack(frames)
 
   // Actually draw the screens.
   Box(modifier = modifier.clip(RectangleShape)) {
     // The frame controller is in complete control of what we actually show. The activeFrames
     // property should be backed by a snapshot state object, so this will recompose automatically
     // if the controller changes its frames.
-    frameController.activeFrames.forEach { (item, frameControlModifier) ->
+    frameController.activeFrames.forEach { (frame, frameControlModifier) ->
       // Even if screens are moved around within the list, as long as they're invoked through the
       // exact same sequence of source locations from within this key lambda, they will keep their
       // state.
-      key(item) {
+      key(frame.key) {
         // This call must be inside the key(){} wrapper.
-        stateHolder.SaveableStateProvider(item) {
+        stateHolder.SaveableStateProvider(frame.key) {
           Box(frameControlModifier) {
-            content(item)
+            frame.Content()
           }
         }
       }
@@ -131,45 +129,28 @@ fun <T : Any> Backstack(
   // Remove stale state from keys no longer in the backstack, but only once the composition has
   // successfully completed.
   SideEffect {
-    stateHolder.removeStaleKeys(backstack)
+    stateHolder.removeStaleKeys(frames.map { it.key })
   }
 }
 
 /**
- * Renders the top of a stack of screens (as [T]s) and animates between screens when the top
- * value changes. Any state used by a screen will be preserved as long as it remains in the stack
- * (i.e. result of [remember] calls).
+ * Renders the top of a stack of screens (modeled as [BackstackFrame]s with keys of type [K])
+ * and animates between screens when the top value changes. Any state used by a screen
+ * will be preserved as long as it remains in the stack (i.e. result of [remember] calls).
  *
  * See the documentation on [Backstack] for more information.
  *
- * @param backstack The stack of screen values.
+ * @param frames The stack of screen models.
  * @param modifier [Modifier] that will be applied to the container of screens. Neither affects nor
  * is affected by transition animations.
  * @param transition The [BackstackTransition] to use to animate screen transitions. For more,
  * call [rememberTransitionController] and pass it to the overload of this function that takes a
  * [FrameController] directly.
- * @param content Called with each element of [backstack] to render it.
  */
-@Composable fun <T : Any> Backstack(
-  backstack: List<T>,
+@Composable fun <K : Any> Backstack(
+  frames: List<BackstackFrame<K>>,
   modifier: Modifier = Modifier,
-  transition: BackstackTransition = BackstackTransition.Slide,
-  content: @Composable (T) -> Unit
+  transition: BackstackTransition = BackstackTransition.Slide
 ) {
-  Backstack(backstack, modifier, rememberTransitionController(transition), content)
-}
-
-@Suppress("DeprecatedCallableAddReplaceWith", "UNUSED_PARAMETER")
-@Deprecated("Use a different overload.", level = ERROR)
-fun <T : Any> Backstack(
-  backstack: List<T>,
-  modifier: Modifier = Modifier,
-  transition: BackstackTransition = BackstackTransition.Slide,
-  animationBuilder: AnimationSpec<Float>? = null,
-  onTransitionStarting: ((from: List<T>, to: List<T>, TransitionDirection) -> Unit)? = null,
-  onTransitionFinished: (() -> Unit)? = null,
-  inspectionParams: Any? = null,
-  drawScreen: @Composable (T) -> Unit
-) {
-  throw UnsupportedOperationException("This function exists only for migration assistance.")
+  Backstack(frames, modifier, rememberTransitionController(transition))
 }
