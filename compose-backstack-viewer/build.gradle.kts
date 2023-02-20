@@ -5,6 +5,9 @@ plugins {
 }
 
 android {
+  namespace = "com.zachklipp.compose.backstack.viewer"
+  testNamespace = "com.zachklipp.compose.backstack.viewer.test"
+
   lintOptions {
     // Workaround for lint bug.
     disable += "InvalidFragmentVersionForActivityResult"
@@ -12,6 +15,9 @@ android {
 }
 
 dependencies {
+  val composeBom = platform(Dependencies.Compose.bom)
+  implementation(composeBom)
+
   compileOnly(Dependencies.Compose.tooling)
 
   api(project(":compose-backstack"))
@@ -26,6 +32,7 @@ dependencies {
   testImplementation(Dependencies.Test.junit)
   testImplementation(Dependencies.Test.truth)
 
+  androidTestImplementation(composeBom)
   androidTestImplementation(Dependencies.AndroidX.junitExt)
   androidTestImplementation(Dependencies.Compose.test)
 }

@@ -1,7 +1,7 @@
 package com.zachklipp.compose.backstack
 
 import androidx.annotation.VisibleForTesting
-import androidx.annotation.VisibleForTesting.PRIVATE
+import androidx.annotation.VisibleForTesting.Companion.PRIVATE
 import androidx.compose.runtime.State
 import androidx.compose.ui.layout.LayoutModifier
 import androidx.compose.ui.layout.Measurable

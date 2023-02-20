@@ -5,6 +5,7 @@ plugins {
 }
 
 android {
+  namespace = "com.zachklipp.compose.backstack.sample"
   defaultConfig {
     applicationId = "com.zachklipp.compose.backstack.sample"
   }
@@ -15,6 +16,8 @@ android {
 }
 
 dependencies {
+  val composeBom = platform(Dependencies.Compose.bom)
+  implementation(composeBom)
   implementation(project(":compose-backstack-viewer"))
   implementation(Dependencies.AndroidX.appcompat)
   implementation(Dependencies.Compose.activity)
@@ -22,5 +25,6 @@ dependencies {
   implementation(Dependencies.Compose.util)
 
   androidTestImplementation(Dependencies.AndroidX.junitExt)
+  androidTestImplementation(composeBom)
   androidTestImplementation(Dependencies.Compose.test)
 }
