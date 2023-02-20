@@ -1,7 +1,7 @@
 object Versions {
-  const val compileSdk = 31
+  const val compileSdk = 33
   const val minSdk = 21
-  const val targetSdk = 30
+  const val targetSdk = 33
   const val composeCompiler = "1.4.2"
   const val composeBom = "2023.01.00"
 }

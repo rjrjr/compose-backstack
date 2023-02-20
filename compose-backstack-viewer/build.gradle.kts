@@ -5,6 +5,9 @@ plugins {
 }
 
 android {
+  namespace = "com.zachklipp.compose.backstack.viewer"
+  testNamespace = "com.zachklipp.compose.backstack.viewer.test"
+
   lintOptions {
     // Workaround for lint bug.
     disable += "InvalidFragmentVersionForActivityResult"

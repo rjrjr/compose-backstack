@@ -5,6 +5,7 @@ plugins {
 }
 
 android {
+  namespace = "com.zachklipp.compose.backstack.sample"
   defaultConfig {
     applicationId = "com.zachklipp.compose.backstack.sample"
   }

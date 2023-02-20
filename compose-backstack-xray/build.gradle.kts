@@ -5,6 +5,9 @@ plugins {
 }
 
 android {
+  namespace = "com.zachklipp.compose.backstack.xray"
+  testNamespace = "com.zachklipp.compose.backstack.xray.test"
+
   lintOptions {
     // Workaround for lint bug.
     disable += "InvalidFragmentVersionForActivityResult"

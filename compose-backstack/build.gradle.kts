@@ -4,6 +4,11 @@ plugins {
   id("release-config")
 }
 
+android {
+  namespace = "com.zachklipp.compose.backstack"
+  testNamespace = "com.zachklipp.compose.backstack.test"
+}
+
 dependencies {
   val composeBom = platform(Dependencies.Compose.bom)
   implementation(composeBom)
