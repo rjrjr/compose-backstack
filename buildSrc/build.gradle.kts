@@ -9,7 +9,7 @@ repositories {
 }
 
 dependencies {
-  implementation("com.android.tools.build:gradle:7.1.3")
+  implementation("com.android.tools.build:gradle:7.4.1")
   implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:1.6.10")
   implementation("org.jetbrains.dokka:dokka-gradle-plugin:1.6.10")
 }
