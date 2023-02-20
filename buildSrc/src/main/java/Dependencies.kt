@@ -2,12 +2,13 @@ object Versions {
   const val compileSdk = 31
   const val minSdk = 21
   const val targetSdk = 30
-  const val compose = "1.1.0"
+  const val composeCompiler = "1.4.2"
+  const val composeBom = "2023.01.00"
 }
 
 object Dependencies {
   object AndroidX {
-    const val appcompat = "androidx.appcompat:appcompat:1.3.1"
+    const val appcompat = "androidx.appcompat:appcompat:1.6.1"
 
     // Note that we're not using the actual androidx material dep yet, it's still alpha.
     const val material = "com.google.android.material:material:1.1.0"
@@ -16,13 +17,14 @@ object Dependencies {
   }
 
   object Compose {
-    const val activity = "androidx.activity:activity-compose:1.3.1"
-    const val foundation = "androidx.compose.foundation:foundation:${Versions.compose}"
-    const val icons = "androidx.compose.material:material-icons-extended:${Versions.compose}"
-    const val material = "androidx.compose.material:material:${Versions.compose}"
-    const val test = "androidx.compose.ui:ui-test-junit4:${Versions.compose}"
-    const val tooling = "androidx.compose.ui:ui-tooling:${Versions.compose}"
-    const val util = "androidx.compose.ui:ui-util:${Versions.compose}"
+    const val activity = "androidx.activity:activity-compose:1.6.1"
+    const val bom = "androidx.compose:compose-bom:${Versions.composeBom}"
+    const val foundation = "androidx.compose.foundation:foundation"
+    const val icons = "androidx.compose.material:material-icons-extended"
+    const val material = "androidx.compose.material:material"
+    const val test = "androidx.compose.ui:ui-test-junit4"
+    const val tooling = "androidx.compose.ui:ui-tooling"
+    const val util = "androidx.compose.ui:ui-util"
   }
 
   object Kotlin {

@@ -12,6 +12,9 @@ android {
 }
 
 dependencies {
+  val composeBom = platform(Dependencies.Compose.bom)
+  implementation(composeBom)
+
   compileOnly(Dependencies.Compose.tooling)
 
   api(project(":compose-backstack"))
@@ -26,6 +29,7 @@ dependencies {
   testImplementation(Dependencies.Test.junit)
   testImplementation(Dependencies.Test.truth)
 
+  androidTestImplementation(composeBom)
   androidTestImplementation(Dependencies.AndroidX.junitExt)
   androidTestImplementation(Dependencies.Compose.test)
 }

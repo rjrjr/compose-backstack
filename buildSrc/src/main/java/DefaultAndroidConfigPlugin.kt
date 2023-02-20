@@ -36,7 +36,7 @@ class DefaultAndroidConfigPlugin : Plugin<Project> {
       }
 
       composeOptions {
-        kotlinCompilerExtensionVersion = Versions.compose
+        kotlinCompilerExtensionVersion = Versions.composeCompiler
       }
 
       packagingOptions {

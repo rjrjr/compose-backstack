@@ -1,5 +1,4 @@
 import com.android.build.gradle.LibraryExtension
-import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaBasePlugin
@@ -42,18 +41,7 @@ class ReleaseConfigPlugin : Plugin<Project> {
     }
 
     target.afterEvaluate {
-      val composeVersion = target.configurations
-        .flatMap { configuration ->
-          configuration.dependencies.filter { dependency ->
-            "androidx.compose" in dependency.group.orEmpty()
-          }
-        }
-        .map { it.version }
-        .distinct()
-        .singleOrNull()
-        ?: throw GradleException("Found multiple Compose versions.")
-
-      target.version = "$releaseVersion+$composeVersion"
+      target.version = "$releaseVersion+${Versions.composeBom}"
         .let { if (isRelease) it else "$it-SNAPSHOT" }
 
       target.configure<PublishingExtension> {
