@@ -1,5 +1,5 @@
 **OBSOLETE**
-This was a nice existance proof but now we have [Compose Navigation 3](https://developer.android.com/guide/navigation/navigation-3), which rocks. Use that.
+This was a nice existence proof but now we have [Compose Navigation 3](https://developer.android.com/guide/navigation/navigation-3), which rocks. Use that.
 
 # compose-backstack
 [![Maven Central](https://img.shields.io/maven-central/v/com.zachklipp/compose-backstack.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:com.zachklipp%20a:compose-backstack)
