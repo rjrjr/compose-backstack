@@ -9,7 +9,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
-import com.zachklipp.compose.backstack.FrameController.BackstackFrame
+import com.zachklipp.compose.backstack.FrameController.FrameAndModifier
 
 /**
  * A stable object that processes changes to a [Backstack]'s list of screen keys, determining which
@@ -22,7 +22,7 @@ import com.zachklipp.compose.backstack.FrameController.BackstackFrame
  * for a while, even after they're removed from the backstack, in order to animate their removal.
  */
 @Stable
-interface FrameController<T : Any> {
+interface FrameController<K : Any> {
 
   /**
    * The frames that are currently being active. All active frames will be composed. When a frame
@@ -31,7 +31,7 @@ interface FrameController<T : Any> {
    * Should be backed by either a [MutableState] or a [SnapshotStateList]. This property
    * will not be read until after [updateBackstack] is called at least once.
    */
-  val activeFrames: List<BackstackFrame<T>>
+  val activeFrames: List<FrameAndModifier<K>>
 
   /**
    * Notifies the controller that a new backstack was passed in. This method must initialize
@@ -43,17 +43,17 @@ interface FrameController<T : Any> {
    * or update any state that is not backed by snapshot state objects (such as [MutableState]s,
    * lists created by [mutableStateListOf], etc.).
    *
-   * @param keys The latest backstack passed to [Backstack]. Will always contain at least one
+   * @param frames The latest backstack passed to [Backstack]. Will always contain at least one
    * element.
    */
-  fun updateBackstack(keys: List<T>)
+  fun updateBackstack(frames: List<BackstackFrame<K>>)
 
   /**
    * A frame controlled by a [FrameController], to be shown by [Backstack].
    */
   @Immutable
-  data class BackstackFrame<out T : Any>(
-    val key: T,
+  data class FrameAndModifier<out K : Any>(
+    val frame: BackstackFrame<K>,
     val modifier: Modifier = Modifier
   )
 }
@@ -62,15 +62,15 @@ interface FrameController<T : Any> {
  * Returns a [FrameController] that always just shows the top frame without any special effects.
  */
 @Suppress("UNCHECKED_CAST")
-fun <T : Any> NoopFrameController(): FrameController<T> = NoopFrameController as FrameController<T>
+fun <K : Any> NoopFrameController(): FrameController<K> = NoopFrameController as FrameController<K>
 
 private object NoopFrameController : FrameController<Any> {
-  private var topFrame by mutableStateOf<BackstackFrame<Any>?>(null)
+  private var topFrame by mutableStateOf<FrameAndModifier<Any>?>(null)
 
-  override val activeFrames: List<BackstackFrame<Any>>
+  override val activeFrames: List<FrameAndModifier<Any>>
     get() = topFrame?.let { listOf(it) } ?: emptyList()
 
-  override fun updateBackstack(keys: List<Any>) {
-    topFrame = BackstackFrame(keys.last())
+  override fun updateBackstack(frames: List<BackstackFrame<Any>>) {
+    topFrame = FrameAndModifier(frames.last())
   }
 }
